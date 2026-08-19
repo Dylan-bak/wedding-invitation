@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>우리 결혼합니다</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+/* 실측 문 좌표 (IMG_0668 원본 3200x4668 기준 %) */
+:root{
+  --img-w: 3200; --img-h: 4668;
+  --door-l: 20.219%;  --door-r: 74.469%;
+  --door-t: 9.747%;   --door-b: 68.123%;
+  --door-c: 50%;
+  --ink:#3a352f; --paper:#fbf9f6;
+  --p:0;            /* 스크롤 진행률 0~1 */
+  --theta:0deg;     /* 문 회전각 */
+  --flash:0;        /* 화이트아웃 */
+  --rise:1;         /* 다음 화면 상승 (1=아래, 0=제자리) */
+  --revealOp:0;
+  --zoom:1;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:"Noto Serif KR",serif; font-weight:300;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+
+/* 1) 문 열림 히어로 */
+.hero{height:460svh; position:relative}
+.hero__sticky{position:sticky; top:0; height:100svh; overflow:hidden}
+
+.stage{position:absolute; inset:0; perspective:1500px; perspective-origin:50% 42%; background:#000}
+
+/* 원본 사진 비율 박스를 cover 로 채움 → 자식은 % 좌표로 정확히 정렬 */
+.photo{
+  position:absolute; top:50%; left:50%;
+  width:max(100vw, calc(100svh * var(--img-w) / var(--img-h)));
+  aspect-ratio: var(--img-w) / var(--img-h);
+  transform:translate(-50%,-50%) scale(var(--zoom));
+  transform-style:preserve-3d; will-change:transform;
+}
+.photo__frame{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block}
+
+/* 문 뒤에서 새어나오는 빛 */
+.gate{
+  position:absolute;
+  left:var(--door-l); top:var(--door-t);
+  width:calc(var(--door-r) - var(--door-l));
+  height:calc(var(--door-b) - var(--door-t));
+  background:#fff url(assets/gate-bg.jpg) center/cover no-repeat;
+  overflow:hidden;
+}
+/* 문틈으로 새어나오는 빛 */
+.gate::after{content:""; position:absolute; inset:0;
+  background:radial-gradient(90% 60% at 50% 62%, rgba(255,255,255,.85) 0%, rgba(255,248,238,.35) 45%, rgba(255,255,255,0) 100%);}
+
+/* 문짝 2장 */
+.door{position:absolute; top:var(--door-t); height:calc(var(--door-b) - var(--door-t));
+  display:block; object-fit:fill; backface-visibility:hidden; will-change:transform;}
+.door--l{
+  left:var(--door-l); width:calc(var(--door-c) - var(--door-l));
+  transform-origin:left center;
+  transform:rotateY(var(--theta));
+  filter:brightness(calc(1 - var(--p)*0.35));
+}
+.door--r{
+  left:var(--door-c); width:calc(var(--door-r) - var(--door-c));
+  transform-origin:right center;
+  transform:rotateY(calc(-1 * var(--theta)));
+  filter:brightness(calc(1 - var(--p)*0.28));
+}
+
+/* 화이트아웃 */
+.flash{position:absolute; inset:0; background:#fff; opacity:var(--flash); pointer-events:none}
+
+/* 문 열리기 전 타이틀 */
+.hero__title{
+  position:absolute; inset:auto 0 12svh 0; text-align:center; color:#fff;
+  text-shadow:0 2px 24px rgba(0,0,0,.45);
+  opacity:clamp(0, calc(1 - var(--p) * 4), 1);
+}
+.hero__title .en{font-family:"Cormorant Garamond",serif; font-size:clamp(13px,3.4vw,18px); letter-spacing:.5em; opacity:.9}
+.hero__title .names{font-size:clamp(22px,6vw,34px); margin-top:.6em; letter-spacing:.18em}
+.hint{position:absolute; left:50%; bottom:4svh; translate:-50% 0; color:#fff; font-size:11px; letter-spacing:.35em;
+  opacity:clamp(0, calc(1 - var(--p) * 5), 1); animation:bob 1.8s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+
+/* 문 열린 뒤 아래에서 올라오는 화면 */
+.reveal{
+  position:absolute; inset:0; display:grid; place-items:center;
+  background:linear-gradient(180deg,#fff 0%, #fdfbf8 100%);
+  opacity:var(--revealOp);
+  transform:translateY(calc(var(--rise) * 34svh));
+  will-change:transform,opacity;
+}
+.reveal__inner{text-align:center; padding:0 28px}
+.reveal__photo{width:min(64vw,300px); aspect-ratio:3/4; object-fit:cover; border-radius:200px 200px 8px 8px;
+  box-shadow:0 18px 50px rgba(90,70,50,.18)}
+.reveal__cap{margin-top:26px; font-size:clamp(15px,4.2vw,19px); letter-spacing:.16em; line-height:2}
+.reveal__sub{margin-top:10px; font-family:"Cormorant Garamond",serif; font-style:italic; opacity:.6; letter-spacing:.12em}
+
+/* 2) 이후 섹션 */
+section.block{padding:14svh 24px; max-width:520px; margin:0 auto; text-align:center}
+.rv{opacity:0; transform:translateY(38px); transition:opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1)}
+.rv.on{opacity:1; transform:none}
+.kicker{font-family:"Cormorant Garamond",serif; letter-spacing:.42em; font-size:12px; opacity:.55; text-transform:uppercase}
+h2{font-weight:400; font-size:clamp(19px,5vw,24px); letter-spacing:.14em; margin:18px 0 26px}
+p.body{font-size:15px; line-height:2.3; letter-spacing:.02em; opacity:.85}
+figure img{width:100%; border-radius:4px; display:block; box-shadow:0 14px 40px rgba(90,70,50,.14)}
+figcaption{margin-top:14px; font-size:12px; letter-spacing:.2em; opacity:.5}
+.info{margin-top:34px; border-top:1px solid rgba(58,53,47,.15); border-bottom:1px solid rgba(58,53,47,.15); padding:26px 0}
+.info dl{display:grid; grid-template-columns:auto 1fr; gap:14px 22px; text-align:left; font-size:14px; line-height:1.9}
+.info dt{opacity:.5; letter-spacing:.16em; white-space:nowrap}
+footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garamond",serif; letter-spacing:.3em; opacity:.4; font-size:12px}
+
+/* 갤러리 */
+.gallery{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+.gallery img{width:100%; aspect-ratio:3/4; object-fit:cover; border-radius:3px; display:block}
+.gallery img:first-child{grid-column:1 / -1; aspect-ratio:4/3}
+
+/* 연락처 / 계좌 */
+.contact{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:26px}
+.card{border:1px solid rgba(58,53,47,.14); border-radius:4px; padding:20px 14px; background:#fff}
+.card .role{font-size:11px; letter-spacing:.24em; opacity:.5}
+.card .name{margin:8px 0 12px; font-size:16px; letter-spacing:.1em}
+.card a{display:inline-block; font-size:12px; letter-spacing:.1em; color:inherit; text-decoration:none;
+  border:1px solid rgba(58,53,47,.2); border-radius:99px; padding:6px 14px; margin:3px 2px}
+.acct{margin-top:14px; text-align:left; font-size:13px; line-height:2}
+.acct .bank{opacity:.55; letter-spacing:.1em}
+.map{margin-top:22px; border-radius:4px; overflow:hidden; border:1px solid rgba(58,53,47,.14)}
+.map img{width:100%; display:block; filter:grayscale(.25)}
+.tip{margin-top:16px; font-size:13px; line-height:2.1; opacity:.75; text-align:left}
+.tip b{font-weight:600; letter-spacing:.12em; opacity:.85}
+
+@media (prefers-reduced-motion: reduce){ .rv{opacity:1; transform:none; transition:none} }
+</style>
+</head>
+<body>
+
+<!-- HERO : 스크롤 → 문 열림 → 화이트아웃 → 아래에서 상승 -->
+<div class="hero" id="hero">
+  <div class="hero__sticky">
+    <div class="stage">
+      <div class="photo">
+        <img class="photo__frame" src="assets/frame.jpg" alt="" fetchpriority="high">
+        <div class="gate"></div>
+        <img class="door door--l" src="assets/door-l.jpg" alt="">
+        <img class="door door--r" src="assets/door-r.jpg" alt="">
+      </div>
+      <div class="flash"></div>
+
+      <div class="hero__title">
+        <div class="en">WE ARE GETTING MARRIED</div>
+        <div class="names">신랑 &nbsp;&middot;&nbsp; 신부</div>
+      </div>
+      <div class="hint">SCROLL</div>
+
+      <div class="reveal">
+        <div class="reveal__inner">
+          <img class="reveal__photo" src="assets/couple-placeholder.jpg" alt="신랑신부">
+          <div class="reveal__cap">2026년 0월 0일 토요일<br>빌라 드 토브헤세드</div>
+          <div class="reveal__sub">Villa de Tov Hesed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 이후 섹션 -->
+<section class="block rv">
+  <div class="kicker">Invitation</div>
+  <h2>초대합니다</h2>
+  <p class="body">
+    서로가 서로에게 물들어<br>
+    같은 곳을 바라보게 되었습니다.<br><br>
+    저희 두 사람이 하나 되는 날,<br>
+    귀한 걸음으로 축복해 주시면<br>
+    더없는 기쁨이겠습니다.
+  </p>
+</section>
+
+<section class="block rv">
+  <figure>
+    <img src="assets/hall-wide.jpg" alt="예식홀">
+    <figcaption>VILLA DE TOV HESED</figcaption>
+  </figure>
+</section>
+
+<section class="block rv">
+  <div class="kicker">When &amp; Where</div>
+  <h2>예식 안내</h2>
+  <div class="info">
+    <dl>
+      <dt>일시</dt><dd>2026년 0월 0일 토요일 오후 0시 00분</dd>
+      <dt>장소</dt><dd>빌라 드 토브헤세드 &middot; 0층 채플</dd>
+      <dt>주소</dt><dd>서울특별시 OO구 OO로 00</dd>
+    </dl>
+  </div>
+</section>
+
+<section class="block rv">
+  <div class="kicker">Gallery</div>
+  <h2>우리의 순간</h2>
+  <div class="gallery">
+    <img src="assets/hall-wide.jpg" alt="">
+    <img src="assets/aisle.jpg" alt="">
+    <img src="assets/g1.jpg" alt="">
+    <img src="assets/g2.jpg" alt="">
+    <img src="assets/g3.jpg" alt="">
+  </div>
+  <figcaption>※ 임시 이미지 — 웨딩 촬영본으로 교체 예정</figcaption>
+</section>
+
+<section class="block rv">
+  <div class="kicker">Location</div>
+  <h2>오시는 길</h2>
+  <div class="map">
+    <img src="assets/g3.jpg" alt="약도 자리">
+  </div>
+  <div class="tip">
+    <b>지하철</b><br>OO선 OO역 O번 출구 도보 0분<br><br>
+    <b>버스</b><br>OO정류장 하차 · 000, 000<br><br>
+    <b>주차</b><br>건물 내 주차장 2시간 무료
+  </div>
+</section>
+
+<section class="block rv">
+  <div class="kicker">Contact</div>
+  <h2>연락하기</h2>
+  <div class="contact">
+    <div class="card">
+      <div class="role">GROOM</div>
+      <div class="name">신랑 OOO</div>
+      <a href="tel:01000000000">전화</a><a href="sms:01000000000">문자</a>
+    </div>
+    <div class="card">
+      <div class="role">BRIDE</div>
+      <div class="name">신부 OOO</div>
+      <a href="tel:01000000000">전화</a><a href="sms:01000000000">문자</a>
+    </div>
+  </div>
+</section>
+
+<section class="block rv">
+  <div class="kicker">With Heart</div>
+  <h2>마음 전하실 곳</h2>
+  <div class="info">
+    <div class="acct">
+      <div class="bank">신랑측</div>
+      <div>OO은행 000-0000-0000 · OOO</div>
+      <div class="bank" style="margin-top:14px">신부측</div>
+      <div>OO은행 000-0000-0000 · OOO</div>
+    </div>
+  </div>
+</section>
+
+<footer>THANK YOU</footer>
+
+<script>
+(() => {
+  const hero = document.getElementById('hero');
+  const root = document.documentElement;
+
+  const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
+  const seg = (p, a, b) => clamp01((p - a) / (b - a));            // a~b 구간 → 0~1
+  const easeInOut = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
+  const easeOut = t => 1 - Math.pow(1 - t, 3);
+
+  // 타임라인
+  const OPEN  = [0.10, 0.62];  // 문 회전
+  const FLASH = [0.46, 0.74];  // 화이트아웃
+  const RISE  = [0.60, 1.00];  // 다음 화면 상승
+  const MAX_DEG = 108;
+  const MAX_ZOOM = 1.22;
+
+  let ticking = false;
+  function update() {
+    ticking = false;
+    const r = hero.getBoundingClientRect();
+    const total = hero.offsetHeight - window.innerHeight;
+    const p = clamp01(-r.top / total);
+
+    const o = easeInOut(seg(p, OPEN[0], OPEN[1]));
+    const f = seg(p, FLASH[0], FLASH[1]);
+    const s = easeOut(seg(p, RISE[0], RISE[1]));
+
+    root.style.setProperty('--p', p.toFixed(4));
+    root.style.setProperty('--theta', (o * MAX_DEG).toFixed(2) + 'deg');
+    root.style.setProperty('--zoom', (1 + o * (MAX_ZOOM - 1)).toFixed(4));
+    root.style.setProperty('--flash', f.toFixed(4));
+    root.style.setProperty('--rise', (1 - s).toFixed(4));
+    root.style.setProperty('--revealOp', clamp01(s * 1.6).toFixed(4));
+  }
+  function onScroll(){ if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+
+  addEventListener('scroll', onScroll, { passive:true });
+  addEventListener('resize', onScroll);
+  update();
+
+  // 이후 섹션 등장
+  const io = new IntersectionObserver(es => {
+    es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); } });
+  }, { threshold: 0.18 });
+  document.querySelectorAll('.rv').forEach(el => io.observe(el));
+})();
+</script>
+</body>
+</html>
