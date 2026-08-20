@@ -6,18 +6,13 @@ const veil = (w, h, a) => sharp({
   create: { width: w, height: h, channels: 4, background: { r: 255, g: 255, b: 255, alpha: a } }
 }).png().toBuffer();
 
-// 1) gate-bg : 문 뒤로 보일 공간 (IMG_1413 홀 내부 → blur + 화이트 워시)
-{
-  const W = 1279, H = 2008;              // 문 비율 0.637 에 맞춘 세로 크롭
-  const base = await sharp('IMG_1413(1).jpg')
-    .extract({ left: 700, top: 0, width: W, height: H })
-    .blur(22).modulate({ brightness: 1.28, saturation: 0.75 })
-    .resize({ width: 900 }).toBuffer();
-  const m = await sharp(base).metadata();
-  await sharp(base)
-    .composite([{ input: await veil(m.width, m.height, 0.42), blend: 'over' }])
-    .jpeg(jpg).toFile('assets/gate-bg.jpg');
-}
+// 1) gate-bg : 문 뒤로 보일 공간
+//    소스 = IMG_0668(1)-2.jpg — 원본에서 문짝만 제거하도록 Gemini(nano banana)로 인페인팅한 결과물
+//    아래 좌표는 그 결과물(848x1248)에서 문틀 안쪽 개구부만 잘라낸 실측값
+await sharp('IMG_0668(1)-2.jpg')
+  .extract({ left: 225, top: 214, width: 394, height: 611 })
+  .resize({ width: 900 }).modulate({ brightness: 1.03 })
+  .jpeg({ quality: 82, mozjpeg: true }).toFile('assets/gate-bg.jpg');
 
 // 2) couple-placeholder : 신랑신부 실사진 들어올 자리 (IMG_1413 플라워 아치)
 await sharp('IMG_1413(1).jpg')

@@ -20,13 +20,14 @@ npx serve -l 4321 .
 | `index.html` | 전체 페이지 (HTML + CSS + JS 단일 파일) |
 | `assets/frame.jpg` | 문틀·기둥·꽃·간판 — 스크롤 중 고정되는 배경 |
 | `assets/door-l.jpg` · `door-r.jpg` | 좌·우 문짝 (각각 경첩 기준 회전) |
-| `assets/gate-bg.jpg` | 문 뒤로 보이는 공간 |
+| `assets/gate-bg.jpg` | 문 뒤로 보이는 공간 (문짝을 지운 인페인팅 결과에서 개구부만 크롭) |
 | `assets/couple-placeholder.jpg` | 문 열린 뒤 올라오는 사진 자리 **(임시)** |
 | `assets/hall-wide.jpg` `aisle.jpg` `g1~g3.jpg` | 본문·갤러리 사진 |
 | `tools/build-assets.mjs` | 원본 사진 → 문짝·배경 자산 생성 |
 | `tools/build-gen.mjs` | 원본 사진 → 문 뒤 배경·갤러리 자산 생성 |
 | `tools/vertex-image.mjs` | Gemini 이미지 생성/편집 호출 (선택) |
 | `IMG_0668(1).jpg` `IMG_1413(1).jpg` `IMG_1804(1).jpg` | 원본 사진 (자산 재생성용 소스) |
+| `IMG_0668(1)-2.jpg` | 원본 0668에서 문짝만 지운 인페인팅 결과 — `gate-bg.jpg` 소스 |
 
 ## 3. 동작 원리
 
@@ -109,7 +110,13 @@ npm i && node tools/build-assets.mjs && node tools/build-gen.mjs
 
 ## 6. Gemini 이미지 생성 (선택)
 
-문 뒤 공간을 blur 합성 대신 AI 인페인팅으로 만들고 싶을 때만 사용.
+`assets/gate-bg.jpg` 는 이미 AI 인페인팅 결과(`IMG_0668(1)-2.jpg`)로 적용돼 있음. 다시 만들 때만 아래 사용.
+
+사용한 프롬프트:
+
+> 첨부한 웨딩홀 정면 사진에서 가운데 나무 여닫이문 두 짝만 완전히 제거하고, 그 자리에 문 안쪽으로 이어지는 실내 공간을 자연스럽게 채워줘. 원본의 대리석 헤링본 바닥, 회색 석재 문틀, 조명 톤, 원근을 그대로 유지. 문틀 바깥 영역(간판, 꽃, 기둥, 계단)은 픽셀 단위로 원본 그대로 보존. 안쪽은 밝은 자연광이 쏟아지는 하얀 공간으로. 원본과 동일한 3200x4668 해상도.
+
+생성 결과는 원본 좌표와 어긋나므로 **문틀 안쪽 개구부만 잘라내 쓴다** (`tools/build-gen.mjs` 의 `extract` 좌표. 결과물 해상도가 바뀌면 이 좌표도 다시 재야 함).
 
 ```bash
 GEMINI_API_KEY=... node tools/vertex-image.mjs assets/gen-gate.png "<프롬프트>" "IMG_0668(1).jpg"
@@ -119,15 +126,146 @@ GEMINI_API_KEY=... node tools/vertex-image.mjs assets/gen-gate.png "<프롬프�
 
 **입력은 반드시 원본 `IMG_0668(1).jpg`** — `assets/` 의 가공본은 축소·blur 로 정보가 손실돼 있어 소스로 부적합.
 
-## 7. 배포 (GitHub Pages)
+## 7. 배포
 
-정적 파일뿐이라 그대로 올리면 됨.
+빌드·서버 로직이 없는 순수 정적 사이트 → 정적 호스팅 아무 곳이나 가능.
+**배포에 필요한 것은 `index.html` + `assets/` 뿐.** 원본 사진(`IMG_*.jpg`, 약 13MB)과 `tools/` 는 자산 재생성용이라 업로드 대상이 아니다.
 
-1. GitHub 저장소 생성 후 push
+### 7-1. GitHub Pages (무료 · 가장 빠름)
+
+1. 저장소 push
 2. Settings → Pages → Source: `Deploy from a branch` → `main` / `/ (root)`
-3. `https://<계정>.github.io/<저장소>/` 로 접속
+3. `https://<계정>.github.io/wedding-invitation/` 로 접속
 
-원본 사진 3장(합계 11MB)은 자산 재생성용이라 배포에는 불필요 — 저장소를 줄이려면 `.gitignore` 에 추가하고 별도 보관.
+한계 = 커스텀 도메인에 HTTPS는 되지만 접속 로그·리다이렉트 제어 불가, 저장소가 public 이어야 무료.
+
+### 7-2. AWS
+
+네 가지 중 하나 고르면 된다. **청첩장 용도 권장 = ②** (커스텀 도메인 + HTTPS + 캐싱, 월 1달러 미만).
+
+| 방식 | 커스텀 도메인 | HTTPS | 월 비용(체감) | 세팅 난이도 | 언제 |
+|---|---|---|---|---|---|
+| ① S3 정적 웹사이트 호스팅 | O | **X (http만)** | ~0.1 USD | 낮음 | 테스트·임시 |
+| ② **S3 + CloudFront + ACM** | O | O | ~0.3 USD | 중간 | **실사용 권장** |
+| ③ Amplify Hosting | O | O | ~0.5 USD | 가장 낮음 | git push 자동배포 원할 때 |
+| ④ Lightsail / EC2 + nginx | O | O | 3.5~5 USD | 높음 | 불필요 (정적인데 서버 유지비만 나감) |
+
+전제 = AWS CLI 설치 + `aws configure` 완료. 아래 `wedding-invitation-dylan` / `wed.example.com` 은 본인 값으로 교체.
+
+#### ① S3 정적 웹사이트 호스팅 (http만)
+
+```bash
+aws s3 mb s3://wedding-invitation-dylan --region ap-northeast-2
+aws s3 website s3://wedding-invitation-dylan --index-document index.html --error-document index.html
+```
+
+퍼블릭 읽기 허용 — 버킷 정책 (`bucket-policy.json` 로 저장 후 적용):
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Sid": "PublicRead",
+    "Effect": "Allow",
+    "Principal": "*",
+    "Action": "s3:GetObject",
+    "Resource": "arn:aws:s3:::wedding-invitation-dylan/*"
+  }]
+}
+```
+
+```bash
+aws s3api put-public-access-block --bucket wedding-invitation-dylan \
+  --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
+aws s3api put-bucket-policy --bucket wedding-invitation-dylan --policy file://bucket-policy.json
+```
+
+업로드 (원본 사진·도구 제외, 캐시 헤더 분리):
+
+```bash
+aws s3 sync ./assets s3://wedding-invitation-dylan/assets --cache-control "public,max-age=31536000,immutable"
+aws s3 cp ./index.html s3://wedding-invitation-dylan/index.html --cache-control "no-cache"
+```
+
+접속 = `http://wedding-invitation-dylan.s3-website.ap-northeast-2.amazonaws.com`
+
+> 카카오톡은 http 링크도 열리지만 og:image 를 http로 주면 미리보기가 안 뜨는 경우가 있음 → 공유용이면 ② 로 갈 것.
+
+#### ② S3 + CloudFront + ACM (권장)
+
+버킷은 ①처럼 만들되 **퍼블릭 차단 유지**(정적 웹사이트 호스팅 설정도 불필요). CloudFront 가 OAC로 대신 읽는다.
+
+```bash
+aws s3 mb s3://wedding-invitation-dylan --region ap-northeast-2
+aws s3 sync ./assets s3://wedding-invitation-dylan/assets --cache-control "public,max-age=31536000,immutable"
+aws s3 cp ./index.html s3://wedding-invitation-dylan/index.html --cache-control "no-cache"
+```
+
+1. **인증서** — ACM은 CloudFront용이면 반드시 `us-east-1`
+
+   ```bash
+   aws acm request-certificate --domain-name wed.example.com \
+     --validation-method DNS --region us-east-1
+   ```
+
+   출력된 CNAME 검증 레코드를 도메인 DNS에 등록 → `ISSUED` 되면 다음 단계
+
+2. **CloudFront 배포 생성** (콘솔이 빠름)
+   - Origin: 위 S3 버킷 선택 → **Origin access: Origin access control (OAC)** → `Create new OAC`
+   - 안내되는 버킷 정책을 그대로 복사해 버킷에 적용 (CloudFront 만 읽게 됨)
+   - Viewer protocol policy: `Redirect HTTP to HTTPS`
+   - Default root object: `index.html`
+   - Alternate domain name: `wed.example.com` + 위 ACM 인증서 선택
+   - Price class: `Use only North America, Europe, Asia` (한국 하객이면 충분)
+
+3. **DNS** — Route 53이면 A 레코드 Alias → CloudFront 배포. 타 등록기관이면 CNAME → `dxxxx.cloudfront.net`
+
+4. **갱신 배포** — 파일 바꾼 뒤
+
+   ```bash
+   aws s3 cp ./index.html s3://wedding-invitation-dylan/index.html --cache-control "no-cache"
+   aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.html" "/assets/*"
+   ```
+
+   `index.html` 만 `no-cache`, `assets/*` 는 1년 캐시 → 사진 교체 시 파일명을 바꾸면 invalidation 없이도 즉시 반영된다.
+
+#### ③ Amplify Hosting (git 연동 자동배포)
+
+빌드 스텝이 없으므로 `amplify.yml` 만 두면 된다.
+
+```yaml
+version: 1
+frontend:
+  phases:
+    build:
+      commands:
+        - echo "static site, no build"
+  artifacts:
+    baseDirectory: /
+    files:
+      - index.html
+      - assets/**/*
+```
+
+콘솔 → Amplify → `Host web app` → GitHub 저장소 `wedding-invitation` 연결 → 브랜치 `main`.
+이후 `git push` 만으로 재배포되고 HTTPS·커스텀 도메인도 자동. 가장 손이 덜 감.
+
+#### ④ Lightsail / EC2 + nginx
+
+정적 사이트에 서버를 띄우는 건 비용·관리 낭비라 **비권장**. 그래도 필요하면:
+
+```bash
+sudo apt update && sudo apt install -y nginx
+sudo rsync -av --delete ./index.html ./assets /var/www/html/
+sudo snap install --classic certbot && sudo certbot --nginx -d wed.example.com
+```
+
+### 7-3. 배포 전 체크
+
+- [ ] `index.html` 의 `OOO` · `0월 0일` 플레이스홀더 전부 교체
+- [ ] `assets/couple-placeholder.jpg` 를 실제 웨딩 사진으로 교체
+- [ ] `DOC-pending.md` 의 og 태그 · BGM 반영 여부 확인
+- [ ] 모바일 실기기에서 스크롤 문열림 프레임 확인 (iOS Safari · Android Chrome)
 
 ## 8. 남은 작업
 
