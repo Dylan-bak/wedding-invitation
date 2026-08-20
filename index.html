@@ -7,6 +7,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="assets/frame.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="assets/door-l.jpg">
+<link rel="preload" as="image" href="assets/door-r.jpg">
+<link rel="preload" as="image" href="assets/gate-bg.jpg">
 <style>
 /* 실측 문 좌표 (IMG_0668 원본 3200x4668 기준 %) */
 :root{
@@ -21,6 +25,7 @@
   --rise:1;         /* 다음 화면 상승 (1=아래, 0=제자리) */
   --revealOp:0;
   --zoom:1;
+  --shade:0;        /* 문짝 그늘 */
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
@@ -58,21 +63,31 @@ body{
 .gate::after{content:""; position:absolute; inset:0;
   background:radial-gradient(90% 60% at 50% 62%, rgba(255,255,255,.85) 0%, rgba(255,248,238,.35) 45%, rgba(255,255,255,0) 100%);}
 
-/* 문짝 2장 */
-.door{position:absolute; top:var(--door-t); height:calc(var(--door-b) - var(--door-t));
-  display:block; object-fit:fill; backface-visibility:hidden; will-change:transform;}
+/* 문짝 2장
+   img 대신 div + background-image — 매 프레임 filter 로 밝기를 깎으면 큰 이미지가
+   재래스터되어 프레임이 떨어진다. 그늘은 ::after 의 opacity 로만 표현(합성 단계 처리). */
+.door{
+  position:absolute; top:var(--door-t); height:calc(var(--door-b) - var(--door-t));
+  background-size:100% 100%; background-repeat:no-repeat;
+  will-change:transform; transform-style:flat;
+}
+.door::after{
+  content:""; position:absolute; inset:0; background:#2b2318;
+  opacity:var(--shade); will-change:opacity;
+}
 .door--l{
   left:var(--door-l); width:calc(var(--door-c) - var(--door-l));
+  background-image:url(assets/door-l.jpg);
   transform-origin:left center;
   transform:rotateY(var(--theta));
-  filter:brightness(calc(1 - var(--p)*0.35));
 }
 .door--r{
   left:var(--door-c); width:calc(var(--door-r) - var(--door-c));
+  background-image:url(assets/door-r.jpg);
   transform-origin:right center;
   transform:rotateY(calc(-1 * var(--theta)));
-  filter:brightness(calc(1 - var(--p)*0.28));
 }
+.door--r::after{opacity:calc(var(--shade) * 0.8)}
 
 /* 화이트아웃 */
 .flash{position:absolute; inset:0; background:#fff; opacity:var(--flash); pointer-events:none}
@@ -148,8 +163,8 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
       <div class="photo">
         <img class="photo__frame" src="assets/frame.jpg" alt="" fetchpriority="high">
         <div class="gate"></div>
-        <img class="door door--l" src="assets/door-l.jpg" alt="">
-        <img class="door door--r" src="assets/door-r.jpg" alt="">
+        <div class="door door--l"></div>
+        <div class="door door--r"></div>
       </div>
       <div class="flash"></div>
 
@@ -277,29 +292,52 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
   const MAX_DEG = 108;
   const MAX_ZOOM = 1.22;
 
-  let ticking = false;
-  function update() {
-    ticking = false;
-    const r = hero.getBoundingClientRect();
-    const total = hero.offsetHeight - window.innerHeight;
-    const p = clamp01(-r.top / total);
+  // 휠 한 칸이 100px 가까이 점프하므로 스크롤값을 그대로 쓰면 각도가 계단처럼 튄다.
+  // 목표값과 현재값을 시간 기반 지수보간으로 따라가게 해 프레임 사이를 메운다.
+  const TAU = 90;   // ms — 작을수록 즉각적, 클수록 부드럽지만 지연
+  const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  let targetP = 0, curP = 0, last = 0, raf = 0;
+
+  function readTarget() {
+    const total = hero.offsetHeight - window.innerHeight;
+    targetP = clamp01(-hero.getBoundingClientRect().top / total);
+  }
+
+  function apply(p) {
     const o = easeInOut(seg(p, OPEN[0], OPEN[1]));
     const f = seg(p, FLASH[0], FLASH[1]);
     const s = easeOut(seg(p, RISE[0], RISE[1]));
 
     root.style.setProperty('--p', p.toFixed(4));
-    root.style.setProperty('--theta', (o * MAX_DEG).toFixed(2) + 'deg');
-    root.style.setProperty('--zoom', (1 + o * (MAX_ZOOM - 1)).toFixed(4));
+    root.style.setProperty('--theta', (o * MAX_DEG).toFixed(3) + 'deg');
+    root.style.setProperty('--zoom', (1 + o * (MAX_ZOOM - 1)).toFixed(5));
+    root.style.setProperty('--shade', (o * 0.38).toFixed(4));
     root.style.setProperty('--flash', f.toFixed(4));
     root.style.setProperty('--rise', (1 - s).toFixed(4));
     root.style.setProperty('--revealOp', clamp01(s * 1.6).toFixed(4));
   }
-  function onScroll(){ if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+
+  function tick(now) {
+    const dt = last ? Math.min(now - last, 64) : 16;
+    last = now;
+    const k = 1 - Math.exp(-dt / TAU);
+    curP += (targetP - curP) * k;
+
+    if (Math.abs(targetP - curP) < 0.00015) { curP = targetP; raf = 0; last = 0; apply(curP); return; }
+    apply(curP);
+    raf = requestAnimationFrame(tick);
+  }
+
+  function onScroll() {
+    readTarget();
+    if (!smooth) { curP = targetP; apply(curP); return; }
+    if (!raf) { last = 0; raf = requestAnimationFrame(tick); }
+  }
 
   addEventListener('scroll', onScroll, { passive:true });
   addEventListener('resize', onScroll);
-  update();
+  readTarget(); curP = targetP; apply(curP);
 
   // 이후 섹션 등장
   const io = new IntersectionObserver(es => {
