@@ -129,112 +129,59 @@ GEMINI_API_KEY=... node tools/vertex-image.mjs assets/gen-gate.png "<프롬프�
 ## 7. 배포
 
 빌드·서버 로직이 없는 순수 정적 사이트 → 정적 호스팅 아무 곳이나 가능.
-**배포에 필요한 것은 `index.html` + `assets/` 뿐.** 원본 사진(`IMG_*.jpg`, 약 13MB)과 `tools/` 는 자산 재생성용이라 업로드 대상이 아니다.
+**올릴 것은 `index.html` + `assets/` 뿐.** 원본 사진(`IMG_*.jpg`, 약 13MB)과 `tools/` 는 자산 재생성용이라 배포 대상이 아니다.
 
-**쉬운 순서** = GitHub Pages(3클릭) → Amplify Hosting(콘솔 5분) → S3+CloudFront(20~30분) → EC2(1시간+).
-**React 로 바꿀 필요 없다.** Amplify Hosting 은 React 전용이 아니라 정적 파일도 그대로 받는다. React 로 옮기면 번들러·빌드 파이프라인이 추가되고 스크롤 로직도 다시 짜야 해서 더 어려워진다.
+### 결론
 
-### 7-1. GitHub Pages (무료 · 가장 빠름)
+**GitHub Pages 가 완전 무료 + 가장 쉽다. 청첩장 용도면 이걸로 끝내면 된다.**
+AWS 는 학습 목적이거나 접속 로그·세밀한 캐시 제어가 필요할 때만.
 
-1. 저장소 push
-2. Settings → Pages → Source: `Deploy from a branch` → `main` / `/ (root)`
-3. `https://<계정>.github.io/wedding-invitation/` 로 접속
-
-한계 = 커스텀 도메인에 HTTPS는 되지만 접속 로그·리다이렉트 제어 불가, 저장소가 public 이어야 무료.
-
-### 7-2. AWS
-
-네 가지 중 하나 고르면 된다. **청첩장 용도 권장 = ②** (커스텀 도메인 + HTTPS + 캐싱, 월 1달러 미만).
-
-| 방식 | 커스텀 도메인 | HTTPS | 월 비용(체감) | 세팅 난이도 | 언제 |
+| # | 방식 | 실제 비용 | 세팅 시간 | HTTPS | 자동배포 |
 |---|---|---|---|---|---|
-| ① S3 정적 웹사이트 호스팅 | O | **X (http만)** | ~0.1 USD | 낮음 | 테스트·임시 |
-| ② **S3 + CloudFront + ACM** | O | O | ~0.3 USD | 중간 | **실사용 권장** |
-| ③ Amplify Hosting | O | O | ~0.5 USD | 가장 낮음 | git push 자동배포 원할 때 |
-| ④ Lightsail / EC2 + nginx | O | O | 3.5~5 USD | 높음 | 불필요 (정적인데 서버 유지비만 나감) |
+| **7-1** | **GitHub Pages** | **0원** | **3클릭** | O | O (push 시) |
+| 7-2 | Amplify Hosting | 0원 (12개월 프리티어) | 콘솔 5분 | O | O (push 시) |
+| 7-3 | S3 + CloudFront | **0원** (기본 주소 사용 시) | 20~30분 | O | X (수동 sync) |
+| 7-4 | S3 단독 · EC2 | 0.1 / 3.5~5 USD | — | X / O | X |
 
-전제 = AWS CLI 설치 + `aws configure` 완료. 아래 `wedding-invitation-dylan` / `wed.example.com` 은 본인 값으로 교체.
+**React 로 바꿀 필요 없다.** Amplify Hosting 은 React 전용이 아니라 정적 파일을 그대로 받는다. React 로 옮기면 번들러·빌드 파이프라인이 추가되고 스크롤 문열림 로직도 다시 짜야 해서 더 어려워진다.
 
-#### ① S3 정적 웹사이트 호스팅 (http만)
+---
 
-```bash
-aws s3 mb s3://wedding-invitation-dylan --region ap-northeast-2
-aws s3 website s3://wedding-invitation-dylan --index-document index.html --error-document index.html
-```
+### 7-1. GitHub Pages — 무료 · 가장 쉬움
 
-퍼블릭 읽기 허용 — 버킷 정책 (`bucket-policy.json` 로 저장 후 적용):
+저장소가 **public** 이어야 무료다. private 이면 GitHub Pro 필요.
 
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [{
-    "Sid": "PublicRead",
-    "Effect": "Allow",
-    "Principal": "*",
-    "Action": "s3:GetObject",
-    "Resource": "arn:aws:s3:::wedding-invitation-dylan/*"
-  }]
-}
-```
-
-```bash
-aws s3api put-public-access-block --bucket wedding-invitation-dylan \
-  --public-access-block-configuration "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
-aws s3api put-bucket-policy --bucket wedding-invitation-dylan --policy file://bucket-policy.json
-```
-
-업로드 (원본 사진·도구 제외, 캐시 헤더 분리):
-
-```bash
-aws s3 sync ./assets s3://wedding-invitation-dylan/assets --cache-control "public,max-age=31536000,immutable"
-aws s3 cp ./index.html s3://wedding-invitation-dylan/index.html --cache-control "no-cache"
-```
-
-접속 = `http://wedding-invitation-dylan.s3-website.ap-northeast-2.amazonaws.com`
-
-> 카카오톡은 http 링크도 열리지만 og:image 를 http로 주면 미리보기가 안 뜨는 경우가 있음 → 공유용이면 ② 로 갈 것.
-
-#### ② S3 + CloudFront + ACM (권장)
-
-버킷은 ①처럼 만들되 **퍼블릭 차단 유지**(정적 웹사이트 호스팅 설정도 불필요). CloudFront 가 OAC로 대신 읽는다.
-
-```bash
-aws s3 mb s3://wedding-invitation-dylan --region ap-northeast-2
-aws s3 sync ./assets s3://wedding-invitation-dylan/assets --cache-control "public,max-age=31536000,immutable"
-aws s3 cp ./index.html s3://wedding-invitation-dylan/index.html --cache-control "no-cache"
-```
-
-1. **인증서** — ACM은 CloudFront용이면 반드시 `us-east-1`
+1. 저장소에 push
 
    ```bash
-   aws acm request-certificate --domain-name wed.example.com \
-     --validation-method DNS --region us-east-1
+   git push -u origin main
    ```
 
-   출력된 CNAME 검증 레코드를 도메인 DNS에 등록 → `ISSUED` 되면 다음 단계
+2. GitHub 저장소 → **Settings** → 좌측 **Pages**
+3. Source = `Deploy from a branch` · Branch = `main` · 폴더 = `/ (root)` → **Save**
+4. 1~2분 후 상단에 주소가 뜬다 → `https://<계정>.github.io/wedding-invitation/`
 
-2. **CloudFront 배포 생성** (콘솔이 빠름)
-   - Origin: 위 S3 버킷 선택 → **Origin access: Origin access control (OAC)** → `Create new OAC`
-   - 안내되는 버킷 정책을 그대로 복사해 버킷에 적용 (CloudFront 만 읽게 됨)
-   - Viewer protocol policy: `Redirect HTTP to HTTPS`
-   - Default root object: `index.html`
-   - Alternate domain name: `wed.example.com` + 위 ACM 인증서 선택
-   - Price class: `Use only North America, Europe, Asia` (한국 하객이면 충분)
+#### 커스텀 도메인 (선택)
 
-3. **DNS** — Route 53이면 A 레코드 Alias → CloudFront 배포. 타 등록기관이면 CNAME → `dxxxx.cloudfront.net`
+1. Pages 화면의 **Custom domain** 에 `wed.example.com` 입력 → Save
+2. 도메인 DNS에 CNAME 추가 — `wed` → `<계정>.github.io`
+3. 검증되면 **Enforce HTTPS** 체크박스 활성화 → 체크 (인증서 무료·자동 갱신)
 
-4. **갱신 배포** — 파일 바꾼 뒤
+도메인 등록비(연 1~2만원) 외 추가 비용 없음.
 
-   ```bash
-   aws s3 cp ./index.html s3://wedding-invitation-dylan/index.html --cache-control "no-cache"
-   aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.html" "/assets/*"
-   ```
+#### 주의
 
-   `index.html` 만 `no-cache`, `assets/*` 는 1년 캐시 → 사진 교체 시 파일명을 바꾸면 invalidation 없이도 즉시 반영된다.
+- 저장소 루트에 `index.html` 이 있으므로 Jekyll 빌드가 끼어들 여지는 없다. `_` 로 시작하는 파일도 없으니 `.nojekyll` 불필요
+- 원본 사진 4장이 저장소에 함께 올라가 있다. Pages 로 서빙되긴 하지만 `index.html` 이 참조하지 않으므로 하객 트래픽에는 영향 없음
+- 소프트 제한 = 저장소 1GB · 월 전송 100GB. 현재 저장소 15MB 라 무관
 
-#### ③ Amplify Hosting (git 연동 자동배포)
+---
 
-빌드 스텝이 없으므로 `amplify.yml` 만 두면 된다.
+### 7-2. Amplify Hosting — 콘솔 5분 · git 연동 자동배포
+
+빌드 스텝이 없으므로 아래 파일만 저장소 루트에 두면 된다.
+
+`amplify.yml`
 
 ```yaml
 version: 1
@@ -250,52 +197,133 @@ frontend:
       - assets/**/*
 ```
 
-콘솔 → Amplify → `Host web app` → GitHub 저장소 `wedding-invitation` 연결 → 브랜치 `main`.
-이후 `git push` 만으로 재배포되고 HTTPS·커스텀 도메인도 자동. 가장 손이 덜 감.
+1. AWS 콘솔 → **Amplify** → `Deploy an app`
+2. Source = **GitHub** → 권한 승인 → 저장소 `wedding-invitation` · 브랜치 `main`
+3. Build settings = 위 `amplify.yml` 자동 인식 (안 잡히면 화면에서 직접 붙여넣기)
+4. `Save and deploy` → 2~3분 후 `https://main.dxxxxxx.amplifyapp.com` 발급
 
-#### ④ Lightsail / EC2 + nginx
+이후 `git push` 만 하면 자동 재배포. HTTPS 기본 포함.
 
-정적 사이트에 서버를 띄우는 건 비용·관리 낭비라 **비권장**. 그래도 필요하면:
+#### 커스텀 도메인 (선택)
+
+Amplify → 해당 앱 → **Hosting → Custom domains** → 도메인 입력.
+Route 53 에 있으면 레코드까지 자동 생성, 외부 등록기관이면 안내되는 CNAME 을 직접 등록. 인증서는 Amplify 가 발급·갱신.
+
+#### 비용
+
+12개월 프리티어 = 빌드 1000분/월 · 전송 15GB/월 · 저장 5GB.
+이 프로젝트는 빌드가 사실상 0초, 전송 2GB 미만 → **프리티어 안에서 0원.** 프리티어 만료 후엔 전송 $0.15/GB → 월 몇십원 수준.
+
+---
+
+### 7-3. S3 + CloudFront — 커스텀 도메인 없이 쓰면 무료
+
+**CloudFront 기본 주소(`dxxxxxxxx.cloudfront.net`)만 쓰면 인증서·DNS 비용이 아예 발생하지 않는다.**
+CloudFront 무료 티어(월 1TB 전송 · 1,000만 요청)는 계정 나이와 무관한 영구 무료라, 남는 과금 요소는 S3 스토리지 1.3MB 뿐 → 월 0.003센트, 청구서엔 `$0.00` 으로 찍힌다.
+
+전제 = AWS CLI 설치 + `aws configure` 완료. 아래 `wedding-invitation-dylan` 은 전 세계에서 유일해야 하므로 본인 값으로 교체.
+
+#### 1) 버킷 생성 + 업로드
+
+퍼블릭 공개를 하지 않는다. CloudFront 가 OAC(Origin Access Control)로 대신 읽는다.
 
 ```bash
-sudo apt update && sudo apt install -y nginx
-sudo rsync -av --delete ./index.html ./assets /var/www/html/
-sudo snap install --classic certbot && sudo certbot --nginx -d wed.example.com
+aws s3 mb s3://wedding-invitation-dylan --region ap-northeast-2
+aws s3 sync ./assets s3://wedding-invitation-dylan/assets --cache-control "public,max-age=31536000,immutable"
+aws s3 cp ./index.html s3://wedding-invitation-dylan/index.html --cache-control "no-cache"
 ```
 
-### 7-3. 비용 — 어디까지 무료인가
+`index.html` 만 `no-cache`, `assets/*` 는 1년 캐시. 사진을 교체할 때 파일명을 바꾸면 캐시 무효화 없이 즉시 반영된다.
 
-자산 총량이 약 1.3MB, 하객 500명이 각 3회씩 열어도 월 전송량 2GB 미만. **어느 방식을 골라도 트래픽 요금이 발생하는 구간에 도달하지 않는다.** 돈이 새는 곳은 트래픽이 아니라 **DNS 호스팅 영역과 도메인 등록비** 뿐이다.
+#### 2) CloudFront 배포 생성
 
-| 항목 | 무료 범위 | 초과 시 단가 | 이 프로젝트 실제 |
+콘솔 → CloudFront → `Create distribution`
+
+| 항목 | 값 |
+|---|---|
+| Origin domain | 위 S3 버킷 선택 (`...s3.ap-northeast-2.amazonaws.com`) |
+| Origin access | **Origin access control (OAC)** → `Create new OAC` |
+| Viewer protocol policy | `Redirect HTTP to HTTPS` |
+| Default root object | `index.html` |
+| Price class | `Use only North America, Europe, Asia` (한국 하객이면 충분) |
+| Alternate domain name / Custom SSL | **비워둔다** ← 여기서 도메인을 안 넣는 것이 무료의 조건 |
+
+생성 직후 안내되는 **버킷 정책을 복사해 S3 버킷에 적용**한다 (CloudFront 만 읽도록). 콘솔의 `Copy policy` 버튼 → S3 → 해당 버킷 → Permissions → Bucket policy 에 붙여넣기.
+
+배포 상태가 `Deployed` 되면 (5~10분) `https://dxxxxxxxx.cloudfront.net` 으로 접속.
+
+#### 3) 갱신 배포
+
+```bash
+aws s3 cp ./index.html s3://wedding-invitation-dylan/index.html --cache-control "no-cache"
+aws s3 sync ./assets s3://wedding-invitation-dylan/assets --cache-control "public,max-age=31536000,immutable"
+aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.html" "/assets/*"
+```
+
+무효화는 월 1,000경로까지 무료.
+
+#### 4) 커스텀 도메인을 붙이려면 (여기서부터 유료)
+
+1. **ACM 인증서** — CloudFront용은 반드시 `us-east-1`
+
+   ```bash
+   aws acm request-certificate --domain-name wed.example.com \
+     --validation-method DNS --region us-east-1
+   ```
+
+   출력된 CNAME 검증 레코드를 도메인 DNS 에 등록 → `ISSUED` 확인
+
+2. CloudFront 배포 편집 → **Alternate domain name** 에 `wed.example.com` + 위 인증서 선택
+3. DNS 연결
+   - Route 53 사용 시 = A 레코드 Alias → CloudFront 배포. **호스팅 영역 월 $0.50 발생**
+   - **Cloudflare DNS(무료) 사용 시** = CNAME `wed` → `dxxxxxxxx.cloudfront.net`. ACM 검증 레코드도 여기 넣으면 **$0.50 을 안 낸다**
+
+---
+
+### 7-4. 나머지 (비권장)
+
+| 방식 | 판정 | 사유 |
+|---|---|---|
+| S3 정적 웹사이트 호스팅 단독 | 비권장 | **http 만.** 카카오톡 공유 시 og:image 미리보기가 안 뜨는 경우가 있음 |
+| Lightsail / EC2 + nginx | 비권장 | 정적 사이트인데 서버 유지비 월 3.5~5 USD 만 나감. 필요하면 `apt install nginx` → `rsync` → `certbot --nginx` |
+
+---
+
+### 7-5. 비용 — 어디까지 무료인가
+
+자산 총량 약 1.3MB, 하객 500명이 각 3회 열어도 월 전송량 2GB 미만. **어느 방식을 골라도 트래픽 요금 구간에 도달하지 않는다.** 돈이 새는 곳은 트래픽이 아니라 **DNS 호스팅 영역과 도메인 등록비** 뿐이다.
+
+| 항목 | 무료 범위 | 초과 단가 | 이 프로젝트 실제 |
 |---|---|---|---|
-| CloudFront 전송 | **월 1TB · 요청 1,000만 건 (계정 나이 무관, 영구 무료)** | $0.114/GB | 0원 |
+| CloudFront 전송 | **월 1TB · 요청 1,000만 (계정 나이 무관 영구 무료)** | $0.114/GB | 0원 |
 | S3 스토리지 | 12개월 프리티어 5GB | $0.025/GB/월 (서울) | 1.3MB → 0.003센트 |
-| S3 요청 | 12개월 프리티어 GET 2만/PUT 2천 | GET $0.00043/1천 | 0원 수준 |
+| S3 요청 | 12개월 프리티어 GET 2만 / PUT 2천 | GET $0.00043/1천 | 0원 수준 |
+| CloudFront 무효화 | 월 1,000 경로 | $0.005/경로 | 0원 |
 | ACM 인증서 | **영구 무료** | — | 0원 |
 | **Route 53 호스팅 영역** | **무료 없음** | **$0.50/월** | 커스텀 도메인 쓸 때만 |
 | 도메인 등록 (.com) | 무료 없음 | 약 $14/년 | 커스텀 도메인 쓸 때만 |
-| Amplify Hosting | 12개월 프리티어 빌드 1000분 · 전송 15GB · 저장 5GB | 전송 $0.15/GB | 0원 |
+| Amplify Hosting | 12개월 프리티어 (빌드 1000분 · 전송 15GB · 저장 5GB) | 전송 $0.15/GB | 0원 |
+| GitHub Pages | public 저장소 무제한 · 월 100GB 전송 | — | 0원 |
 
 정리 —
 
-- **CloudFront 기본 주소(`dxxxx.cloudfront.net`)로 만족하면 AWS 비용은 사실상 0원.** 청구서에 센트 단위가 찍히는 정도
-- 커스텀 도메인(`wed.example.com`)을 쓰고 Route 53에 올리면 **월 $0.50 고정** + 도메인 등록비
-- **Route 53 우회 = Cloudflare DNS(무료)** 에 도메인을 올리고 CNAME 만 CloudFront로 넘기면 월 $0.50도 안 낸다. ACM DNS 검증 레코드도 Cloudflare 쪽에 넣으면 됨
+- **CloudFront 기본 주소로 만족하면 AWS 비용 0원.** 도메인·DNS를 안 사는 것이 조건
+- 커스텀 도메인 + Route 53 = **월 $0.50 고정** + 도메인 등록비
+- Route 53 우회 = **Cloudflare DNS(무료)** 에 도메인 올리고 CNAME 만 CloudFront 로 → 월 $0.50 도 안 낸다
 
-### 7-4. 완전 무료로만 가고 싶으면
+### 7-6. AWS 를 아예 안 쓰는 무료 대안
 
-AWS를 안 쓰는 쪽이 더 싸고 더 쉽다. 정적 사이트라 결과물은 동일하다.
+정적 사이트라 결과물은 동일하다.
 
-| 서비스 | 무료 범위 | 커스텀 도메인 HTTPS | 배포 방법 |
-|---|---|---|---|
-| **GitHub Pages** | public 저장소 무제한 · 월 100GB 전송 | 무료 | Settings → Pages 3클릭 |
-| **Cloudflare Pages** | 전송 무제한 · 빌드 월 500회 | 무료 | 저장소 연결 |
-| Vercel / Netlify | 월 100GB 전송 | 무료 | 저장소 연결 |
+| 서비스 | 무료 범위 | 커스텀 도메인 HTTPS |
+|---|---|---|
+| **GitHub Pages** | public 저장소 · 월 100GB 전송 | 무료 |
+| **Cloudflare Pages** | 전송 무제한 · 빌드 월 500회 | 무료 |
+| Vercel / Netlify | 월 100GB 전송 | 무료 |
 
-도메인 등록비(연 1~2만원)는 어디서든 피할 수 없다. 그것마저 안 쓰면 `<계정>.github.io/wedding-invitation` 같은 무료 주소로 끝낼 수 있다.
+도메인 등록비는 어디서도 못 피한다. 그것마저 안 쓰면 `<계정>.github.io/wedding-invitation` 무료 주소로 끝낼 수 있다.
 
-### 7-5. 배포 전 체크
+### 7-7. 배포 전 체크
 
 - [ ] `index.html` 의 `OOO` · `0월 0일` 플레이스홀더 전부 교체
 - [ ] `assets/couple-placeholder.jpg` 를 실제 웨딩 사진으로 교체
