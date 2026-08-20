@@ -38,7 +38,7 @@ body{
 .hero{height:460svh; position:relative}
 .hero__sticky{position:sticky; top:0; height:100svh; overflow:hidden}
 
-.stage{position:absolute; inset:0; perspective:1500px; perspective-origin:50% 42%; background:#000}
+.stage{position:absolute; inset:0; background:#000}
 
 /* 원본 사진 비율 박스를 cover 로 채움 → 자식은 % 좌표로 정확히 정렬 */
 .photo{
@@ -46,8 +46,15 @@ body{
   width:max(100vw, calc(100svh * var(--img-w) / var(--img-h)));
   aspect-ratio: var(--img-w) / var(--img-h);
   transform:translate(-50%,-50%) scale(var(--zoom));
-  transform-style:preserve-3d; will-change:transform;
+  will-change:transform;
 }
+
+/* 문짝 전용 3D 컨텍스트.
+   perspective 를 여기에 두면 문짝 회전은 이 박스 안에서만 3D 로 계산되고,
+   .doors 자체는 평면 요소로 취급돼 DOM 순서대로 .gate 위에 그려진다.
+   .photo 에 preserve-3d 를 주면 문짝과 .gate 가 같은 3D 공간에서 깊이로 정렬되어,
+   안쪽으로 회전한 문짝이 불투명한 .gate 뒤로 밀려 사라진다. */
+.doors{position:absolute; inset:0; perspective:1500px; perspective-origin:50% 42%}
 .photo__frame{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block}
 
 /* 문 뒤에서 새어나오는 빛 */
@@ -163,8 +170,10 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
       <div class="photo">
         <img class="photo__frame" src="assets/frame.jpg" alt="" fetchpriority="high">
         <div class="gate"></div>
-        <div class="door door--l"></div>
-        <div class="door door--r"></div>
+        <div class="doors">
+          <div class="door door--l"></div>
+          <div class="door door--r"></div>
+        </div>
       </div>
       <div class="flash"></div>
 
@@ -287,9 +296,11 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
 
   // 타임라인
   const OPEN  = [0.10, 0.62];  // 문 회전
-  const FLASH = [0.46, 0.74];  // 화이트아웃
+  const FLASH = [0.42, 0.72];  // 화이트아웃
   const RISE  = [0.60, 1.00];  // 다음 화면 상승
-  const MAX_DEG = 108;
+  // 90도에서는 문짝이 정면으로 서서 두께 0 이 되어 사라진다.
+  // 그 직전(82도)까지만 돌리고 나머지는 화이트아웃이 덮게 한다.
+  const MAX_DEG = 82;
   const MAX_ZOOM = 1.22;
 
   // 휠 한 칸이 100px 가까이 점프하므로 스크롤값을 그대로 쓰면 각도가 계단처럼 튄다.
