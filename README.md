@@ -131,6 +131,9 @@ GEMINI_API_KEY=... node tools/vertex-image.mjs assets/gen-gate.png "<프롬프�
 빌드·서버 로직이 없는 순수 정적 사이트 → 정적 호스팅 아무 곳이나 가능.
 **배포에 필요한 것은 `index.html` + `assets/` 뿐.** 원본 사진(`IMG_*.jpg`, 약 13MB)과 `tools/` 는 자산 재생성용이라 업로드 대상이 아니다.
 
+**쉬운 순서** = GitHub Pages(3클릭) → Amplify Hosting(콘솔 5분) → S3+CloudFront(20~30분) → EC2(1시간+).
+**React 로 바꿀 필요 없다.** Amplify Hosting 은 React 전용이 아니라 정적 파일도 그대로 받는다. React 로 옮기면 번들러·빌드 파이프라인이 추가되고 스크롤 로직도 다시 짜야 해서 더 어려워진다.
+
 ### 7-1. GitHub Pages (무료 · 가장 빠름)
 
 1. 저장소 push
@@ -260,7 +263,39 @@ sudo rsync -av --delete ./index.html ./assets /var/www/html/
 sudo snap install --classic certbot && sudo certbot --nginx -d wed.example.com
 ```
 
-### 7-3. 배포 전 체크
+### 7-3. 비용 — 어디까지 무료인가
+
+자산 총량이 약 1.3MB, 하객 500명이 각 3회씩 열어도 월 전송량 2GB 미만. **어느 방식을 골라도 트래픽 요금이 발생하는 구간에 도달하지 않는다.** 돈이 새는 곳은 트래픽이 아니라 **DNS 호스팅 영역과 도메인 등록비** 뿐이다.
+
+| 항목 | 무료 범위 | 초과 시 단가 | 이 프로젝트 실제 |
+|---|---|---|---|
+| CloudFront 전송 | **월 1TB · 요청 1,000만 건 (계정 나이 무관, 영구 무료)** | $0.114/GB | 0원 |
+| S3 스토리지 | 12개월 프리티어 5GB | $0.025/GB/월 (서울) | 1.3MB → 0.003센트 |
+| S3 요청 | 12개월 프리티어 GET 2만/PUT 2천 | GET $0.00043/1천 | 0원 수준 |
+| ACM 인증서 | **영구 무료** | — | 0원 |
+| **Route 53 호스팅 영역** | **무료 없음** | **$0.50/월** | 커스텀 도메인 쓸 때만 |
+| 도메인 등록 (.com) | 무료 없음 | 약 $14/년 | 커스텀 도메인 쓸 때만 |
+| Amplify Hosting | 12개월 프리티어 빌드 1000분 · 전송 15GB · 저장 5GB | 전송 $0.15/GB | 0원 |
+
+정리 —
+
+- **CloudFront 기본 주소(`dxxxx.cloudfront.net`)로 만족하면 AWS 비용은 사실상 0원.** 청구서에 센트 단위가 찍히는 정도
+- 커스텀 도메인(`wed.example.com`)을 쓰고 Route 53에 올리면 **월 $0.50 고정** + 도메인 등록비
+- **Route 53 우회 = Cloudflare DNS(무료)** 에 도메인을 올리고 CNAME 만 CloudFront로 넘기면 월 $0.50도 안 낸다. ACM DNS 검증 레코드도 Cloudflare 쪽에 넣으면 됨
+
+### 7-4. 완전 무료로만 가고 싶으면
+
+AWS를 안 쓰는 쪽이 더 싸고 더 쉽다. 정적 사이트라 결과물은 동일하다.
+
+| 서비스 | 무료 범위 | 커스텀 도메인 HTTPS | 배포 방법 |
+|---|---|---|---|
+| **GitHub Pages** | public 저장소 무제한 · 월 100GB 전송 | 무료 | Settings → Pages 3클릭 |
+| **Cloudflare Pages** | 전송 무제한 · 빌드 월 500회 | 무료 | 저장소 연결 |
+| Vercel / Netlify | 월 100GB 전송 | 무료 | 저장소 연결 |
+
+도메인 등록비(연 1~2만원)는 어디서든 피할 수 없다. 그것마저 안 쓰면 `<계정>.github.io/wedding-invitation` 같은 무료 주소로 끝낼 수 있다.
+
+### 7-5. 배포 전 체크
 
 - [ ] `index.html` 의 `OOO` · `0월 0일` 플레이스홀더 전부 교체
 - [ ] `assets/couple-placeholder.jpg` 를 실제 웨딩 사진으로 교체
