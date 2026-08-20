@@ -26,6 +26,7 @@
   --revealOp:0;
   --zoom:1;
   --shade:0;        /* 문짝 그늘 */
+  --swing:1;        /* 1 = 안쪽으로 열림, -1 = 바깥쪽(보는 사람 쪽)으로 열림 */
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
@@ -86,13 +87,13 @@ body{
   left:var(--door-l); width:calc(var(--door-c) - var(--door-l));
   background-image:url(assets/door-l.jpg);
   transform-origin:left center;
-  transform:rotateY(var(--theta));
+  transform:rotateY(calc(var(--swing) * var(--theta)));
 }
 .door--r{
   left:var(--door-c); width:calc(var(--door-r) - var(--door-c));
   background-image:url(assets/door-r.jpg);
   transform-origin:right center;
-  transform:rotateY(calc(-1 * var(--theta)));
+  transform:rotateY(calc(-1 * var(--swing) * var(--theta)));
 }
 .door--r::after{opacity:calc(var(--shade) * 0.8)}
 
