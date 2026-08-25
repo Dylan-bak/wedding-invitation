@@ -78,7 +78,7 @@ if (SHOTS) {
     const h = document.getElementById('hero');
     return h.offsetHeight - innerHeight;
   });
-  for (const p of [0, 0.14, 0.20, 0.26, 0.32, 0.38, 0.44, 0.52, 0.70, 0.90]) {
+  for (const p of [0, 0.01, 0.02, 0.04, 0.07, 0.12, 0.20, 0.32, 0.44, 0.60]) {
     await page.evaluate(y => scrollTo(0, y), Math.round(total * p));
     await new Promise(r => setTimeout(r, 500));
     const name = `tools/shots/p${String(Math.round(p * 100)).padStart(2, '0')}.png`;

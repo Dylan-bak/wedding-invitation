@@ -104,12 +104,12 @@ body{
 .hero__title{
   position:absolute; inset:auto 0 12svh 0; text-align:center; color:#fff;
   text-shadow:0 2px 24px rgba(0,0,0,.45);
-  opacity:clamp(0, calc(1 - var(--p) * 4), 1);
+  opacity:clamp(0, calc(1 - var(--p) * 9), 1);
 }
 .hero__title .en{font-family:"Cormorant Garamond",serif; font-size:clamp(13px,3.4vw,18px); letter-spacing:.5em; opacity:.9}
 .hero__title .names{font-size:clamp(22px,6vw,34px); margin-top:.6em; letter-spacing:.18em}
 .hint{position:absolute; left:50%; bottom:4svh; translate:-50% 0; color:#fff; font-size:11px; letter-spacing:.35em;
-  opacity:clamp(0, calc(1 - var(--p) * 5), 1); animation:bob 1.8s ease-in-out infinite}
+  opacity:clamp(0, calc(1 - var(--p) * 12), 1); animation:bob 1.8s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
 
 /* 문 열린 뒤 아래에서 올라오는 화면 */
@@ -187,8 +187,8 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
       <div class="reveal">
         <div class="reveal__inner">
           <img class="reveal__photo" src="assets/couple-placeholder.jpg" alt="신랑신부">
-          <div class="reveal__cap">2026년 0월 0일 토요일<br>빌라 드 토브헤세드</div>
-          <div class="reveal__sub">Villa de Tov Hesed</div>
+          <div class="reveal__cap">2026년 0월 0일 토요일<br>토브 헤세드</div>
+          <div class="reveal__sub">Tov Hesed</div>
         </div>
       </div>
     </div>
@@ -211,7 +211,7 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
 <section class="block rv">
   <figure>
     <img src="assets/hall-wide.jpg" alt="예식홀">
-    <figcaption>VILLA DE TOV HESED</figcaption>
+    <figcaption>TOV HESED</figcaption>
   </figure>
 </section>
 
@@ -221,7 +221,7 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
   <div class="info">
     <dl>
       <dt>일시</dt><dd>2026년 0월 0일 토요일 오후 0시 00분</dd>
-      <dt>장소</dt><dd>빌라 드 토브헤세드 &middot; 0층 채플</dd>
+      <dt>장소</dt><dd>토브 헤세드 &middot; 0층 채플</dd>
       <dt>주소</dt><dd>서울특별시 OO구 OO로 00</dd>
     </dl>
   </div>
@@ -294,11 +294,14 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
   const seg = (p, a, b) => clamp01((p - a) / (b - a));            // a~b 구간 → 0~1
   const easeInOut = t => t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3) / 2;
   const easeOut = t => 1 - Math.pow(1 - t, 3);
+  // 문 회전용 — 스크롤을 시작하자마자 각도가 붙게 감속형만 사용.
+  // 가속형(easeInOut)은 초반 수백 px 동안 각도가 1도도 안 움직여 반응이 없는 것처럼 보인다.
+  const easeOutQuad = t => t * (2 - t);
 
   // 타임라인
-  const OPEN  = [0.10, 0.62];  // 문 회전
-  const FLASH = [0.42, 0.72];  // 화이트아웃
-  const RISE  = [0.60, 1.00];  // 다음 화면 상승
+  const OPEN  = [0.015, 0.50]; // 문 회전 — 스크롤 시작 직후부터
+  const FLASH = [0.42, 0.70];  // 화이트아웃
+  const RISE  = [0.55, 1.00];  // 다음 화면 상승
   // 90도에서는 문짝이 정면으로 서서 두께 0 이 되어 사라진다.
   // 그 직전(82도)까지만 돌리고 나머지는 화이트아웃이 덮게 한다.
   const MAX_DEG = 82;
@@ -317,7 +320,7 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
   }
 
   function apply(p) {
-    const o = easeInOut(seg(p, OPEN[0], OPEN[1]));
+    const o = easeOutQuad(seg(p, OPEN[0], OPEN[1]));
     const f = seg(p, FLASH[0], FLASH[1]);
     const s = easeOut(seg(p, RISE[0], RISE[1]));
 
