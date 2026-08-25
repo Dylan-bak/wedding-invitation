@@ -1,14 +1,13 @@
-// 첫 화면(대문) 자산 생성
-// 소스 = 1000017567.png — IMG_0668(1).jpg 의 간판을 "TOV HESED" 로 고친 생성본 (848x1236)
 import sharp from 'sharp';
 import { mkdirSync } from 'fs';
 
 mkdirSync('assets', { recursive: true });
 
-const SRC = '1000017567.png';
-const W = 848, H = 1236;
-// 실측 문 영역 (소스 px)
-const D = { L: 157, R: 685, T: 119, B: 840, C: 424 };
+// 첫 화면 소스 = 간판을 TOV HESED 로 수정한 재생성 이미지 (848x1248)
+// 원본 IMG_0668(1).jpg(3200x4668)와 기하가 다르므로 좌표는 이 이미지에서 재실측한 값
+const SRC = '3c4b782e-d48a-4e8d-8e9e-a11900226e3b.png';
+const W = 848, H = 1248;
+const D = { L: 139, R: 690, T: 142, B: 840, C: 425 };
 
 const jpg = { quality: 82, mozjpeg: true };
 
@@ -23,13 +22,13 @@ await sharp(SRC)
   .extract({ left: D.C, top: D.T, width: D.R - D.C, height: D.B - D.T })
   .jpeg(jpg).toFile('assets/door-r.jpg');
 
+// 3) 본문 사진 (임시 — 실사진으로 교체 예정)
+await sharp('IMG_1413(1).jpg').resize({ width: 1200 }).jpeg(jpg).toFile('assets/hall-wide.jpg');
+
 console.log(JSON.stringify({
-  imgW: W, imgH: H,
-  doorPct: {
-    l: +(D.L / W * 100).toFixed(3),
-    r: +(D.R / W * 100).toFixed(3),
-    t: +(D.T / H * 100).toFixed(3),
-    b: +(D.B / H * 100).toFixed(3),
-    c: +(D.C / W * 100).toFixed(3),
-  }
+  'door-l%': (D.L / W * 100).toFixed(3),
+  'door-r%': (D.R / W * 100).toFixed(3),
+  'door-t%': (D.T / H * 100).toFixed(3),
+  'door-b%': (D.B / H * 100).toFixed(3),
+  'door-c%': (D.C / W * 100).toFixed(3),
 }));
