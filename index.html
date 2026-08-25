@@ -27,6 +27,7 @@
   --zoom:1;
   --shade:0;        /* 문짝 그늘 */
   --swing:-1;       /* 1 = 안쪽으로 열림, -1 = 바깥쪽(보는 사람 쪽)으로 열림 */
+  --shift-x:1.5%;   /* 첫 화면 좌우 이동. 사진 폭 기준 %, +면 오른쪽 */
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
@@ -46,7 +47,7 @@ body{
   position:absolute; top:50%; left:50%;
   width:max(100vw, calc(100svh * var(--img-w) / var(--img-h)));
   aspect-ratio: var(--img-w) / var(--img-h);
-  transform:translate(-50%,-50%) scale(var(--zoom));
+  transform:translate(calc(-50% + var(--shift-x)),-50%) scale(var(--zoom));
   will-change:transform;
 }
 
@@ -77,8 +78,15 @@ body{
 .door{
   position:absolute; top:var(--door-t); height:calc(var(--door-b) - var(--door-t));
   background-size:100% 100%; background-repeat:no-repeat;
-  will-change:transform; transform-style:flat;
+  will-change:transform; transform-style:preserve-3d;
 }
+/* 문 두께 — 여닫는 쪽 모서리에 세운 얇은 면. 문짝 폭의 4.5% = 실제 문 두께 비율 */
+.door::before{
+  content:""; position:absolute; top:0; bottom:0; width:4.5%;
+  background:linear-gradient(90deg,#6d5a44,#8a7358 45%,#5c4b38);
+}
+.door--l::before{left:100%; transform-origin:left center; transform:rotateY(90deg)}
+.door--r::before{right:100%; transform-origin:right center; transform:rotateY(-90deg)}
 .door::after{
   content:""; position:absolute; inset:0; background:#2b2318;
   opacity:var(--shade); will-change:opacity;
