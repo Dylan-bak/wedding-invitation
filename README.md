@@ -28,7 +28,8 @@ npx serve -l 4321 .
 | `tools/vertex-image.mjs` | Gemini 이미지 생성/편집 호출 (선택) |
 | `IMG_0668(1).jpg` `IMG_1413(1).jpg` `IMG_1804(1).jpg` | 원본 사진 (자산 재생성용 소스) |
 | `IMG_0668(1)-2.jpg` | 원본 0668에서 문짝만 지운 인페인팅 결과 — `gate-bg.jpg` 소스 |
-| `1000017567.png` | 원본 0668의 간판을 "TOV HESED" 로 고친 생성본 (848x1236) — `frame.jpg`·문짝 소스 |
+| `3c4b782e-d48a-4e8d-8e9e-a11900226e3b.png` | 원본 0668의 간판을 "TOV HESED" 로 고친 생성본 (848x1248) — `frame.jpg`·문짝 소스 |
+| `tools/build-qr.mjs` | 배포 주소 → QR (`assets/qr.svg` · `qr.png`) |
 
 ## 3. 동작 원리
 
@@ -68,14 +69,15 @@ p 0.55~1.00    사진 + 날짜가 아래에서 위로 상승
 
 ### 문짝 위치가 문틀과 어긋날 때
 
-`index.html` 의 `:root` 값만 조정. `1000017567.png`(848×1236) 기준 백분율.
+`index.html` 의 `:root` 값만 조정. `3c4b782e-...png`(848×1248) 기준 백분율.
 
 ```css
---door-l: 18.514%;  /* 문 왼쪽 끝 */
---door-r: 80.778%;  /* 문 오른쪽 끝 */
---door-t:  9.628%;  /* 문 위쪽 */
---door-b: 67.961%;  /* 문 아래쪽 */
---door-c: 50%;      /* 두 문짝 분할선 */
+--door-l: 16.392%;  /* 문 왼쪽 끝 */
+--door-r: 81.368%;  /* 문 오른쪽 끝 */
+--door-t: 11.378%;  /* 문 위쪽 */
+--door-b: 67.308%;  /* 문 아래쪽 */
+--door-c: 50.118%;  /* 두 문짝 분할선 */
+--shift-x:  0.35%;  /* 첫 화면 좌우 이동. +면 오른쪽 */
 ```
 
 바꿨으면 문짝 이미지도 같은 좌표로 다시 잘라야 함 → `tools/build-assets.mjs` 상단 `D` 상수 수정 후
@@ -100,6 +102,10 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 
 문 회전에는 **감속형 이징(`easeOutQuad`)만 쓴다.** 가속형(`easeInOut`)을 쓰면 스크롤 초반 수백 px 동안 각도가 1도도 안 움직여, 아무리 내려도 반응이 없는 것처럼 느껴진다.
 
+### 문 두께
+
+`.door::before` 가 문짝 여닫는 쪽 모서리에 세운 옆면이다. 폭 `6.75%`(문짝 폭 기준)를 키우면 두꺼워진다.
+
 ### 사진 교체
 
 `assets/` 의 같은 파일명으로 덮어쓰면 끝. 권장 스펙:
@@ -120,7 +126,36 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 - 연락처 `tel:` / `sms:` 번호
 - 계좌 정보
 
-## 5. 자산 재생성
+## 5. QR 코드
+
+배포 주소를 QR 로 뽑는다. 종이 청첩장·현장 안내판용.
+
+```bash
+node tools/build-qr.mjs
+```
+
+주소가 바뀌면 인자로 넘긴다 — `node tools/build-qr.mjs https://example.com/`
+
+| 산출물 | 용도 |
+|---|---|
+| `assets/qr.svg` | 화면·벡터. 크기를 키워도 안 깨진다 |
+| `assets/qr.png` | 인쇄용 1200px (300dpi 로 약 10cm) |
+
+오류정정 수준 Q — 25% 손상까지 복원되므로 인쇄물이 접히거나 가운데에 로고를 얹어도 읽힌다.
+
+**생성 후 실제로 디코딩해 주소가 맞는지 확인할 것.** 눈으로는 틀린 QR 을 구별할 수 없다.
+
+```bash
+node -e "(async()=>{const sharp=(await import('sharp')).default;const jsQR=(await import('jsqr')).default;const {data,info}=await sharp('assets/qr.png').ensureAlpha().raw().toBuffer({resolveWithObject:true});console.log(jsQR(new Uint8ClampedArray(data),info.width,info.height).data)})()"
+```
+
+페이지 안에 넣으려면 이미지 한 줄이면 된다. 런타임 QR 라이브러리는 불필요.
+
+```html
+<img src="assets/qr.svg" alt="청첩장 주소 QR" width="160">
+```
+
+## 6. 자산 재생성
 
 원본 사진 3장이 있어야 함. `node_modules` (sharp) 필요.
 
@@ -128,7 +163,7 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 npm i && node tools/build-assets.mjs && node tools/build-gen.mjs
 ```
 
-## 6. Gemini 이미지 생성 (선택)
+## 7. Gemini 이미지 생성 (선택)
 
 `assets/gate-bg.jpg` 는 이미 AI 인페인팅 결과(`IMG_0668(1)-2.jpg`)로 적용돼 있음. 다시 만들 때만 아래 사용.
 
@@ -146,7 +181,7 @@ GEMINI_API_KEY=... node tools/vertex-image.mjs assets/gen-gate.png "<프롬프�
 
 **입력은 반드시 원본 `IMG_0668(1).jpg`** — `assets/` 의 가공본은 축소·blur 로 정보가 손실돼 있어 소스로 부적합.
 
-## 7. 배포
+## 8. 배포
 
 빌드·서버 로직이 없는 순수 정적 사이트 → 정적 호스팅 아무 곳이나 가능.
 **올릴 것은 `index.html` + `assets/` 뿐.** 원본 사진(`IMG_*.jpg`, 약 13MB)과 `tools/` 는 자산 재생성용이라 배포 대상이 아니다.
@@ -158,16 +193,16 @@ AWS 는 학습 목적이거나 접속 로그·세밀한 캐시 제어가 필요�
 
 | # | 방식 | 실제 비용 | 세팅 시간 | HTTPS | 자동배포 |
 |---|---|---|---|---|---|
-| **7-1** | **GitHub Pages** | **0원** | **3클릭** | O | O (push 시) |
-| 7-2 | Amplify Hosting | 0원 (12개월 프리티어) | 콘솔 5분 | O | O (push 시) |
-| 7-3 | S3 + CloudFront | **0원** (기본 주소 사용 시) | 20~30분 | O | X (수동 sync) |
-| 7-4 | S3 단독 · EC2 | 0.1 / 3.5~5 USD | — | X / O | X |
+| **8-1** | **GitHub Pages** | **0원** | **3클릭** | O | O (push 시) |
+| 8-2 | Amplify Hosting | 0원 (12개월 프리티어) | 콘솔 5분 | O | O (push 시) |
+| 8-3 | S3 + CloudFront | **0원** (기본 주소 사용 시) | 20~30분 | O | X (수동 sync) |
+| 8-4 | S3 단독 · EC2 | 0.1 / 3.5~5 USD | — | X / O | X |
 
 **React 로 바꿀 필요 없다.** Amplify Hosting 은 React 전용이 아니라 정적 파일을 그대로 받는다. React 로 옮기면 번들러·빌드 파이프라인이 추가되고 스크롤 문열림 로직도 다시 짜야 해서 더 어려워진다.
 
 ---
 
-### 7-1. GitHub Pages — 무료 · 가장 쉬움
+### 8-1. GitHub Pages — 무료 · 가장 쉬움
 
 저장소가 **public** 이어야 무료다. private 이면 GitHub Pro 필요.
 
@@ -197,7 +232,7 @@ AWS 는 학습 목적이거나 접속 로그·세밀한 캐시 제어가 필요�
 
 ---
 
-### 7-2. Amplify Hosting — 콘솔 5분 · git 연동 자동배포
+### 8-2. Amplify Hosting — 콘솔 5분 · git 연동 자동배포
 
 빌드 스텝이 없으므로 아래 파일만 저장소 루트에 두면 된다.
 
@@ -236,7 +271,7 @@ Route 53 에 있으면 레코드까지 자동 생성, 외부 등록기관이면 
 
 ---
 
-### 7-3. S3 + CloudFront — 커스텀 도메인 없이 쓰면 무료
+### 8-3. S3 + CloudFront — 커스텀 도메인 없이 쓰면 무료
 
 **CloudFront 기본 주소(`dxxxxxxxx.cloudfront.net`)만 쓰면 인증서·DNS 비용이 아예 발생하지 않는다.**
 CloudFront 무료 티어(월 1TB 전송 · 1,000만 요청)는 계정 나이와 무관한 영구 무료라, 남는 과금 요소는 S3 스토리지 1.3MB 뿐 → 월 0.003센트, 청구서엔 `$0.00` 으로 찍힌다.
@@ -300,7 +335,7 @@ aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.
 
 ---
 
-### 7-4. 나머지 (비권장)
+### 8-4. 나머지 (비권장)
 
 | 방식 | 판정 | 사유 |
 |---|---|---|
@@ -309,7 +344,7 @@ aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.
 
 ---
 
-### 7-5. 비용 — 어디까지 무료인가
+### 8-5. 비용 — 어디까지 무료인가
 
 자산 총량 약 1.3MB, 하객 500명이 각 3회 열어도 월 전송량 2GB 미만. **어느 방식을 골라도 트래픽 요금 구간에 도달하지 않는다.** 돈이 새는 곳은 트래픽이 아니라 **DNS 호스팅 영역과 도메인 등록비** 뿐이다.
 
@@ -331,7 +366,7 @@ aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.
 - 커스텀 도메인 + Route 53 = **월 $0.50 고정** + 도메인 등록비
 - Route 53 우회 = **Cloudflare DNS(무료)** 에 도메인 올리고 CNAME 만 CloudFront 로 → 월 $0.50 도 안 낸다
 
-### 7-6. AWS 를 아예 안 쓰는 무료 대안
+### 8-6. AWS 를 아예 안 쓰는 무료 대안
 
 정적 사이트라 결과물은 동일하다.
 
@@ -343,13 +378,13 @@ aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.
 
 도메인 등록비는 어디서도 못 피한다. 그것마저 안 쓰면 `<계정>.github.io/wedding-invitation` 무료 주소로 끝낼 수 있다.
 
-### 7-7. 배포 전 체크
+### 8-7. 배포 전 체크
 
 - [ ] `index.html` 의 `OOO` · `0월 0일` 플레이스홀더 전부 교체
 - [ ] `assets/couple-placeholder.jpg` 를 실제 웨딩 사진으로 교체
 - [ ] `DOC-pending.md` 의 og 태그 · BGM 반영 여부 확인
 - [ ] 모바일 실기기에서 스크롤 문열림 프레임 확인 (iOS Safari · Android Chrome)
 
-## 8. 남은 작업
+## 9. 남은 작업
 
 `DOC-pending.md` 참조.
