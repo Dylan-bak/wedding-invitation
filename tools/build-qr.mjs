@@ -8,7 +8,8 @@ const URL = process.argv[2] || 'https://dylan-bak.github.io/wedding-invitation/'
 mkdirSync('assets', { recursive: true });
 
 // errorCorrectionLevel Q = 25% 손상까지 복원. 인쇄물이 접히거나 가운데 로고를 얹어도 읽힌다
-const common = { errorCorrectionLevel: 'Q', margin: 2, color: { dark: '#3a352f', light: '#ffffff' } };
+// margin 4 = QR 규격이 요구하는 여백(quiet zone) 4모듈. 인쇄 업체가 여백을 잘라내면 인식률이 떨어진다
+const common = { errorCorrectionLevel: 'Q', margin: 4, color: { dark: '#3a352f', light: '#ffffff' } };
 
 await QRCode.toFile('assets/qr.svg', URL, { ...common, type: 'svg' });
 

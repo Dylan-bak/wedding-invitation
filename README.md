@@ -3,6 +3,8 @@
 베뉴(Tov Hesed) 실제 입구 사진을 좌·우 문짝으로 잘라, 스크롤 진행률에 맞춰 `rotateY` 로 열리게 한 단일 파일 모바일 청첩장.
 동영상·GIF·이미지 시퀀스 미사용 → 총 자산 1MB 미만, 스크롤 역방향도 그대로 되감김.
 
+**배포 주소** — https://dylan-bak.github.io/wedding-invitation/ (GitHub Pages, `main` 에 push 하면 1~2분 뒤 자동 반영)
+
 ## 1. 실행
 
 ```bash
@@ -29,7 +31,9 @@ npx serve -l 4321 .
 | `IMG_0668(1).jpg` `IMG_1413(1).jpg` `IMG_1804(1).jpg` | 원본 사진 (자산 재생성용 소스) |
 | `IMG_0668(1)-2.jpg` | 원본 0668에서 문짝만 지운 인페인팅 결과 — `gate-bg.jpg` 소스 |
 | `3c4b782e-d48a-4e8d-8e9e-a11900226e3b.png` | 원본 0668의 간판을 "TOV HESED" 로 고친 생성본 (848x1248) — `frame.jpg`·문짝 소스 |
-| `tools/build-qr.mjs` | 배포 주소 → QR (`assets/qr.svg` · `qr.png`) |
+| `assets/qr.svg` · `qr.png` | 배포 주소 QR — **종이 청첩장 인쇄 업체 전달용** |
+| `tools/build-qr.mjs` | QR 생성 |
+| `tools/measure-scroll.mjs` | 문 열림 구간 프레임·각도 측정 + 구간별 스냅샷 |
 
 ## 3. 동작 원리
 
@@ -126,9 +130,9 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 - 연락처 `tel:` / `sms:` 번호
 - 계좌 정보
 
-## 5. QR 코드
+## 5. QR 코드 — 종이 청첩장 인쇄용
 
-배포 주소를 QR 로 뽑는다. 종이 청첩장·현장 안내판용.
+청첩장 주소를 QR 로 뽑아 **인쇄 업체에 전달**하는 용도. 웹 페이지 안에는 넣지 않는다.
 
 ```bash
 node tools/build-qr.mjs
@@ -136,24 +140,38 @@ node tools/build-qr.mjs
 
 주소가 바뀌면 인자로 넘긴다 — `node tools/build-qr.mjs https://example.com/`
 
-| 산출물 | 용도 |
-|---|---|
-| `assets/qr.svg` | 화면·벡터. 크기를 키워도 안 깨진다 |
-| `assets/qr.png` | 인쇄용 1200px (300dpi 로 약 10cm) |
+### 업체에 넘길 파일
 
-오류정정 수준 Q — 25% 손상까지 복원되므로 인쇄물이 접히거나 가운데에 로고를 얹어도 읽힌다.
+| 파일 | 설명 | 우선순위 |
+|---|---|---|
+| `assets/qr.svg` | 벡터. 업체가 어떤 크기로 배치해도 안 깨진다 | **이걸 먼저 준다** |
+| `assets/qr.png` | 1200px 래스터. 업체가 SVG 를 못 받을 때만 | 대체용 |
 
-**생성 후 실제로 디코딩해 주소가 맞는지 확인할 것.** 눈으로는 틀린 QR 을 구별할 수 없다.
+### 인쇄 사양 (업체 전달 시 함께 명시)
+
+| 항목 | 값 | 이유 |
+|---|---|---|
+| 코드 구성 | 37×37 모듈 + 사방 여백 4모듈 = **45×45** | — |
+| **최소 인쇄 크기** | **가로세로 25mm 이상** | 모듈 하나가 0.5mm 이상이어야 휴대폰 카메라가 안정적으로 읽는다 |
+| 권장 크기 | 30~40mm | 실내 조명·구형 기기까지 여유 |
+| 여백(quiet zone) | **사방 흰 여백을 잘라내지 말 것** | 이미 파일에 4모듈 포함. 잘라내면 인식률이 급격히 떨어진다 |
+| 색상 | 코드 `#3a352f` / 배경 흰색 | 청첩장 본문 색과 맞춘 값. 명암비 충분 |
+| 반전 | **금지** — 밝은 배경 위 어두운 코드 유지 | 반전 코드는 못 읽는 리더기가 많다 |
+| 배경 | 사진·패턴 위에 얹지 말 것 | 단색 배경만 |
+
+업체가 순수 검정(`#000000`)을 요구하면 `tools/build-qr.mjs` 의 `dark` 값만 바꿔 다시 생성한다.
+
+오류정정 수준 **Q** (25% 손상까지 복원) — 인쇄물이 접히거나 가운데에 작은 로고를 얹어도 읽힌다.
+
+### 넘기기 전 확인 (2가지 모두)
+
+**1) 파일이 올바른 주소를 담고 있는지 디코딩으로 확인.** 눈으로는 틀린 QR 을 구별할 수 없다.
 
 ```bash
 node -e "(async()=>{const sharp=(await import('sharp')).default;const jsQR=(await import('jsqr')).default;const {data,info}=await sharp('assets/qr.png').ensureAlpha().raw().toBuffer({resolveWithObject:true});console.log(jsQR(new Uint8ClampedArray(data),info.width,info.height).data)})()"
 ```
 
-페이지 안에 넣으려면 이미지 한 줄이면 된다. 런타임 QR 라이브러리는 불필요.
-
-```html
-<img src="assets/qr.svg" alt="청첩장 주소 QR" width="160">
-```
+**2) 시안이 나오면 실제 인쇄물을 휴대폰으로 스캔.** 화면에서 읽히는 것과 종이에서 읽히는 것은 다르다 — 잉크 번짐·크기 축소·코팅 반사에서 실패한다.
 
 ## 6. 자산 재생성
 
@@ -387,4 +405,14 @@ aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.
 
 ## 9. 남은 작업
 
-`DOC-pending.md` 참조.
+배포는 이미 동작 중이고, 남은 것은 내용 채우기다.
+
+| 구분 | 내용 |
+|---|---|
+| **필수** | `index.html` 의 `OOO` · `0월 0일` 플레이스홀더 전부 교체 (이름·일시·장소·주소·연락처·계좌) |
+| **필수** | `assets/couple-placeholder.jpg` 를 실제 웨딩 사진으로 교체 |
+| 권장 | `assets/g1~g3.jpg` · `hall-wide.jpg` · `aisle.jpg` 도 현재 베뉴 사진(임시)이라 촬영본으로 교체 |
+| 권장 | 실기기(iOS Safari · Android Chrome)에서 문 열림 확인 |
+| 보류 | 카카오톡 공유 메타태그(og:image), 배경음악 — `DOC-pending.md` 참조 |
+
+내용을 채운 뒤에는 **QR 을 다시 뽑을 필요가 없다.** 주소가 그대로이므로 이미 만든 QR 이 계속 유효하다.
