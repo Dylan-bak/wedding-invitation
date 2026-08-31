@@ -123,7 +123,8 @@ body{
   opacity:clamp(0, calc(1 - var(--p) * 9), 1);
 }
 .hero__title .names{font-size:clamp(20px,5.4vw,30px); letter-spacing:.1em; line-height:1.5}
-.hero__title .heart{margin:0 .12em; font-size:.92em}
+/* names 의 letter-spacing 이 하트 앞뒤에도 붙는다. 음수 마진으로 상쇄해 이름과 붙임 */
+.hero__title .heart{margin:0 -.06em 0 -.1em; letter-spacing:0; font-size:.92em}
 .hero__title .when{margin-top:.9em; font-size:clamp(13px,3.6vw,16px); letter-spacing:.06em; opacity:.92}
 
 /* 스크롤 안내 — 테두리 박스 안에서 점이 아래에서 위로 반복 이동 */
