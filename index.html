@@ -180,10 +180,11 @@ figcaption{margin-top:14px; font-size:12px; letter-spacing:.2em; opacity:.5}
 .info dt{opacity:.5; letter-spacing:.16em; white-space:nowrap}
 footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garamond",serif; letter-spacing:.3em; opacity:.4; font-size:12px}
 
-/* 갤러리 */
-.gallery{display:grid; grid-template-columns:1fr 1fr; gap:8px}
-.gallery img{width:100%; aspect-ratio:3/4; object-fit:cover; border-radius:3px; display:block}
-.gallery img:first-child{grid-column:1 / -1; aspect-ratio:4/3}
+/* 갤러리 — 단독 3장은 원본 비율 그대로, 이어서 정사각 2x2 */
+.solo{display:grid; gap:10px}
+.solo img{width:100%; height:auto; border-radius:3px; display:block}
+.grid4{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px}
+.grid4 img{width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:3px; display:block}
 
 /* 연락처 / 계좌 */
 .contact{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:26px}
@@ -195,7 +196,8 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
 .acct{margin-top:14px; text-align:left; font-size:13px; line-height:2}
 .acct .bank{opacity:.55; letter-spacing:.1em}
 .map{margin-top:22px; border-radius:4px; overflow:hidden; border:1px solid rgba(58,53,47,.14)}
-.map img{width:100%; display:block; filter:grayscale(.25)}
+/* 약도는 지하철 노선색이 정보이므로 색을 깎지 않는다 */
+.map img{width:100%; display:block}
 .tip{margin-top:16px; font-size:13px; line-height:2.1; opacity:.75; text-align:left}
 .tip b{font-weight:600; letter-spacing:.12em; opacity:.85}
 
@@ -267,7 +269,7 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
     <dl>
       <dt>일시</dt><dd>2026년 11월 14일 토요일 오후 6시 30분</dd>
       <dt>장소</dt><dd>토브 헤세드 &middot; 0층 채플</dd>
-      <dt>주소</dt><dd>서울특별시 OO구 OO로 00</dd>
+      <dt>주소</dt><dd>서울시 강남구 도산대로38길 32 (논현동 72-8번지)</dd>
     </dl>
   </div>
 </section>
@@ -275,26 +277,35 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
 <section class="block rv">
   <div class="kicker">Gallery</div>
   <h2>우리의 순간</h2>
-  <div class="gallery">
-    <img src="assets/temp/hall-wide.jpg" alt="">
-    <img src="assets/temp/aisle.jpg" alt="">
-    <img src="assets/temp/g1.jpg" alt="">
-    <img src="assets/temp/g2.jpg" alt="">
-    <img src="assets/temp/g3.jpg" alt="">
+  <div class="solo">
+    <img src="assets/photo/s1.jpg" alt="" loading="lazy">
+    <img src="assets/photo/s2.jpg" alt="" loading="lazy">
+    <img src="assets/photo/s3.jpg" alt="" loading="lazy">
   </div>
-  <figcaption>※ 임시 이미지 — 웨딩 촬영본으로 교체 예정</figcaption>
+  <div class="grid4">
+    <img src="assets/photo/g1.jpg" alt="" loading="lazy">
+    <img src="assets/photo/g2.jpg" alt="" loading="lazy">
+    <img src="assets/photo/g3.jpg" alt="" loading="lazy">
+    <img src="assets/photo/g4.jpg" alt="" loading="lazy">
+  </div>
 </section>
 
 <section class="block rv">
   <div class="kicker">Location</div>
   <h2>오시는 길</h2>
   <div class="map">
-    <img src="assets/temp/g3.jpg" alt="약도 자리">
+    <img src="assets/photo/map.jpg" alt="토브헤세드 약도" loading="lazy">
   </div>
   <div class="tip">
-    <b>지하철</b><br>OO선 OO역 O번 출구 도보 0분<br><br>
-    <b>버스</b><br>OO정류장 하차 · 000, 000<br><br>
-    <b>주차</b><br>건물 내 주차장 2시간 무료
+    <b>주소</b><br>서울시 강남구 도산대로38길 32 (논현동 72-8번지)<br><br>
+    <b>지하철</b><br>7호선 학동역 10번 출구(서울세관 방면) 도보 7분<br>
+    예식 1시간 전부터 셔틀버스 수시 운행<br><br>
+    <b>버스</b><br>언북중학교 입구 하차 후 도보 6분<br>
+    간선 145 · 440 / 지선 4212<br>
+    서울세관 하차 후 도보 5분<br>
+    간선 141 / 직행 3600<br><br>
+    <b>자가용</b><br>네비게이션에 &lsquo;토브헤세드&rsquo; 또는 &lsquo;언북중학교 정문&rsquo; 검색<br>
+    주차 요원의 안내를 받으세요
   </div>
 </section>
 

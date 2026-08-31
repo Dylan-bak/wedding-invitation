@@ -4,6 +4,7 @@
   },
   "devDependencies": {
     "jsqr": "^1.4.0",
+    "pdfjs-dist": "^6.3.289",
     "puppeteer-core": "^25.8.0",
     "qrcode": "^1.5.4"
   }
