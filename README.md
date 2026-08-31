@@ -20,17 +20,19 @@ npx serve -l 4321 .
 | 경로 | 역할 |
 |---|---|
 | `index.html` | 전체 페이지 (HTML + CSS + JS 단일 파일) |
-| `assets/temp/frame.jpg` | 문틀·기둥·꽃·간판 — 스크롤 중 고정되는 배경 |
-| `assets/temp/door-l.jpg` · `door-r.jpg` | 좌·우 문짝 (각각 경첩 기준 회전) |
-| `assets/temp/gate-bg.jpg` | 문 뒤로 보이는 공간 (문짝을 지운 인페인팅 결과에서 개구부만 크롭) |
-| `assets/temp/couple-placeholder.jpg` | 문 열린 뒤 올라오는 사진 자리 **(임시)** |
-| `assets/temp/hall-wide.jpg` `aisle.jpg` `g1~g3.jpg` | 본문·갤러리 사진 |
-| `tools/build-assets.mjs` | 원본 사진 → 문짝·배경 자산 생성 |
-| `tools/build-gen.mjs` | 원본 사진 → 문 뒤 배경·갤러리 자산 생성 |
+| `assets/hero/frame.jpg` | 문틀·기둥·꽃·간판 — 스크롤 중 고정되는 배경 |
+| `assets/hero/door-l.jpg` · `door-r.jpg` | 좌·우 문짝 (각각 경첩 기준 회전) |
+| `assets/hero/gate-bg.jpg` | 문 뒤로 보이는 공간 (문짝을 지운 인페인팅 결과에서 개구부만 크롭) |
+| `assets/photo/reveal.jpg` | 문 열린 뒤 아래에서 올라오는 사진 |
+| `assets/photo/s1~s3.jpg` | 갤러리 단독 게재 3장 (원본 비율 유지) |
+| `assets/photo/g1~g4.jpg` | 갤러리 2x2 격자 4장 (정사각) |
+| `assets/photo/map.jpg` | 약도 |
+| `assets/origin/` | 촬영 원본 `1~7.jpg` `door.png` `map.jpg` — **git 제외**. 자산 재생성용 소스 |
+| `tools/build-assets.mjs` | `origin/door.png` → 문틀·문짝 자산 |
+| `tools/build-gen.mjs` | 인페인팅 결과 → 문 뒤 공간(`gate-bg`) |
+| `tools/build-photos.mjs` | `origin/1~7.jpg`·`map.jpg` → 갤러리·약도·reveal |
 | `tools/vertex-image.mjs` | Gemini 이미지 생성/편집 호출 (선택) |
-| `IMG_0668(1).jpg` `IMG_1413(1).jpg` `IMG_1804(1).jpg` | 원본 사진 (자산 재생성용 소스) |
-| `IMG_0668(1)-2.jpg` | 원본 0668에서 문짝만 지운 인페인팅 결과 — `gate-bg.jpg` 소스 |
-| `3c4b782e-d48a-4e8d-8e9e-a11900226e3b.png` | 원본 0668의 간판을 "TOV HESED" 로 고친 생성본 (848x1248) — `frame.jpg`·문짝 소스 |
+| `assets/gate-src.jpg` | 문짝만 지운 인페인팅 결과(848×1248) — `gate-bg.jpg` 소스 |
 | `assets/qr.svg` · `qr.png` | 배포 주소 QR — **종이 청첩장 인쇄 업체 전달용** |
 | `tools/build-qr.mjs` | QR 생성 |
 | `tools/measure-scroll.mjs` | 문 열림 구간 프레임·각도 측정 + 구간별 스냅샷 |
@@ -73,14 +75,14 @@ p 0.55~1.00    사진 + 날짜가 아래에서 위로 상승
 
 ### 문짝 위치가 문틀과 어긋날 때
 
-`index.html` 의 `:root` 값만 조정. `3c4b782e-...png`(848×1248) 기준 백분율.
+`index.html` 의 `:root` 값만 조정. `assets/origin/door.png`(3533×5200) 기준 백분율.
 
 ```css
---door-l: 16.392%;  /* 문 왼쪽 끝 */
---door-r: 81.368%;  /* 문 오른쪽 끝 */
---door-t: 11.378%;  /* 문 위쪽 */
---door-b: 67.308%;  /* 문 아래쪽 */
---door-c: 50.118%;  /* 두 문짝 분할선 */
+--door-l: 17.888%;  /* 문 왼쪽 끝 */
+--door-r: 81.942%;  /* 문 오른쪽 끝 */
+--door-t: 10.712%;  /* 문 위쪽 */
+--door-b: 67.500%;  /* 문 아래쪽 */
+--door-c: 49.958%;  /* 두 문짝 분할선 */
 --shift-x:  0.35%;  /* 첫 화면 좌우 이동. +면 오른쪽 */
 ```
 
@@ -112,13 +114,14 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 
 ### 사진 교체
 
-`assets/` 의 같은 파일명으로 덮어쓰면 끝. 권장 스펙:
+`assets/origin/` 에 새 사진을 넣고 번호를 맞춘 뒤 `node tools/build-photos.mjs` 를 다시 돌린다.
 
-| 파일 | 비율 | 폭 |
+| origin | 쓰이는 곳 | 처리 |
 |---|---|---|
-| `couple-placeholder.jpg` | 3:4 세로 | 900px |
-| `g1~g3.jpg` | 3:4 세로 | 800px |
-| `hall-wide.jpg` | 자유 | 1200px |
+| `1.jpg` | 갤러리 단독 1번 + 문 열린 뒤 올라오는 사진 | 단독은 원본 비율, reveal 은 3:4 |
+| `2.jpg` `3.jpg` | 갤러리 단독 2·3번 | 원본 비율 유지 (자르지 않음) |
+| `4~7.jpg` | 갤러리 2x2 격자 | 정사각 900px 로 중앙 크롭 |
+| `map.jpg` | 약도 | 폭 932 그대로, 품질 90 |
 
 ### 텍스트
 
@@ -175,15 +178,15 @@ node -e "(async()=>{const sharp=(await import('sharp')).default;const jsQR=(awai
 
 ## 6. 자산 재생성
 
-원본 사진 3장이 있어야 함. `node_modules` (sharp) 필요.
+`assets/origin/` 의 촬영 원본이 있어야 함. `node_modules` (sharp) 필요.
 
 ```bash
-npm i && node tools/build-assets.mjs && node tools/build-gen.mjs
+npm i && node tools/build-assets.mjs && node tools/build-gen.mjs && node tools/build-photos.mjs
 ```
 
 ## 7. Gemini 이미지 생성 (선택)
 
-`assets/temp/gate-bg.jpg` 는 이미 AI 인페인팅 결과(`IMG_0668(1)-2.jpg`)로 적용돼 있음. 다시 만들 때만 아래 사용.
+`assets/hero/gate-bg.jpg` 는 이미 AI 인페인팅 결과(`assets/gate-src.jpg`)로 적용돼 있음. 다시 만들 때만 아래 사용.
 
 사용한 프롬프트:
 
@@ -192,17 +195,18 @@ npm i && node tools/build-assets.mjs && node tools/build-gen.mjs
 생성 결과는 원본 좌표와 어긋나므로 **문틀 안쪽 개구부만 잘라내 쓴다** (`tools/build-gen.mjs` 의 `extract` 좌표. 결과물 해상도가 바뀌면 이 좌표도 다시 재야 함).
 
 ```bash
-GEMINI_API_KEY=... node tools/vertex-image.mjs assets/gen-gate.png "<프롬프트>" "IMG_0668(1).jpg"
+GEMINI_API_KEY=... node tools/vertex-image.mjs assets/gen-gate.png "<프롬프트>" "assets/origin/door.png"
 ```
 
 `GEMINI_API_KEY` 없으면 Vertex AI + gemini CLI OAuth 토큰으로 폴백. 단 해당 GCP 프로젝트에 `aiplatform.endpoints.predict` 권한이 있어야 함.
 
-**입력은 반드시 원본 `IMG_0668(1).jpg`** — `assets/` 의 가공본은 축소·blur 로 정보가 손실돼 있어 소스로 부적합.
+**입력은 반드시 촬영 원본 `assets/origin/door.png`** — 가공본은 축소로 정보가 손실돼 있어 소스로 부적합.
 
 ## 8. 배포
 
 빌드·서버 로직이 없는 순수 정적 사이트 → 정적 호스팅 아무 곳이나 가능.
-**올릴 것은 `index.html` + `assets/` 뿐.** 원본 사진(`IMG_*.jpg`, 약 13MB)과 `tools/` 는 자산 재생성용이라 배포 대상이 아니다.
+**올릴 것은 `index.html` + `assets/hero` + `assets/photo` + `assets/qr.*` 뿐.**
+`assets/origin/`(촬영 원본, git 제외)과 `tools/` 는 자산 재생성용이라 배포 대상이 아니다.
 
 ### 결론
 

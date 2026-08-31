@@ -7,10 +7,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
-<link rel="preload" as="image" href="assets/temp/frame.jpg" fetchpriority="high">
-<link rel="preload" as="image" href="assets/temp/door-l.jpg">
-<link rel="preload" as="image" href="assets/temp/door-r.jpg">
-<link rel="preload" as="image" href="assets/temp/gate-bg.jpg">
+<link rel="preload" as="image" href="assets/hero/frame.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="assets/hero/door-l.jpg">
+<link rel="preload" as="image" href="assets/hero/door-r.jpg">
+<link rel="preload" as="image" href="assets/hero/gate-bg.jpg">
 <style>
 /* 실측 문 좌표 (assets/origin/door.png — 촬영 원본 3533x5200 기준 %) */
 :root{
@@ -65,7 +65,7 @@ body{
   left:var(--door-l); top:var(--door-t);
   width:calc(var(--door-r) - var(--door-l));
   height:calc(var(--door-b) - var(--door-t));
-  background:#fff url(assets/temp/gate-bg.jpg) center/cover no-repeat;
+  background:#fff url(assets/hero/gate-bg.jpg) center/cover no-repeat;
   overflow:hidden;
 }
 /* 문틈으로 새어나오는 빛 */
@@ -93,13 +93,13 @@ body{
 }
 .door--l{
   left:var(--door-l); width:calc(var(--door-c) - var(--door-l));
-  background-image:url(assets/temp/door-l.jpg);
+  background-image:url(assets/hero/door-l.jpg);
   transform-origin:left center;
   transform:rotateY(calc(var(--swing) * var(--theta)));
 }
 .door--r{
   left:var(--door-c); width:calc(var(--door-r) - var(--door-c));
-  background-image:url(assets/temp/door-r.jpg);
+  background-image:url(assets/hero/door-r.jpg);
   transform-origin:right center;
   transform:rotateY(calc(-1 * var(--swing) * var(--theta)));
 }
@@ -211,7 +211,7 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
   <div class="hero__sticky">
     <div class="stage">
       <div class="photo">
-        <img class="photo__frame" src="assets/temp/frame.jpg" alt="" fetchpriority="high">
+        <img class="photo__frame" src="assets/hero/frame.jpg" alt="" fetchpriority="high">
         <div class="gate"></div>
         <div class="doors">
           <div class="door door--l"></div>
@@ -233,7 +233,7 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
 
       <div class="reveal">
         <div class="reveal__inner">
-          <img class="reveal__photo" src="assets/temp/couple-placeholder.jpg" alt="신랑신부">
+          <img class="reveal__photo" src="assets/photo/reveal.jpg" alt="신랑신부">
           <div class="reveal__cap">2026년 11월 14일 토요일<br>토브 헤세드</div>
           <div class="reveal__sub">Tov Hesed</div>
         </div>
@@ -253,13 +253,6 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
     귀한 걸음으로 축복해 주시면<br>
     더없는 기쁨이겠습니다.
   </p>
-</section>
-
-<section class="block rv">
-  <figure>
-    <img src="assets/temp/hall-wide.jpg" alt="예식홀">
-    <figcaption>TOV HESED</figcaption>
-  </figure>
 </section>
 
 <section class="block rv">
