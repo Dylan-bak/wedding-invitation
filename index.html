@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>우리 결혼합니다</title>
+<title>유찬💛혜진 결혼합니다</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
@@ -108,17 +108,48 @@ body{
 /* 화이트아웃 */
 .flash{position:absolute; inset:0; background:#fff; opacity:var(--flash); pointer-events:none}
 
-/* 문 열리기 전 타이틀 */
-.hero__title{
-  position:absolute; inset:auto 0 12svh 0; text-align:center; color:#fff;
-  text-shadow:0 2px 24px rgba(0,0,0,.45);
+/* 타이틀·스크롤 안내가 밝은 대리석 바닥 위에 놓여 흰 글자가 묻힌다.
+   글자 뒤에만 어두운 그라데이션을 깔아 대비를 만든다. */
+.hero__veil{
+  position:absolute; inset:auto 0 0 0; height:46svh; pointer-events:none;
+  background:linear-gradient(180deg, rgba(20,16,12,0) 0%, rgba(20,16,12,.42) 55%, rgba(20,16,12,.62) 100%);
   opacity:clamp(0, calc(1 - var(--p) * 9), 1);
 }
-.hero__title .en{font-family:"Cormorant Garamond",serif; font-size:clamp(13px,3.4vw,18px); letter-spacing:.5em; opacity:.9}
-.hero__title .names{font-size:clamp(22px,6vw,34px); margin-top:.6em; letter-spacing:.18em}
-.hint{position:absolute; left:50%; bottom:4svh; translate:-50% 0; color:#fff; font-size:11px; letter-spacing:.35em;
-  opacity:clamp(0, calc(1 - var(--p) * 12), 1); animation:bob 1.8s ease-in-out infinite}
-@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+
+/* 문 열리기 전 타이틀 */
+.hero__title{
+  position:absolute; inset:auto 0 16svh 0; text-align:center; color:#fff;
+  text-shadow:0 1px 3px rgba(0,0,0,.5), 0 2px 24px rgba(0,0,0,.55);
+  opacity:clamp(0, calc(1 - var(--p) * 9), 1);
+}
+.hero__title .names{font-size:clamp(20px,5.4vw,30px); letter-spacing:.1em; line-height:1.5}
+.hero__title .heart{margin:0 .12em; font-size:.92em}
+.hero__title .when{margin-top:.9em; font-size:clamp(13px,3.6vw,16px); letter-spacing:.06em; opacity:.92}
+
+/* 스크롤 안내 — 테두리 박스 안에서 점이 아래에서 위로 반복 이동 */
+.hint{
+  position:absolute; left:50%; bottom:4svh; translate:-50% 0;
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  color:#fff; text-shadow:0 2px 16px rgba(0,0,0,.45);
+  opacity:clamp(0, calc(1 - var(--p) * 12), 1);
+}
+.hint__box{
+  position:relative; width:25px; height:40px;
+  border:1px solid rgba(255,255,255,.9); border-radius:4px; overflow:hidden;
+}
+.hint__dot{
+  position:absolute; left:50%; width:8px; height:8px; margin-left:-4px;
+  border-radius:50%; background:#fff;
+  animation:scrollDot 1.5s linear infinite;
+}
+/* 끝점의 opacity 0 = 위에 닿은 점이 아래로 순간이동하는 것이 안 보이게 */
+@keyframes scrollDot{
+  0%{top:100%; opacity:0}
+  18%{opacity:1}
+  82%{opacity:1}
+  100%{top:0; opacity:0}
+}
+.hint__label{font-size:13px; letter-spacing:.02em}
 
 /* 문 열린 뒤 아래에서 올라오는 화면 */
 .reveal{
@@ -186,16 +217,21 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
       </div>
       <div class="flash"></div>
 
+      <div class="hero__veil"></div>
       <div class="hero__title">
-        <div class="en">WE ARE GETTING MARRIED</div>
-        <div class="names">신랑 &nbsp;&middot;&nbsp; 신부</div>
+        <!-- 하트 이모지는 아래 한 글자만 바꾸면 된다 -->
+        <div class="names">유찬<span class="heart">💛</span>혜진 결혼합니다</div>
+        <div class="when">11/14(토) 오후 6:30 토브헤세드</div>
       </div>
-      <div class="hint">SCROLL</div>
+      <div class="hint">
+        <div class="hint__box"><span class="hint__dot"></span></div>
+        <div class="hint__label">스크롤 해주세요.</div>
+      </div>
 
       <div class="reveal">
         <div class="reveal__inner">
           <img class="reveal__photo" src="assets/couple-placeholder.jpg" alt="신랑신부">
-          <div class="reveal__cap">2026년 0월 0일 토요일<br>토브 헤세드</div>
+          <div class="reveal__cap">2026년 11월 14일 토요일<br>토브 헤세드</div>
           <div class="reveal__sub">Tov Hesed</div>
         </div>
       </div>
@@ -228,7 +264,7 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
   <h2>예식 안내</h2>
   <div class="info">
     <dl>
-      <dt>일시</dt><dd>2026년 0월 0일 토요일 오후 0시 00분</dd>
+      <dt>일시</dt><dd>2026년 11월 14일 토요일 오후 6시 30분</dd>
       <dt>장소</dt><dd>토브 헤세드 &middot; 0층 채플</dd>
       <dt>주소</dt><dd>서울특별시 OO구 OO로 00</dd>
     </dl>
