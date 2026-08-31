@@ -40,7 +40,8 @@ body{
 .hero{height:460svh; position:relative}
 .hero__sticky{position:sticky; top:0; height:100svh; overflow:hidden}
 
-.stage{position:absolute; inset:0; background:#000}
+/* 이미지 로드 실패 시 드러나는 색. 검정이면 화면이 통째로 검게 보이므로 본문과 같은 크림톤으로 */
+.stage{position:absolute; inset:0; background:var(--paper)}
 
 /* 원본 사진 비율 박스를 cover 로 채움 → 자식은 % 좌표로 정확히 정렬 */
 .photo{
