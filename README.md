@@ -20,11 +20,11 @@ npx serve -l 4321 .
 | 경로 | 역할 |
 |---|---|
 | `index.html` | 전체 페이지 (HTML + CSS + JS 단일 파일) |
-| `assets/frame.jpg` | 문틀·기둥·꽃·간판 — 스크롤 중 고정되는 배경 |
-| `assets/door-l.jpg` · `door-r.jpg` | 좌·우 문짝 (각각 경첩 기준 회전) |
-| `assets/gate-bg.jpg` | 문 뒤로 보이는 공간 (문짝을 지운 인페인팅 결과에서 개구부만 크롭) |
-| `assets/couple-placeholder.jpg` | 문 열린 뒤 올라오는 사진 자리 **(임시)** |
-| `assets/hall-wide.jpg` `aisle.jpg` `g1~g3.jpg` | 본문·갤러리 사진 |
+| `assets/temp/frame.jpg` | 문틀·기둥·꽃·간판 — 스크롤 중 고정되는 배경 |
+| `assets/temp/door-l.jpg` · `door-r.jpg` | 좌·우 문짝 (각각 경첩 기준 회전) |
+| `assets/temp/gate-bg.jpg` | 문 뒤로 보이는 공간 (문짝을 지운 인페인팅 결과에서 개구부만 크롭) |
+| `assets/temp/couple-placeholder.jpg` | 문 열린 뒤 올라오는 사진 자리 **(임시)** |
+| `assets/temp/hall-wide.jpg` `aisle.jpg` `g1~g3.jpg` | 본문·갤러리 사진 |
 | `tools/build-assets.mjs` | 원본 사진 → 문짝·배경 자산 생성 |
 | `tools/build-gen.mjs` | 원본 사진 → 문 뒤 배경·갤러리 자산 생성 |
 | `tools/vertex-image.mjs` | Gemini 이미지 생성/편집 호출 (선택) |
@@ -183,7 +183,7 @@ npm i && node tools/build-assets.mjs && node tools/build-gen.mjs
 
 ## 7. Gemini 이미지 생성 (선택)
 
-`assets/gate-bg.jpg` 는 이미 AI 인페인팅 결과(`IMG_0668(1)-2.jpg`)로 적용돼 있음. 다시 만들 때만 아래 사용.
+`assets/temp/gate-bg.jpg` 는 이미 AI 인페인팅 결과(`IMG_0668(1)-2.jpg`)로 적용돼 있음. 다시 만들 때만 아래 사용.
 
 사용한 프롬프트:
 
@@ -399,7 +399,7 @@ aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.
 ### 8-7. 배포 전 체크
 
 - [ ] `index.html` 의 `OOO` · `0월 0일` 플레이스홀더 전부 교체
-- [ ] `assets/couple-placeholder.jpg` 를 실제 웨딩 사진으로 교체
+- [ ] `assets/temp/couple-placeholder.jpg` 를 실제 웨딩 사진으로 교체
 - [ ] `DOC-pending.md` 의 og 태그 · BGM 반영 여부 확인
 - [ ] 모바일 실기기에서 스크롤 문열림 프레임 확인 (iOS Safari · Android Chrome)
 
@@ -410,7 +410,7 @@ aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.
 | 구분 | 내용 |
 |---|---|
 | **필수** | `index.html` 의 `OOO` · `0월 0일` 플레이스홀더 전부 교체 (이름·일시·장소·주소·연락처·계좌) |
-| **필수** | `assets/couple-placeholder.jpg` 를 실제 웨딩 사진으로 교체 |
+| **필수** | `assets/temp/couple-placeholder.jpg` 를 실제 웨딩 사진으로 교체 |
 | 권장 | `assets/g1~g3.jpg` · `hall-wide.jpg` · `aisle.jpg` 도 현재 베뉴 사진(임시)이라 촬영본으로 교체 |
 | 권장 | 실기기(iOS Safari · Android Chrome)에서 문 열림 확인 |
 | 보류 | 카카오톡 공유 메타태그(og:image), 배경음악 — `DOC-pending.md` 참조 |

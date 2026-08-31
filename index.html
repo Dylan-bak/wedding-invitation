@@ -7,10 +7,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
-<link rel="preload" as="image" href="assets/frame.jpg" fetchpriority="high">
-<link rel="preload" as="image" href="assets/door-l.jpg">
-<link rel="preload" as="image" href="assets/door-r.jpg">
-<link rel="preload" as="image" href="assets/gate-bg.jpg">
+<link rel="preload" as="image" href="assets/temp/frame.jpg" fetchpriority="high">
+<link rel="preload" as="image" href="assets/temp/door-l.jpg">
+<link rel="preload" as="image" href="assets/temp/door-r.jpg">
+<link rel="preload" as="image" href="assets/temp/gate-bg.jpg">
 <style>
 /* 실측 문 좌표 (3c4b782e-d48a-4e8d-8e9e-a11900226e3b.png — TOV HESED 간판 생성본 848x1248 기준 %) */
 :root{
@@ -65,7 +65,7 @@ body{
   left:var(--door-l); top:var(--door-t);
   width:calc(var(--door-r) - var(--door-l));
   height:calc(var(--door-b) - var(--door-t));
-  background:#fff url(assets/gate-bg.jpg) center/cover no-repeat;
+  background:#fff url(assets/temp/gate-bg.jpg) center/cover no-repeat;
   overflow:hidden;
 }
 /* 문틈으로 새어나오는 빛 */
@@ -93,13 +93,13 @@ body{
 }
 .door--l{
   left:var(--door-l); width:calc(var(--door-c) - var(--door-l));
-  background-image:url(assets/door-l.jpg);
+  background-image:url(assets/temp/door-l.jpg);
   transform-origin:left center;
   transform:rotateY(calc(var(--swing) * var(--theta)));
 }
 .door--r{
   left:var(--door-c); width:calc(var(--door-r) - var(--door-c));
-  background-image:url(assets/door-r.jpg);
+  background-image:url(assets/temp/door-r.jpg);
   transform-origin:right center;
   transform:rotateY(calc(-1 * var(--swing) * var(--theta)));
 }
@@ -208,7 +208,7 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
   <div class="hero__sticky">
     <div class="stage">
       <div class="photo">
-        <img class="photo__frame" src="assets/frame.jpg" alt="" fetchpriority="high">
+        <img class="photo__frame" src="assets/temp/frame.jpg" alt="" fetchpriority="high">
         <div class="gate"></div>
         <div class="doors">
           <div class="door door--l"></div>
@@ -230,7 +230,7 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
 
       <div class="reveal">
         <div class="reveal__inner">
-          <img class="reveal__photo" src="assets/couple-placeholder.jpg" alt="신랑신부">
+          <img class="reveal__photo" src="assets/temp/couple-placeholder.jpg" alt="신랑신부">
           <div class="reveal__cap">2026년 11월 14일 토요일<br>토브 헤세드</div>
           <div class="reveal__sub">Tov Hesed</div>
         </div>
@@ -254,7 +254,7 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
 
 <section class="block rv">
   <figure>
-    <img src="assets/hall-wide.jpg" alt="예식홀">
+    <img src="assets/temp/hall-wide.jpg" alt="예식홀">
     <figcaption>TOV HESED</figcaption>
   </figure>
 </section>
@@ -275,11 +275,11 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
   <div class="kicker">Gallery</div>
   <h2>우리의 순간</h2>
   <div class="gallery">
-    <img src="assets/hall-wide.jpg" alt="">
-    <img src="assets/aisle.jpg" alt="">
-    <img src="assets/g1.jpg" alt="">
-    <img src="assets/g2.jpg" alt="">
-    <img src="assets/g3.jpg" alt="">
+    <img src="assets/temp/hall-wide.jpg" alt="">
+    <img src="assets/temp/aisle.jpg" alt="">
+    <img src="assets/temp/g1.jpg" alt="">
+    <img src="assets/temp/g2.jpg" alt="">
+    <img src="assets/temp/g3.jpg" alt="">
   </div>
   <figcaption>※ 임시 이미지 — 웨딩 촬영본으로 교체 예정</figcaption>
 </section>
@@ -288,7 +288,7 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
   <div class="kicker">Location</div>
   <h2>오시는 길</h2>
   <div class="map">
-    <img src="assets/g3.jpg" alt="약도 자리">
+    <img src="assets/temp/g3.jpg" alt="약도 자리">
   </div>
   <div class="tip">
     <b>지하철</b><br>OO선 OO역 O번 출구 도보 0분<br><br>
