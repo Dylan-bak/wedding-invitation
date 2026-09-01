@@ -209,6 +209,10 @@ figcaption{margin-top:14px; font-size:12px; letter-spacing:.2em; opacity:.5}
 .info{margin-top:34px; border-top:1px solid rgba(58,53,47,.15); border-bottom:1px solid rgba(58,53,47,.15); padding:26px 0}
 .info dl{display:grid; grid-template-columns:auto 1fr; gap:14px 22px; text-align:left; font-size:14px; line-height:1.9}
 .info dt{opacity:.5; letter-spacing:.16em; white-space:nowrap}
+.info dt::after{content:" /"; opacity:.6}
+/* 갤러리 위에 놓이는 예식 안내 — 위아래와 붙지 않게.
+   .when 은 대문 서브타이틀이 이미 쓰는 이름이라 겹치면 안 된다 */
+.venue{margin:11svh 0}
 footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garamond",serif; letter-spacing:.3em; opacity:.4; font-size:12px}
 
 /* 갤러리 — 단독 2장은 원본 비율 그대로, 이어서 3열 썸네일 격자 */
@@ -307,7 +311,7 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
       <div class="reveal">
         <div class="reveal__inner">
           <img class="reveal__photo" src="assets/photo/reveal.jpg" alt="신랑신부">
-          <div class="reveal__cap">2026년 11월 14일 토요일<br>토브 헤세드</div>
+          <div class="reveal__cap">2026년 11월 14일 토요일<br>토브헤세드</div>
           <div class="reveal__sub">Tov Hesed</div>
         </div>
       </div>
@@ -340,19 +344,19 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
     <p>구학모 &middot; 이해옥 <span class="rel">의 차녀</span> <b>혜진</b></p>
   </div>
 
-  <div class="thumbs" id="thumbs"></div>
-</section>
-
-<section class="block rv">
-  <div class="kicker">When &amp; Where</div>
-  <h2>예식 안내</h2>
-  <div class="info">
-    <dl>
-      <dt>일시</dt><dd>2026년 11월 14일 토요일 오후 6시 30분</dd>
-      <dt>장소</dt><dd>토브 헤세드 &middot; 0층 채플</dd>
-      <dt>주소</dt><dd>서울시 강남구 도산대로38길 32 (논현동 72-8번지)</dd>
-    </dl>
+  <div class="venue">
+    <div class="kicker kicker--asis">When &amp; Where</div>
+    <h2 class="couple"><b>예식 안내</b></h2>
+    <div class="info">
+      <dl>
+        <dt>일시</dt><dd>2026년 11월 14일 토요일 오후 6시 30분</dd>
+        <dt>장소</dt><dd>토브헤세드</dd>
+        <dt>주소</dt><dd>서울시 강남구 논현 2동 도산대로 38길 32<br>(논현동 72-8번지)</dd>
+      </dl>
+    </div>
   </div>
+
+  <div class="thumbs" id="thumbs"></div>
 </section>
 
 <section class="block rv">
