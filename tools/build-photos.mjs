@@ -33,9 +33,9 @@ for (const [i, n] of GALLERY.entries()) {
     .resize({ width: 336, height: 366, fit: 'cover', position: 'centre' })
     .jpeg({ quality: 78, mozjpeg: true }).toFile(`assets/photo/t${id}.jpg`);
 
-  // 확대용 — 장변 1400. 클릭할 때만 내려받으므로 첫 로딩에 영향 없다
+  // 확대용 — 장변 2000. 폴드 펼침·태블릿까지 커버. 클릭할 때만 내려받으므로 첫 로딩에 영향 없다
   await sharp(src(n)).rotate()
-    .resize({ width: 1400, height: 1400, fit: 'inside', withoutEnlargement: true })
+    .resize({ width: 2000, height: 2000, fit: 'inside', withoutEnlargement: true })
     .jpeg(jpg).toFile(`assets/photo/f${id}.jpg`);
 }
 

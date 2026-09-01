@@ -26,7 +26,7 @@ npx serve -l 4321 .
 | `assets/photo/reveal.jpg` | 문 열린 뒤 아래에서 올라오는 사진 |
 | `assets/photo/s1~s2.jpg` | 갤러리 단독 게재 2장 (원본 비율 유지) |
 | `assets/photo/t01~t15.jpg` | 갤러리 썸네일 15장 (336×366) |
-| `assets/photo/f01~f15.jpg` | 썸네일 클릭 시 띄우는 확대본 (장변 1400) |
+| `assets/photo/f01~f15.jpg` | 썸네일 클릭 시 띄우는 확대본 (장변 2000, 장당 약 150KB) |
 | `assets/photo/map.jpg` | 약도 |
 | `assets/origin/` | 촬영 원본 `1~17` `door-2.jpeg` `map.jpg` — **git 제외**. 확장자가 `.jpg`/`.jpeg` 섞여 있어 빌드 스크립트가 있는 쪽을 찾아 쓴다 |
 | `tools/build-assets.mjs` | `origin/door-2.jpeg` → 문틀·문짝 자산 |
@@ -123,7 +123,7 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 |---|---|---|
 | `1` | 갤러리 단독 1번 + 문 열린 뒤 올라오는 사진 | 단독은 원본 비율, reveal 은 3:4 |
 | `2` | 갤러리 단독 2번 | 원본 비율 유지 (자르지 않음) |
-| `3~17` | 갤러리 썸네일 격자 15장 | 썸네일은 112:122 중앙 크롭, 확대본은 원본 비율 |
+| `3~17` | 갤러리 썸네일 격자 15장 | 썸네일은 112:122 중앙 크롭(336×366), 확대본은 원본 비율 장변 2000 |
 | `map.jpg` | 약도 | 폭 932 그대로, 품질 90 |
 
 ### 텍스트
@@ -141,7 +141,9 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 ### 대문 중앙 로고
 
 `.hero__logo` — Cormorant Garamond SemiBold(600), 흰색, 트래킹 `.05em`(+50).
-`&` 는 이름의 `0.5em`. 그림자는 `0 0 21px rgba(0,0,0,.48)` 에 짧은 그림자를 겹쳐 퍼짐(spread)을 흉내낸 것 — CSS text-shadow 에는 spread 값이 없다.
+`&` 는 이름의 `0.5em`.
+
+**Photoshop 과 달리 CSS `text-shadow` 에 spread 미존재.** 값 4개 중 `offset-x offset-y blur color` 만 지원 → 퍼짐은 짧은 그림자를 겹쳐 흉내낸다. 현재값 = `0 0 21px rgba(0,0,0,.48)` + `0 0 7px rgba(0,0,0,.34)`. 정확히 재현하려면 SVG `feMorphology` + `feGaussianBlur` 필요.
 마지막 글자 뒤에 붙는 자간 때문에 가운데정렬이 왼쪽으로 밀리므로 `margin-right:-.05em` 로 상쇄한다.
 
 ## 5. QR 코드 — 종이 청첩장 인쇄용
