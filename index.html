@@ -195,6 +195,8 @@ h2{font-weight:400; font-size:clamp(19px,5vw,24px); letter-spacing:.14em; margin
 /* kicker 는 기본이 대문자 변환. 표기를 준 그대로 두는 경우에만 해제 */
 .kicker--asis{text-transform:none}
 .couple{letter-spacing:.08em}
+/* 사진 사이에 들어가는 글 — 위아래 사진과 붙지 않게 여백 */
+.invite{margin:11svh 0}
 .couple b{font-weight:600}
 p.body{font-size:15px; line-height:2.3; letter-spacing:.02em; opacity:.85}
 figure img{width:100%; border-radius:4px; display:block; box-shadow:0 14px 40px rgba(90,70,50,.14)}
@@ -308,17 +310,26 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
   </div>
 </div>
 
-<!-- 이후 섹션 -->
+<!-- 이후 섹션 — 사진과 글이 번갈아 나오도록 한 섹션 안에 배치 -->
 <section class="block rv">
-  <div class="kicker">Invitation</div>
-  <h2>초대합니다</h2>
-  <p class="body">
-    서로가 서로에게 물들어<br>
-    같은 곳을 바라보게 되었습니다.<br><br>
-    저희 두 사람이 하나 되는 날,<br>
-    귀한 걸음으로 축복해 주시면<br>
-    더없는 기쁨이겠습니다.
-  </p>
+  <div class="kicker kicker--asis">The WEDDING OF</div>
+  <h2 class="couple"><b>박유찬</b> 그리고 <b>구혜진</b></h2>
+  <div class="solo"><img src="assets/photo/s1.jpg" alt="" loading="lazy"></div>
+
+  <div class="invite">
+    <div class="kicker">Invitation</div>
+    <h2 class="couple"><b>초대합니다</b></h2>
+    <p class="body">
+      서로를 만나기 위해 각자의 길을 걸어왔습니다.<br>
+      각자의 길 끝에 서로가 서로에게 물들어<br>
+      같은 곳을 바라보게 되었습니다.<br><br>
+      이제 두 사람의 길이 하나가 됩니다.<br>
+      그 시작을 함께 축복해주세요.
+    </p>
+  </div>
+
+  <div class="solo"><img src="assets/photo/s2.jpg" alt="" loading="lazy"></div>
+  <div class="thumbs" id="thumbs"></div>
 </section>
 
 <section class="block rv">
@@ -331,16 +342,6 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
       <dt>주소</dt><dd>서울시 강남구 도산대로38길 32 (논현동 72-8번지)</dd>
     </dl>
   </div>
-</section>
-
-<section class="block rv">
-  <div class="kicker kicker--asis">The WEDDING OF</div>
-  <h2 class="couple"><b>박유찬</b> 그리고 <b>구혜진</b></h2>
-  <div class="solo">
-    <img src="assets/photo/s1.jpg" alt="" loading="lazy">
-    <img src="assets/photo/s2.jpg" alt="" loading="lazy">
-  </div>
-  <div class="thumbs" id="thumbs"></div>
 </section>
 
 <section class="block rv">
