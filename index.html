@@ -217,6 +217,78 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
 /* 제작 표기 — THANK YOU 보다 한 단 낮게 */
 footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.62}
 
+/* 참석 의사 — 본문 섹션 · 진입 팝업 공용 */
+.btn-primary{
+  display:block; width:100%; margin-top:28px; padding:15px 16px;
+  border:1px solid rgba(58,53,47,.75); border-radius:4px;
+  background:var(--ink); color:#fbf9f6;
+  font-family:inherit; font-size:14px; letter-spacing:.14em; cursor:pointer;
+  -webkit-tap-highlight-color:transparent; transition:opacity .2s ease;
+}
+.btn-primary:active{opacity:.78}
+.btn-primary:disabled{opacity:.45; cursor:default}
+.btn-primary:focus-visible{outline:2px solid rgba(58,53,47,.45); outline-offset:3px}
+
+/* 팝업 — 아래에서 올라오는 시트 */
+.sheet{
+  position:fixed; inset:0; z-index:60; display:grid; align-items:end;
+  background:rgba(20,16,12,.5); opacity:0; pointer-events:none;
+  transition:opacity .3s ease;
+}
+.sheet[data-open]{opacity:1; pointer-events:auto}
+.sheet__panel{
+  background:var(--paper); border-radius:14px 14px 0 0;
+  padding:30px 24px calc(26px + env(safe-area-inset-bottom));
+  max-height:92svh; overflow-y:auto; text-align:center; position:relative;
+  transform:translateY(14px); transition:transform .3s cubic-bezier(.2,.7,.2,1);
+}
+.sheet[data-open] .sheet__panel{transform:none}
+@media (min-width:560px){
+  .sheet{align-items:center; place-items:center}
+  .sheet__panel{border-radius:10px; width:min(92vw,460px)}
+}
+.sheet__close{
+  position:absolute; top:10px; right:12px; width:40px; height:40px;
+  border:0; background:none; color:inherit; font-size:24px; line-height:1;
+  opacity:.45; cursor:pointer;
+}
+.sheet__lead{margin-top:4px}
+
+/* 입력 항목 */
+.rsvp-form{margin-top:30px; text-align:left; display:grid; gap:20px}
+.fld{display:grid; gap:9px}
+.fld > span{font-size:12.5px; letter-spacing:.14em; opacity:.55}
+.fld > span em{font-style:normal; opacity:.7}
+.fld input, .fld textarea{
+  width:100%; padding:12px 13px; border:1px solid rgba(58,53,47,.2); border-radius:4px;
+  background:#fff; color:inherit; font-family:inherit; font-size:15px; resize:none;
+}
+.fld input:focus, .fld textarea:focus{outline:none; border-color:rgba(58,53,47,.55)}
+.fld[data-off]{opacity:.35; pointer-events:none}
+
+/* 선택 버튼 묶음 */
+.seg{display:grid; grid-template-columns:repeat(2,1fr); gap:8px}
+.seg--num{grid-template-columns:repeat(4,1fr)}
+.seg button{
+  padding:12px 6px; border:1px solid rgba(58,53,47,.2); border-radius:4px;
+  background:#fff; color:inherit; font-family:inherit; font-size:14px; cursor:pointer;
+  -webkit-tap-highlight-color:transparent; transition:background .18s ease, border-color .18s ease;
+}
+.seg button[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:#fbf9f6}
+
+/* 인원 증감 */
+.stepper{display:flex; align-items:center; justify-content:center; gap:18px; margin-top:4px}
+.stepper button{
+  width:38px; height:38px; border:1px solid rgba(58,53,47,.2); border-radius:50%;
+  background:#fff; color:inherit; font-size:18px; line-height:1; cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.stepper button:disabled{opacity:.3; cursor:default}
+.stepper output{min-width:3.2em; text-align:center; font-size:16px; letter-spacing:.06em}
+
+.fld__msg{margin-top:14px; font-size:13px; line-height:1.8; text-align:center}
+.fld__msg[data-err]{color:#a4433a}
+
 /* 갤러리 — 단독 2장은 원본 비율 그대로, 이어서 3열 썸네일 격자 */
 .solo{display:grid; gap:10px}
 .solo img{width:100%; height:auto; border-radius:3px; display:block}
@@ -412,6 +484,74 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
   </div>
 </section>
 
+<section class="block rv" id="rsvpSection" hidden>
+  <div class="kicker">R.S.V.P</div>
+  <h2 class="couple"><b>참석 의사 전달</b></h2>
+  <p class="body">
+    귀한 걸음 해주시는 모든 분들을 정성껏 모실 수 있도록,<br>
+    참석 의사를 남겨주시면 감사하겠습니다.
+  </p>
+  <button type="button" class="btn-primary" id="rsvpOpen">참석 의사 전달하기</button>
+</section>
+
+<div class="sheet" id="rsvp" role="dialog" aria-modal="true" aria-labelledby="rsvpTitle">
+  <div class="sheet__panel">
+    <button type="button" class="sheet__close" id="rsvpClose" aria-label="닫기">&times;</button>
+    <div class="kicker">R.S.V.P</div>
+    <h2 class="couple" id="rsvpTitle"><b>참석 의사 전달</b></h2>
+    <p class="body sheet__lead">
+      귀한 걸음 해주시는 모든 분들을 정성껏 모실 수 있도록,<br>
+      참석 의사를 남겨주시면 감사하겠습니다.
+    </p>
+
+    <form class="rsvp-form" id="rsvpForm" novalidate>
+      <label class="fld">
+        <span>성함</span>
+        <input name="name" type="text" maxlength="20" autocomplete="name" placeholder="성함을 입력해 주세요">
+      </label>
+
+      <div class="fld">
+        <span>구분</span>
+        <div class="seg" data-name="side">
+          <button type="button" value="신랑측" aria-pressed="false">신랑측</button>
+          <button type="button" value="신부측" aria-pressed="false">신부측</button>
+        </div>
+      </div>
+
+      <div class="fld">
+        <span>참석 여부</span>
+        <div class="seg" data-name="attend">
+          <button type="button" value="참석" aria-pressed="false">참석</button>
+          <button type="button" value="미참석" aria-pressed="false">미참석</button>
+        </div>
+      </div>
+
+      <div class="fld" id="mealFld">
+        <span>식사 인원수 <em>(본인 포함)</em></span>
+        <div class="seg seg--num" data-name="meal">
+          <button type="button" value="1" aria-pressed="false">1</button>
+          <button type="button" value="2" aria-pressed="false">2</button>
+          <button type="button" value="3" aria-pressed="false">3</button>
+          <button type="button" value="4" aria-pressed="false">4</button>
+        </div>
+        <div class="stepper">
+          <button type="button" data-step="-1" aria-label="한 명 줄이기">&minus;</button>
+          <output id="mealOut">0명</output>
+          <button type="button" data-step="1" aria-label="한 명 늘리기">&plus;</button>
+        </div>
+      </div>
+
+      <label class="fld">
+        <span>전달 말씀 <em>(선택)</em></span>
+        <textarea name="msg" rows="2" maxlength="200" placeholder="남기실 말씀이 있으면 적어 주세요"></textarea>
+      </label>
+
+      <button type="submit" class="btn-primary" id="rsvpSubmit">전달하기</button>
+      <p class="fld__msg" id="rsvpMsg" hidden></p>
+    </form>
+  </div>
+</div>
+
 <section class="block rv">
   <div class="kicker">With Heart</div>
   <h2>마음 전하실 곳</h2>
@@ -578,6 +718,126 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
     else if (e.key === 'ArrowRight') show(cur + 1);
   });
 
+
+
+  // ── 참석 의사 전달 ──────────────────────────
+  // Apps Script 웹앱 주소. 비어 있으면 섹션·팝업 모두 노출하지 않는다
+  const RSVP_ENDPOINT = '';
+  const RSVP_SEEN_KEY = 'rsvp-popup-seen';
+  // 시크릿 모드·일부 인앱 브라우저는 localStorage 접근만으로도 예외를 던진다.
+  // 감싸두지 않으면 이 아래 코드 전체가 실행되지 않는다
+  const seen = {
+    get: () => { try { return !!localStorage.getItem(RSVP_SEEN_KEY); } catch { return false; } },
+    set: () => { try { localStorage.setItem(RSVP_SEEN_KEY, '1'); } catch {} },
+  };
+  const MEAL_MAX = 20;
+
+  const rsvp = document.getElementById('rsvp');
+  const rsvpSection = document.getElementById('rsvpSection');
+
+  if (!RSVP_ENDPOINT) rsvp.hidden = true;   // 주소가 없으면 팝업도 DOM 에서 감춘다
+
+  if (RSVP_ENDPOINT) {
+    rsvpSection.hidden = false;
+
+    const form = document.getElementById('rsvpForm');
+    const msg = document.getElementById('rsvpMsg');
+    const submit = document.getElementById('rsvpSubmit');
+    const mealFld = document.getElementById('mealFld');
+    const mealOut = document.getElementById('mealOut');
+    const segs = [...form.querySelectorAll('.seg')];
+    const pick = {};              // {side, attend, meal}
+
+    const setMeal = n => {
+      pick.meal = Math.max(0, Math.min(MEAL_MAX, n));
+      mealOut.textContent = pick.meal + '명';
+      form.querySelectorAll('.seg[data-name="meal"] button').forEach(b =>
+        b.setAttribute('aria-pressed', String(+b.value === pick.meal)));
+      form.querySelector('.stepper button[data-step="-1"]').disabled = pick.meal <= 0;
+      form.querySelector('.stepper button[data-step="1"]').disabled = pick.meal >= MEAL_MAX;
+    };
+    setMeal(0);
+
+    // 선택 버튼 — 같은 묶음에서 하나만
+    segs.forEach(seg => seg.addEventListener('click', e => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const key = seg.dataset.name;
+      if (key === 'meal') { setMeal(+btn.value); return; }
+      pick[key] = btn.value;
+      seg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+      // 미참석이면 식사 인원을 물을 필요가 없다
+      if (key === 'attend') {
+        const off = btn.value === '미참석';
+        mealFld.toggleAttribute('data-off', off);
+        if (off) setMeal(0);
+      }
+    }));
+
+    form.querySelector('.stepper').addEventListener('click', e => {
+      const btn = e.target.closest('button[data-step]');
+      if (btn) setMeal(pick.meal + +btn.dataset.step);
+    });
+
+    const say = (text, isErr) => {
+      msg.hidden = false;
+      msg.textContent = text;
+      msg.toggleAttribute('data-err', !!isErr);
+    };
+
+    const openRsvp = () => {
+      rsvp.setAttribute('data-open', '');
+      document.body.style.overflow = 'hidden';
+    };
+    const closeRsvp = () => {
+      rsvp.removeAttribute('data-open');
+      document.body.style.overflow = '';
+    };
+
+    document.getElementById('rsvpOpen').addEventListener('click', openRsvp);
+    document.getElementById('rsvpClose').addEventListener('click', closeRsvp);
+    rsvp.addEventListener('click', e => { if (e.target === rsvp) closeRsvp(); });
+    addEventListener('keydown', e => {
+      if (e.key === 'Escape' && rsvp.hasAttribute('data-open')) closeRsvp();
+    });
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const name = form.name.value.trim();
+      if (!name) return say('성함을 입력해 주세요.', true);
+      if (!pick.side) return say('신랑측 · 신부측을 선택해 주세요.', true);
+      if (!pick.attend) return say('참석 여부를 선택해 주세요.', true);
+      if (pick.attend === '참석' && !pick.meal) return say('식사 인원수를 선택해 주세요.', true);
+
+      submit.disabled = true;
+      say('전달 중입니다…');
+      try {
+        // 헤더를 붙이지 않으면 사전요청(preflight) 없이 전송된다
+        await fetch(RSVP_ENDPOINT, {
+          method: 'POST',
+          body: JSON.stringify({
+            name, side: pick.side, attend: pick.attend,
+            meal: pick.meal, msg: form.msg.value.trim(),
+          }),
+        });
+        form.querySelectorAll('input,textarea,button').forEach(el => el.disabled = true);
+        say('전달되었습니다. 감사합니다.');
+        seen.set();
+        setTimeout(closeRsvp, 1600);
+      } catch {
+        submit.disabled = false;
+        say('전달에 실패했습니다. 잠시 후 다시 시도해 주세요.', true);
+      }
+    });
+
+    // 첫 진입 1회만 팝업. 문 열림 연출을 가리지 않도록 조금 뒤에
+    if (!seen.get()) {
+      setTimeout(() => {
+        if (!rsvp.hasAttribute('data-open')) openRsvp();
+        seen.set();
+      }, 2200);
+    }
+  }
 
   // ── 지도앱 바로가기 ─────────────────────────
   // 앱 스킴을 먼저 시도하고, 화면이 백그라운드로 넘어가지 않으면(=앱 없음) 웹으로 보낸다

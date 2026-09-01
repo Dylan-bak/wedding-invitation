@@ -36,6 +36,7 @@ npx serve -l 4321 .
 | `assets/gate-src.jpg` | 문짝만 지운 인페인팅 결과(848×1248) — `gate-bg.jpg` 소스 |
 | `assets/qr.svg` · `qr.png` | 배포 주소 QR — **종이 청첩장 인쇄 업체 전달용** |
 | `tools/build-qr.mjs` | QR 생성 |
+| `tools/rsvp.gs` | 참석 의사 수집용 Apps Script (스프레드시트에 붙여넣는 코드) |
 | `tools/measure-scroll.mjs` | 문 열림 구간 프레임·각도 측정 + 구간별 스냅샷 |
 
 ## 3. 동작 원리
@@ -146,7 +147,46 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 **Photoshop 과 달리 CSS `text-shadow` 에 spread 미존재.** 값 4개 중 `offset-x offset-y blur color` 만 지원 → 퍼짐은 짧은 그림자를 겹쳐 흉내낸다. 현재값 = `0 0 21px rgba(0,0,0,.48)` + `0 0 7px rgba(0,0,0,.34)`. 정확히 재현하려면 SVG `feMorphology` + `feGaussianBlur` 필요.
 마지막 글자 뒤에 붙는 자간 때문에 가운데정렬이 왼쪽으로 밀리므로 `margin-right:-.05em` 로 상쇄한다.
 
-## 5. QR 코드 — 종이 청첩장 인쇄용
+## 5. 참석 의사 전달 (R.S.V.P)
+
+응답은 Google 스프레드시트에 쌓인다. 정적 사이트라 서버가 없으므로 Apps Script 웹앱을 수집처로 쓴다.
+
+### 배포 (1회)
+
+전체 절차는 `tools/rsvp.gs` 맨 위 주석에 있다. 요약 —
+
+1. 새 스프레드시트 → 확장 프로그램 → Apps Script
+2. `tools/rsvp.gs` 내용을 붙여넣기
+3. 배포 → 새 배포 → 유형 `웹 앱` · 실행 계정 `나` · **액세스 권한 `모든 사용자`**
+4. 나온 URL 을 `index.html` 의 `RSVP_ENDPOINT` 에 넣는다
+
+```js
+const RSVP_ENDPOINT = 'https://script.google.com/macros/s/.../exec';
+```
+
+**`RSVP_ENDPOINT` 가 비어 있으면 섹션과 팝업이 화면에 나오지 않는다.** 주소를 넣는 순간 노출된다.
+
+3단계에서 액세스 권한을 `모든 사용자` 로 바꾸지 않으면 하객이 보낼 때 실패한다.
+
+### 동작
+
+| 항목 | 내용 |
+|---|---|
+| 위치 | 오시는 길 다음 · 마음 전하실 곳 앞 |
+| 팝업 | 첫 진입 2.2초 뒤 1회. 다시 열지 않도록 `localStorage` 에 기록 |
+| 입력 | 성함(텍스트) · 구분 · 참석 여부 · 식사 인원수 · 전달 말씀(선택) |
+| 식사 인원수 | 1~4 버튼 + 증감 버튼(0~20). 미참석 선택 시 항목 비활성 |
+| 전송 | 요청 헤더를 붙이지 않아 사전요청(preflight)이 생기지 않는다. Apps Script 가 시트에 한 줄 추가 |
+
+`localStorage` 는 시크릿 모드·일부 인앱 브라우저에서 **접근만으로도 예외를 던진다.** 감싸지 않으면 그 아래 스크립트 전체가 실행되지 않으므로 `try/catch` 로 감싸 쓴다.
+
+### 응답 확인
+
+스프레드시트 `rsvp` 시트 — 접수시각 · 성함 · 구분 · 참석여부 · 식사인원 · 전달말씀.
+웹앱 URL 을 브라우저에서 그냥 열면 현재 접수 건수가 JSON 으로 나온다.
+
+
+## 6. QR 코드 — 종이 청첩장 인쇄용
 
 청첩장 주소를 QR 로 뽑아 **인쇄 업체에 전달**하는 용도. 웹 페이지 안에는 넣지 않는다.
 
@@ -189,7 +229,7 @@ node -e "(async()=>{const sharp=(await import('sharp')).default;const jsQR=(awai
 
 **2) 시안이 나오면 실제 인쇄물을 휴대폰으로 스캔.** 화면에서 읽히는 것과 종이에서 읽히는 것은 다르다 — 잉크 번짐·크기 축소·코팅 반사에서 실패한다.
 
-## 6. 자산 재생성
+## 7. 자산 재생성
 
 `assets/origin/` 의 촬영 원본이 있어야 함. `node_modules` (sharp) 필요.
 
@@ -197,7 +237,7 @@ node -e "(async()=>{const sharp=(await import('sharp')).default;const jsQR=(awai
 npm i && node tools/build-assets.mjs && node tools/build-gen.mjs && node tools/build-photos.mjs
 ```
 
-## 7. Gemini 이미지 생성 (선택)
+## 8. Gemini 이미지 생성 (선택)
 
 `assets/hero/gate-bg.jpg` 는 이미 AI 인페인팅 결과(`assets/gate-src.jpg`)로 적용돼 있음. 다시 만들 때만 아래 사용.
 
@@ -215,7 +255,7 @@ GEMINI_API_KEY=... node tools/vertex-image.mjs assets/gen-gate.png "<프롬프�
 
 **입력은 반드시 촬영 원본 `assets/origin/door-2.jpeg`** — 가공본은 축소로 정보가 손실돼 있어 소스로 부적합.
 
-## 8. 배포
+## 9. 배포
 
 빌드·서버 로직이 없는 순수 정적 사이트 → 정적 호스팅 아무 곳이나 가능.
 **올릴 것은 `index.html` + `assets/hero` + `assets/photo` + `assets/qr.*` 뿐.**
@@ -420,7 +460,7 @@ aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.
 - [ ] `DOC-pending.md` 의 og 태그 · BGM 반영 여부 확인
 - [ ] 모바일 실기기에서 스크롤 문열림 프레임 확인 (iOS Safari · Android Chrome)
 
-## 9. 남은 작업
+## 10. 남은 작업
 
 배포는 이미 동작 중이고, 남은 것은 내용 채우기다.
 
