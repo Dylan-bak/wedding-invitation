@@ -153,20 +153,53 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 
 ### 배포 (1회)
 
-전체 절차는 `tools/rsvp.gs` 맨 위 주석에 있다. 요약 —
+1. **스프레드시트 생성** — https://sheets.new 접속. 이름은 아무거나.
 
-1. 새 스프레드시트 → 확장 프로그램 → Apps Script
-2. `tools/rsvp.gs` 내용을 붙여넣기
-3. 배포 → 새 배포 → 유형 `웹 앱` · 실행 계정 `나` · **액세스 권한 `모든 사용자`**
-4. 나온 URL 을 `index.html` 의 `RSVP_ENDPOINT` 에 넣는다
+2. **Apps Script 열기** — 그 스프레드시트에서 `확장 프로그램` → `Apps Script`
 
-```js
-const RSVP_ENDPOINT = 'https://script.google.com/macros/s/.../exec';
-```
+3. **코드 붙여넣기** — 편집기의 기존 코드(`function myFunction() {}`)를 **전부 지우고**,
+   `tools/rsvp.gs` 내용을 붙여넣은 뒤 저장(Ctrl+S)
 
-**`RSVP_ENDPOINT` 가 비어 있으면 섹션과 팝업이 화면에 나오지 않는다.** 주소를 넣는 순간 노출된다.
+4. **배포** — `배포` → `새 배포` → 톱니바퀴에서 유형 `웹 앱` 선택
 
-3단계에서 액세스 권한을 `모든 사용자` 로 바꾸지 않으면 하객이 보낼 때 실패한다.
+   | 항목 | 값 |
+   |---|---|
+   | 설명 | 아무거나 (예: rsvp v1) |
+   | 실행 계정 | **나** |
+   | 액세스 권한이 있는 사용자 | **모든 사용자** |
+
+   `모든 사용자` 로 바꾸지 않으면 하객이 보낼 때 실패한다. 기본값이 `나만` 이므로 반드시 확인.
+
+5. **권한 승인** — 처음 배포하면 경고 화면이 나온다.
+   `고급` → `<프로젝트 이름>(으)로 이동` → 계정 선택 → `허용`
+
+6. **URL 복사** — 배포 완료 창의 `웹 앱 URL`
+   (`https://script.google.com/macros/s/AKfy.../exec` 형태)
+
+7. **주소를 넣고 배포**
+
+   `index.html` 에서 `RSVP_ENDPOINT` 를 찾아 6번의 URL 을 넣는다.
+
+   ```js
+   const RSVP_ENDPOINT = 'https://script.google.com/macros/s/AKfy.../exec';
+   ```
+
+   ```bash
+   git add index.html
+   git commit -m "chore: 참석 의사 수집 주소 연결"
+   git push origin main
+   ```
+
+   1~2분 뒤 사이트에 섹션과 팝업이 나타난다.
+
+8. **확인** — 사이트에서 직접 한 번 보내보고 스프레드시트 `rsvp` 시트에 줄이 생기는지 본다.
+   실패하면 4단계의 액세스 권한을 다시 확인한다.
+
+#### 코드를 고친 뒤에는 다시 배포해야 한다
+
+`tools/rsvp.gs` 를 수정하면 `배포` → `배포 관리` → 연필 → 버전 `새 버전` → `배포`.
+새 배포를 만들면 URL 이 바뀌므로, 기존 URL 을 유지하려면 **배포 관리에서 버전만 올린다**.
+
 
 ### 동작
 
