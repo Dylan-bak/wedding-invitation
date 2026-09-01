@@ -214,6 +214,8 @@ figcaption{margin-top:14px; font-size:12px; letter-spacing:.2em; opacity:.5}
    .when 은 대문 서브타이틀이 이미 쓰는 이름이라 겹치면 안 된다 */
 .venue{margin:11svh 0}
 footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garamond",serif; letter-spacing:.3em; opacity:.4; font-size:12px}
+/* 제작 표기 — THANK YOU 보다 한 단 낮게 */
+footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.62}
 
 /* 갤러리 — 단독 2장은 원본 비율 그대로, 이어서 3열 썸네일 격자 */
 .solo{display:grid; gap:10px}
@@ -427,7 +429,10 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
   <div class="lb__count" id="lbCount"></div>
 </div>
 
-<footer>THANK YOU</footer>
+<footer>
+  <div>THANK YOU</div>
+  <div class="credit">DEVELOPED BY YUCHAN</div>
+</footer>
 
 <script>
 (() => {
