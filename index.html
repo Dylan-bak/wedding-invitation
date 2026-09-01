@@ -191,6 +191,11 @@ section.block{padding:14svh 24px; max-width:520px; margin:0 auto; text-align:cen
 .rv.on{opacity:1; transform:none}
 .kicker{font-family:"Cormorant Garamond",serif; letter-spacing:.42em; font-size:12px; opacity:.55; text-transform:uppercase}
 h2{font-weight:400; font-size:clamp(19px,5vw,24px); letter-spacing:.14em; margin:18px 0 26px}
+/* 이름은 굵게, 이어주는 말은 가볍게 */
+/* kicker 는 기본이 대문자 변환. 표기를 준 그대로 두는 경우에만 해제 */
+.kicker--asis{text-transform:none}
+.couple{letter-spacing:.08em}
+.couple b{font-weight:600}
 p.body{font-size:15px; line-height:2.3; letter-spacing:.02em; opacity:.85}
 figure img{width:100%; border-radius:4px; display:block; box-shadow:0 14px 40px rgba(90,70,50,.14)}
 figcaption{margin-top:14px; font-size:12px; letter-spacing:.2em; opacity:.5}
@@ -329,8 +334,8 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
 </section>
 
 <section class="block rv">
-  <div class="kicker">Gallery</div>
-  <h2>우리의 순간</h2>
+  <div class="kicker kicker--asis">The WEDDING OF</div>
+  <h2 class="couple"><b>박유찬</b> 그리고 <b>구헤진</b></h2>
   <div class="solo">
     <img src="assets/photo/s1.jpg" alt="" loading="lazy">
     <img src="assets/photo/s2.jpg" alt="" loading="lazy">
