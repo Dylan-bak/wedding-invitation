@@ -6,7 +6,7 @@
 <title>유찬💕혜진 결혼합니다</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="assets/hero/frame.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="assets/hero/door-l.jpg">
 <link rel="preload" as="image" href="assets/hero/door-r.jpg">
@@ -83,7 +83,7 @@ body{
 }
 /* 문 두께 — 여닫는 쪽 모서리에 세운 얇은 면. 문짝 폭에 대한 비율이므로 화면이 커져도 비율이 유지된다 */
 .door::before{
-  content:""; position:absolute; top:0; bottom:0; width:10.125%;
+  content:""; position:absolute; top:0; bottom:0; width:10%;
   background:linear-gradient(90deg,#6d5a44,#8a7358 45%,#5c4b38);
 }
 .door--l::before{left:100%; transform-origin:left center; transform:rotateY(90deg)}
@@ -116,6 +116,24 @@ body{
   background:linear-gradient(180deg, rgba(20,16,12,0) 0%, rgba(20,16,12,.42) 55%, rgba(20,16,12,.62) 100%);
   opacity:clamp(0, calc(1 - var(--p) * 9), 1);
 }
+
+/* 대문 중앙 로고 — 이름을 정보가 아니라 로고처럼 얹는다.
+   문이 주역이므로 크기는 문 폭 안에 머물게 하고, 글자만 떠 보이도록 그림자로 분리 */
+.hero__logo{
+  position:absolute; left:0; right:0; top:46%; translate:0 -50%;
+  text-align:center; pointer-events:none;
+  color:#FFFFFF;
+  font-family:"Cormorant Garamond",serif; font-weight:600;
+  font-size:clamp(30px, 9.5vw, 54px); line-height:1.05;
+  letter-spacing:.05em;                      /* 트래킹 +50 = 50/1000 em */
+  /* Drop Shadow — 거리 0 / 번짐 21 / 불투명도 48%.
+     CSS 에는 spread 가 없어 짧은 그림자를 겹쳐 퍼짐을 흉내낸다 */
+  text-shadow:0 0 21px rgba(0,0,0,.48), 0 0 7px rgba(0,0,0,.34);
+  opacity:clamp(0, calc(1 - var(--p) * 7), 1);
+}
+/* letter-spacing 은 마지막 글자 뒤에도 붙어 가운데정렬이 왼쪽으로 밀린다 → 상쇄 */
+.hero__logo span{display:block; margin-right:-.05em}
+.hero__logo .amp{font-size:.5em; letter-spacing:0; margin:.1em 0; opacity:.92}
 
 /* 문 열리기 전 타이틀 */
 .hero__title{
@@ -258,6 +276,11 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
       </div>
       <div class="flash"></div>
 
+      <div class="hero__logo">
+        <span>Yuchan</span>
+        <span class="amp">&amp;</span>
+        <span>Hyejin</span>
+      </div>
       <div class="hero__veil"></div>
       <div class="hero__title">
         <!-- 하트 이모지는 아래 한 글자만 바꾸면 된다 -->
@@ -340,13 +363,13 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
   <div class="contact">
     <div class="card">
       <div class="role">GROOM</div>
-      <div class="name">신랑 OOO</div>
-      <a href="tel:01000000000">전화</a><a href="sms:01000000000">문자</a>
+      <div class="name">신랑 유찬</div>
+      <a href="tel:01084496840">전화</a><a href="sms:01084496840">문자</a>
     </div>
     <div class="card">
       <div class="role">BRIDE</div>
-      <div class="name">신부 OOO</div>
-      <a href="tel:01000000000">전화</a><a href="sms:01000000000">문자</a>
+      <div class="name">신부 혜진</div>
+      <a href="tel:01082104248">전화</a><a href="sms:01082104248">문자</a>
     </div>
   </div>
 </section>
@@ -357,9 +380,9 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
   <div class="info">
     <div class="acct">
       <div class="bank">신랑측</div>
-      <div>OO은행 000-0000-0000 · OOO</div>
+      <div>우리 1002-766-360702 · 유찬</div>
       <div class="bank" style="margin-top:14px">신부측</div>
-      <div>OO은행 000-0000-0000 · OOO</div>
+      <div>국민 520702-01-180773 · 혜진</div>
     </div>
   </div>
 </section>
