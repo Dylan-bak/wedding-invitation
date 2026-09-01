@@ -272,6 +272,9 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
 .map img{width:100%; display:block}
 .tip{margin-top:16px; font-size:13px; line-height:2.1; opacity:.75; text-align:left}
 .tip b{font-weight:600; letter-spacing:.12em; opacity:.85}
+/* ※ 안내문 — 교통 정보와 성격이 달라 구분 */
+.notice{margin-top:26px; padding-top:18px; border-top:1px solid rgba(58,53,47,.14);
+  font-size:12.5px; line-height:1.9; opacity:.6; text-align:left}
 
 @media (prefers-reduced-motion: reduce){ .rv{opacity:1; transform:none; transition:none} }
 </style>
@@ -366,16 +369,24 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
     <img src="assets/photo/map.jpg" alt="토브헤세드 약도" loading="lazy">
   </div>
   <div class="tip">
-    <b>주소</b><br>서울시 강남구 도산대로38길 32 (논현동 72-8번지)<br><br>
-    <b>지하철</b><br>7호선 학동역 10번 출구(서울세관 방면) 도보 7분<br>
-    예식 1시간 전부터 셔틀버스 수시 운행<br><br>
-    <b>버스</b><br>언북중학교 입구 하차 후 도보 6분<br>
-    간선 145 · 440 / 지선 4212<br>
-    서울세관 하차 후 도보 5분<br>
-    간선 141 / 직행 3600<br><br>
-    <b>자가용</b><br>네비게이션에 &lsquo;토브헤세드&rsquo; 또는 &lsquo;언북중학교 정문&rsquo; 검색<br>
-    주차 요원의 안내를 받으세요
+    <b>지하철</b><br>
+    7호선 학동역 10번 출구<br>
+    예식 1시간 전부터 셔틀버스 운행 (서울세관 방면)<br><br>
+
+    <b>버스</b><br>
+    언북중학교 입구 정류장 하차<br>
+    간선버스 145, 440<br>
+    지선버스 4212<br><br>
+    서울세관 정류장 하차<br>
+    간선버스 141<br>
+    직행버스 3600<br><br>
+
+    <b>차량</b><br>
+    네비게이션 &lsquo;토브헤세드&rsquo; 또는 &lsquo;언북중학교&rsquo; 검색<br>
+    서울시 강남구 논현 2동 도산대로 38길 32<br>
+    (지번) 서울특별시 강남구 논현동 72-8
   </div>
+  <p class="notice">※ 축하화환은 건물 내 반입&middot;진열이 불가하여 정중히 사양합니다.</p>
 </section>
 
 <section class="block rv">
