@@ -1,7 +1,7 @@
 # 모바일 청첩장 — 스크롤로 문이 열리는 청첩장
 
 베뉴(Tov Hesed) 실제 입구 사진을 좌·우 문짝으로 잘라, 스크롤 진행률에 맞춰 `rotateY` 로 열리게 한 단일 파일 모바일 청첩장.
-동영상·GIF·이미지 시퀀스 미사용 → 총 자산 1MB 미만, 스크롤 역방향도 그대로 되감김.
+동영상·GIF·이미지 시퀀스 미사용 → 첫 화면 자산 400KB 미만, 스크롤 역방향도 그대로 되감김.
 
 **배포 주소** — https://dylan-bak.github.io/wedding-invitation/ (GitHub Pages, `main` 에 push 하면 1~2분 뒤 자동 반영)
 
@@ -24,13 +24,14 @@ npx serve -l 4321 .
 | `assets/hero/door-l.jpg` · `door-r.jpg` | 좌·우 문짝 (각각 경첩 기준 회전) |
 | `assets/hero/gate-bg.jpg` | 문 뒤로 보이는 공간 (문짝을 지운 인페인팅 결과에서 개구부만 크롭) |
 | `assets/photo/reveal.jpg` | 문 열린 뒤 아래에서 올라오는 사진 |
-| `assets/photo/s1~s3.jpg` | 갤러리 단독 게재 3장 (원본 비율 유지) |
-| `assets/photo/g1~g4.jpg` | 갤러리 2x2 격자 4장 (정사각) |
+| `assets/photo/s1~s2.jpg` | 갤러리 단독 게재 2장 (원본 비율 유지) |
+| `assets/photo/t01~t15.jpg` | 갤러리 썸네일 15장 (336×366) |
+| `assets/photo/f01~f15.jpg` | 썸네일 클릭 시 띄우는 확대본 (장변 1400) |
 | `assets/photo/map.jpg` | 약도 |
-| `assets/origin/` | 촬영 원본 `1~7.jpg` `door.png` `map.jpg` — **git 제외**. 자산 재생성용 소스 |
-| `tools/build-assets.mjs` | `origin/door.png` → 문틀·문짝 자산 |
+| `assets/origin/` | 촬영 원본 `1~17` `door-2.jpeg` `map.jpg` — **git 제외**. 확장자가 `.jpg`/`.jpeg` 섞여 있어 빌드 스크립트가 있는 쪽을 찾아 쓴다 |
+| `tools/build-assets.mjs` | `origin/door-2.jpeg` → 문틀·문짝 자산 |
 | `tools/build-gen.mjs` | 인페인팅 결과 → 문 뒤 공간(`gate-bg`) |
-| `tools/build-photos.mjs` | `origin/1~7.jpg`·`map.jpg` → 갤러리·약도·reveal |
+| `tools/build-photos.mjs` | `origin/1~17`·`map.jpg` → 갤러리·약도·reveal |
 | `tools/vertex-image.mjs` | Gemini 이미지 생성/편집 호출 (선택) |
 | `assets/gate-src.jpg` | 문짝만 지운 인페인팅 결과(848×1248) — `gate-bg.jpg` 소스 |
 | `assets/qr.svg` · `qr.png` | 배포 주소 QR — **종이 청첩장 인쇄 업체 전달용** |
@@ -75,14 +76,14 @@ p 0.55~1.00    사진 + 날짜가 아래에서 위로 상승
 
 ### 문짝 위치가 문틀과 어긋날 때
 
-`index.html` 의 `:root` 값만 조정. `assets/origin/door.png`(3533×5200) 기준 백분율.
+`index.html` 의 `:root` 값만 조정. `assets/origin/door-2.jpeg`(1400×2061) 기준 백분율.
 
 ```css
---door-l: 17.888%;  /* 문 왼쪽 끝 */
---door-r: 81.942%;  /* 문 오른쪽 끝 */
---door-t: 10.712%;  /* 문 위쪽 */
---door-b: 67.500%;  /* 문 아래쪽 */
---door-c: 49.958%;  /* 두 문짝 분할선 */
+--door-l: 17.429%;  /* 문 왼쪽 끝 */
+--door-r: 82.214%;  /* 문 오른쪽 끝 */
+--door-t: 10.626%;  /* 문 위쪽 */
+--door-b: 67.443%;  /* 문 아래쪽 */
+--door-c: 50.000%;  /* 두 문짝 분할선 */
 --shift-x:  0.35%;  /* 첫 화면 좌우 이동. +면 오른쪽 */
 ```
 
@@ -110,7 +111,9 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 
 ### 문 두께
 
-`.door::before` 가 문짝 여닫는 쪽 모서리에 세운 옆면이다. 폭 `6.75%`(문짝 폭 기준)를 키우면 두꺼워진다.
+`.door::before` 가 문짝 여닫는 쪽 모서리에 세운 옆면이다. 폭 `10.125%` 를 키우면 두꺼워진다.
+
+**단위는 `%`(문짝 폭 기준)를 쓴다. `rem`·`px` 은 쓰지 않는다** — 문짝 폭은 화면 크기에 비례해 변하는데 두께만 고정되면 큰 화면에서 얇고 작은 화면에서 두꺼워 보인다.
 
 ### 사진 교체
 
@@ -118,9 +121,9 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 
 | origin | 쓰이는 곳 | 처리 |
 |---|---|---|
-| `1.jpg` | 갤러리 단독 1번 + 문 열린 뒤 올라오는 사진 | 단독은 원본 비율, reveal 은 3:4 |
-| `2.jpg` `3.jpg` | 갤러리 단독 2·3번 | 원본 비율 유지 (자르지 않음) |
-| `4~7.jpg` | 갤러리 2x2 격자 | 정사각 900px 로 중앙 크롭 |
+| `1` | 갤러리 단독 1번 + 문 열린 뒤 올라오는 사진 | 단독은 원본 비율, reveal 은 3:4 |
+| `2` | 갤러리 단독 2번 | 원본 비율 유지 (자르지 않음) |
+| `3~17` | 갤러리 썸네일 격자 15장 | 썸네일은 112:122 중앙 크롭, 확대본은 원본 비율 |
 | `map.jpg` | 약도 | 폭 932 그대로, 품질 90 |
 
 ### 텍스트
@@ -190,17 +193,17 @@ npm i && node tools/build-assets.mjs && node tools/build-gen.mjs && node tools/b
 
 사용한 프롬프트:
 
-> 첨부한 웨딩홀 정면 사진에서 가운데 나무 여닫이문 두 짝만 완전히 제거하고, 그 자리에 문 안쪽으로 이어지는 실내 공간을 자연스럽게 채워줘. 원본의 대리석 헤링본 바닥, 회색 석재 문틀, 조명 톤, 원근을 그대로 유지. 문틀 바깥 영역(간판, 꽃, 기둥, 계단)은 픽셀 단위로 원본 그대로 보존. 안쪽은 밝은 자연광이 쏟아지는 하얀 공간으로. 원본과 동일한 3200x4668 해상도.
+> 첨부한 웨딩홀 정면 사진에서 가운데 나무 여닫이문 두 짝만 완전히 제거하고, 그 자리에 문 안쪽으로 이어지는 실내 공간을 자연스럽게 채워줘. 원본의 대리석 헤링본 바닥, 회색 석재 문틀, 조명 톤, 원근을 그대로 유지. 문틀 바깥 영역(간판, 꽃, 기둥, 계단)은 픽셀 단위로 원본 그대로 보존. 안쪽은 밝은 자연광이 쏟아지는 하얀 공간으로. 원본과 동일한 해상도.
 
 생성 결과는 원본 좌표와 어긋나므로 **문틀 안쪽 개구부만 잘라내 쓴다** (`tools/build-gen.mjs` 의 `extract` 좌표. 결과물 해상도가 바뀌면 이 좌표도 다시 재야 함).
 
 ```bash
-GEMINI_API_KEY=... node tools/vertex-image.mjs assets/gen-gate.png "<프롬프트>" "assets/origin/door.png"
+GEMINI_API_KEY=... node tools/vertex-image.mjs assets/gen-gate.png "<프롬프트>" "assets/origin/door-2.jpeg"
 ```
 
 `GEMINI_API_KEY` 없으면 Vertex AI + gemini CLI OAuth 토큰으로 폴백. 단 해당 GCP 프로젝트에 `aiplatform.endpoints.predict` 권한이 있어야 함.
 
-**입력은 반드시 촬영 원본 `assets/origin/door.png`** — 가공본은 축소로 정보가 손실돼 있어 소스로 부적합.
+**입력은 반드시 촬영 원본 `assets/origin/door-2.jpeg`** — 가공본은 축소로 정보가 손실돼 있어 소스로 부적합.
 
 ## 8. 배포
 

@@ -3,24 +3,24 @@ import { mkdirSync } from 'fs';
 
 mkdirSync('assets/hero', { recursive: true });
 
-// 첫 화면 소스 = 촬영 원본 (간판 TOV HESED)
-// 좌표는 이 이미지에서 가장자리 확대로 실측한 값
-const SRC = 'assets/origin/door.png';
-const W = 3533, H = 5200;
-const D = { L: 632, R: 2895, T: 557, B: 3510, C: 1765 };
+// 첫 화면 소스 = assets/origin/door-2.jpeg
+// 좌표는 이 이미지에서 가장자리를 4배 확대해 실측한 값
+const SRC = 'assets/origin/door-2.jpeg';
+const W = 1400, H = 2061;
+const D = { L: 244, R: 1151, T: 219, B: 1390, C: 700 };
 
-const jpg = { quality: 82, mozjpeg: true };
+const jpg = { quality: 84, mozjpeg: true };
 
-// 1) 문틀 배경 (문 포함 전체)
-await sharp(SRC).resize({ width: 1400 }).jpeg(jpg).toFile('assets/hero/frame.jpg');
+// 문틀 배경 (문 포함 전체)
+await sharp(SRC).jpeg(jpg).toFile('assets/hero/frame.jpg');
 
-// 2) 좌/우 문짝 — 화면에서 차지하는 폭에 맞춰 축소
+// 좌/우 문짝 — 원본 해상도가 낮아 확대하지 않고 그대로 잘라낸다
 await sharp(SRC)
   .extract({ left: D.L, top: D.T, width: D.C - D.L, height: D.B - D.T })
-  .resize({ width: 900 }).jpeg(jpg).toFile('assets/hero/door-l.jpg');
+  .jpeg(jpg).toFile('assets/hero/door-l.jpg');
 await sharp(SRC)
   .extract({ left: D.C, top: D.T, width: D.R - D.C, height: D.B - D.T })
-  .resize({ width: 900 }).jpeg(jpg).toFile('assets/hero/door-r.jpg');
+  .jpeg(jpg).toFile('assets/hero/door-r.jpg');
 
 console.log(JSON.stringify({
   'img-w': W, 'img-h': H,

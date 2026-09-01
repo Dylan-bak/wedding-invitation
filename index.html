@@ -12,12 +12,12 @@
 <link rel="preload" as="image" href="assets/hero/door-r.jpg">
 <link rel="preload" as="image" href="assets/hero/gate-bg.jpg">
 <style>
-/* 실측 문 좌표 (assets/origin/door.png — 촬영 원본 3533x5200 기준 %) */
+/* 실측 문 좌표 (assets/origin/door-2.jpeg — 1400x2061 기준 %) */
 :root{
-  --img-w: 3533; --img-h: 5200;
-  --door-l: 17.888%;  --door-r: 81.942%;
-  --door-t: 10.712%;  --door-b: 67.500%;
-  --door-c: 49.958%;
+  --img-w: 1400; --img-h: 2061;
+  --door-l: 17.429%;  --door-r: 82.214%;
+  --door-t: 10.626%;  --door-b: 67.443%;
+  --door-c: 50.000%;
   --ink:#3a352f; --paper:#fbf9f6;
   --p:0;            /* 스크롤 진행률 0~1 */
   --theta:0deg;     /* 문 회전각 */
@@ -81,9 +81,9 @@ body{
   background-size:100% 100%; background-repeat:no-repeat;
   will-change:transform; transform-style:preserve-3d;
 }
-/* 문 두께 — 여닫는 쪽 모서리에 세운 얇은 면. 문짝 폭의 4.5% = 실제 문 두께 비율 */
+/* 문 두께 — 여닫는 쪽 모서리에 세운 얇은 면. 문짝 폭에 대한 비율이므로 화면이 커져도 비율이 유지된다 */
 .door::before{
-  content:""; position:absolute; top:0; bottom:0; width:6.75%;
+  content:""; position:absolute; top:0; bottom:0; width:10.125%;
   background:linear-gradient(90deg,#6d5a44,#8a7358 45%,#5c4b38);
 }
 .door--l::before{left:100%; transform-origin:left center; transform:rotateY(90deg)}
@@ -181,11 +181,48 @@ figcaption{margin-top:14px; font-size:12px; letter-spacing:.2em; opacity:.5}
 .info dt{opacity:.5; letter-spacing:.16em; white-space:nowrap}
 footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garamond",serif; letter-spacing:.3em; opacity:.4; font-size:12px}
 
-/* 갤러리 — 단독 3장은 원본 비율 그대로, 이어서 정사각 2x2 */
+/* 갤러리 — 단독 2장은 원본 비율 그대로, 이어서 3열 썸네일 격자 */
 .solo{display:grid; gap:10px}
 .solo img{width:100%; height:auto; border-radius:3px; display:block}
-.grid4{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px}
-.grid4 img{width:100%; aspect-ratio:1/1; object-fit:cover; border-radius:3px; display:block}
+
+/* 썸네일 격자. 112x122 비율은 참고한 청첩장과 같은 값 */
+.thumbs{display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-top:10px}
+.thumbs button{
+  padding:0; border:0; background:none; cursor:pointer; display:block;
+  border-radius:3px; overflow:hidden; -webkit-tap-highlight-color:transparent;
+}
+.thumbs img{width:100%; aspect-ratio:112/122; object-fit:cover; display:block;
+  transition:transform .35s cubic-bezier(.2,.7,.2,1)}
+.thumbs button:hover img, .thumbs button:focus-visible img{transform:scale(1.06)}
+.thumbs button:focus-visible{outline:2px solid rgba(58,53,47,.5); outline-offset:2px}
+
+/* 확대 보기 */
+.lb{
+  position:fixed; inset:0; z-index:50; display:grid; place-items:center;
+  background:rgba(16,13,10,.94); opacity:0; pointer-events:none;
+  transition:opacity .28s ease;
+}
+.lb[data-open]{opacity:1; pointer-events:auto}
+.lb__img{
+  max-width:100vw; max-height:100svh; width:auto; height:auto;
+  object-fit:contain; display:block; user-select:none; -webkit-user-drag:none;
+}
+.lb__btn{
+  position:absolute; top:50%; translate:0 -50%; width:44px; height:44px;
+  border:0; border-radius:50%; background:rgba(255,255,255,.14); color:#fff;
+  font-size:20px; line-height:1; cursor:pointer; display:grid; place-items:center;
+}
+.lb__btn--prev{left:10px} .lb__btn--next{right:10px}
+.lb__close{
+  position:absolute; top:calc(10px + env(safe-area-inset-top)); right:10px;
+  width:44px; height:44px; border:0; border-radius:50%;
+  background:rgba(255,255,255,.14); color:#fff; font-size:22px; cursor:pointer;
+}
+.lb__count{
+  position:absolute; bottom:calc(14px + env(safe-area-inset-bottom)); left:50%; translate:-50% 0;
+  color:rgba(255,255,255,.8); font-size:12px; letter-spacing:.16em;
+}
+@media (hover:none){ .lb__btn{display:none} }
 
 /* 연락처 / 계좌 */
 .contact{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:26px}
@@ -274,14 +311,8 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
   <div class="solo">
     <img src="assets/photo/s1.jpg" alt="" loading="lazy">
     <img src="assets/photo/s2.jpg" alt="" loading="lazy">
-    <img src="assets/photo/s3.jpg" alt="" loading="lazy">
   </div>
-  <div class="grid4">
-    <img src="assets/photo/g1.jpg" alt="" loading="lazy">
-    <img src="assets/photo/g2.jpg" alt="" loading="lazy">
-    <img src="assets/photo/g3.jpg" alt="" loading="lazy">
-    <img src="assets/photo/g4.jpg" alt="" loading="lazy">
-  </div>
+  <div class="thumbs" id="thumbs"></div>
 </section>
 
 <section class="block rv">
@@ -332,6 +363,14 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
     </div>
   </div>
 </section>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="사진 확대">
+  <img class="lb__img" id="lbImg" alt="">
+  <button class="lb__close" id="lbClose" aria-label="닫기">&times;</button>
+  <button class="lb__btn lb__btn--prev" id="lbPrev" aria-label="이전 사진">&#8249;</button>
+  <button class="lb__btn lb__btn--next" id="lbNext" aria-label="다음 사진">&#8250;</button>
+  <div class="lb__count" id="lbCount"></div>
+</div>
 
 <footer>THANK YOU</footer>
 
@@ -409,6 +448,80 @@ footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garam
     es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); io.unobserve(e.target); } });
   }, { threshold: 0.18 });
   document.querySelectorAll('.rv').forEach(el => io.observe(el));
+
+  // ── 갤러리 썸네일 + 확대 보기 ─────────────────
+  const GALLERY_COUNT = 15;
+  const pad = n => String(n).padStart(2, '0');
+
+  const thumbs = document.getElementById('thumbs');
+  if (thumbs) {
+    const frag = document.createDocumentFragment();
+    for (let i = 1; i <= GALLERY_COUNT; i++) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.dataset.i = i;
+      btn.setAttribute('aria-label', `${i}번째 사진 크게 보기`);
+      const im = document.createElement('img');
+      im.src = `assets/photo/t${pad(i)}.jpg`;
+      im.loading = 'lazy';
+      im.decoding = 'async';
+      im.alt = '';
+      btn.appendChild(im);
+      frag.appendChild(btn);
+    }
+    thumbs.appendChild(frag);
+  }
+
+  const lb = document.getElementById('lb');
+  const lbImg = document.getElementById('lbImg');
+  const lbCount = document.getElementById('lbCount');
+  let cur = 0, scrollLock = 0;
+
+  const show = i => {
+    cur = (i + GALLERY_COUNT) % GALLERY_COUNT;      // 끝에서 처음으로 이어짐
+    lbImg.src = `assets/photo/f${pad(cur + 1)}.jpg`;
+    lbCount.textContent = `${cur + 1} / ${GALLERY_COUNT}`;
+  };
+
+  const open = i => {
+    show(i);
+    lb.setAttribute('data-open', '');
+    // 확대 중에는 배경이 스크롤되지 않게 위치를 고정
+    scrollLock = window.scrollY;
+    document.body.style.cssText = `position:fixed; top:${-scrollLock}px; left:0; right:0`;
+  };
+
+  const close = () => {
+    lb.removeAttribute('data-open');
+    document.body.style.cssText = '';
+    window.scrollTo(0, scrollLock);
+  };
+
+  thumbs?.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-i]');
+    if (btn) open(+btn.dataset.i - 1);
+  });
+  document.getElementById('lbClose').addEventListener('click', close);
+  document.getElementById('lbPrev').addEventListener('click', () => show(cur - 1));
+  document.getElementById('lbNext').addEventListener('click', () => show(cur + 1));
+  // 사진·버튼이 아닌 빈 곳을 누르면 닫힘
+  lb.addEventListener('click', e => { if (e.target === lb) close(); });
+
+  addEventListener('keydown', e => {
+    if (!lb.hasAttribute('data-open')) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowLeft') show(cur - 1);
+    else if (e.key === 'ArrowRight') show(cur + 1);
+  });
+
+  // 좌우 스와이프로 넘김
+  let sx = 0, sy = 0;
+  lb.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+  lb.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - sx;
+    const dy = e.changedTouches[0].clientY - sy;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) show(cur + (dx < 0 ? 1 : -1));
+  }, { passive: true });
 })();
 </script>
 </body>
