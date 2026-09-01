@@ -274,6 +274,24 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
 .map img{width:100%; display:block}
 .tip{margin-top:16px; font-size:13px; line-height:2.1; opacity:.75; text-align:left}
 .tip b{font-weight:600; letter-spacing:.12em; opacity:.85}
+/* 지도앱 바로가기 */
+.maplinks{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px}
+.maplink{
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  padding:13px 10px; border:1px solid rgba(58,53,47,.16); border-radius:6px;
+  background:#fff; color:inherit; font-family:inherit; font-size:13.5px;
+  letter-spacing:.02em; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  transition:background .2s ease, border-color .2s ease;
+}
+.maplink svg{width:15px; height:15px; flex:none}
+.maplink:active{background:rgba(58,53,47,.04)}
+.maplink:focus-visible{outline:2px solid rgba(58,53,47,.45); outline-offset:2px}
+/* 브랜드 색은 아이콘에만 — 로고 이미지는 저작권 때문에 쓰지 않는다 */
+.maplink--naver svg{fill:#03C75A}
+.maplink--kakao svg{fill:#3C1E1E}
+.maplink--kakao{background:#FEE500; border-color:rgba(0,0,0,.08)}
+.maplink--kakao:active{background:#f2da00}
+
 /* ※ 안내문 — 교통 정보와 성격이 달라 구분 */
 .notice{margin-top:26px; padding-top:18px; border-top:1px solid rgba(58,53,47,.14);
   font-size:12.5px; line-height:1.9; opacity:.6; text-align:left}
@@ -370,23 +388,9 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
   <div class="map">
     <img src="assets/photo/map.jpg" alt="토브헤세드 약도" loading="lazy">
   </div>
-  <div class="tip">
-    <b>지하철</b><br>
-    7호선 학동역 10번 출구<br>
-    예식 1시간 전부터 셔틀버스 운행 (서울세관 방면)<br><br>
-
-    <b>버스</b><br>
-    언북중학교 입구 정류장 하차<br>
-    간선버스 145, 440<br>
-    지선버스 4212<br><br>
-    서울세관 정류장 하차<br>
-    간선버스 141<br>
-    직행버스 3600<br><br>
-
-    <b>차량</b><br>
-    네비게이션 &lsquo;토브헤세드&rsquo; 또는 &lsquo;언북중학교&rsquo; 검색<br>
-    서울시 강남구 논현 2동 도산대로 38길 32<br>
-    (지번) 서울특별시 강남구 논현동 72-8
+  <div class="maplinks">
+    <button type="button" class="maplink maplink--naver" data-app="naver"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>네이버 지도</button>
+    <button type="button" class="maplink maplink--kakao" data-app="kakao"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>카카오맵</button>
   </div>
   <p class="notice">※ 축하화환은 건물 내 반입&middot;진열이 불가하여 정중히 사양합니다.</p>
 </section>
@@ -572,6 +576,48 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
     if (e.key === 'Escape') close();
     else if (e.key === 'ArrowLeft') show(cur - 1);
     else if (e.key === 'ArrowRight') show(cur + 1);
+  });
+
+
+  // ── 지도앱 바로가기 ─────────────────────────
+  // 앱 스킴을 먼저 시도하고, 화면이 백그라운드로 넘어가지 않으면(=앱 없음) 웹으로 보낸다
+  const PLACE = '토브헤세드';
+  const MAP_TARGET = {
+    naver: {
+      app: `nmap://search?query=${encodeURIComponent(PLACE)}&appname=${location.host}`,
+      web: `https://map.naver.com/p/search/${encodeURIComponent(PLACE)}`,
+    },
+    kakao: {
+      app: `kakaomap://search?q=${encodeURIComponent(PLACE)}`,
+      web: `https://map.kakao.com/?q=${encodeURIComponent(PLACE)}`,
+    },
+  };
+
+  document.querySelector('.maplinks')?.addEventListener('click', e => {
+    const btn = e.target.closest('.maplink');
+    if (!btn) return;
+    const t = MAP_TARGET[btn.dataset.app];
+    if (!t) return;
+
+    // PC 는 스킴이 없으므로 바로 웹으로
+    if (!/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      window.open(t.web, '_blank', 'noopener');
+      return;
+    }
+
+    let left = false;
+    const onLeave = () => { left = true; };
+    addEventListener('pagehide', onLeave, { once: true });
+    addEventListener('blur', onLeave, { once: true });
+    document.addEventListener('visibilitychange', onLeave, { once: true });
+
+    location.href = t.app;
+    setTimeout(() => {
+      removeEventListener('pagehide', onLeave);
+      removeEventListener('blur', onLeave);
+      document.removeEventListener('visibilitychange', onLeave);
+      if (!left && !document.hidden) location.href = t.web;   // 앱 미설치 → 웹
+    }, 1300);
   });
 
   // 좌우 스와이프로 넘김
