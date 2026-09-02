@@ -5,12 +5,12 @@
  * 요약 = 스프레드시트 → 확장 프로그램 → Apps Script → 이 코드 붙여넣기 →
  *        배포 → 웹 앱 · 실행 계정 "나" · 액세스 권한 "모든 사용자"
  *
- * 응답은 같은 스프레드시트의 rsvp 시트에 쌓인다.
+ * 응답은 같은 스프레드시트의 SHEET_NAME 시트에 쌓인다.
  * 방문자 ID 가 같으면 새 줄을 만들지 않고 그 줄을 고쳐 쓴다 (하객이 잘못 눌렀을 때 다시 보낼 수 있게).
  */
 
-// 양식이 바뀔 때마다 이름 뒤 번호를 올린다. 옛 응답을 덮어쓰지 않고 새 시트에 쌓기 위함
-var SHEET_NAME = 'rsvp_v2';
+// 열 구성이 바뀌면 뒤 버전을 올린다 (v1 → v2). 옛 회신은 옛 시트에 그대로 남는다
+var SHEET_NAME = '모청 참석 회신 v1';
 var HEADERS = ['방문자ID', '구분', '참석여부', '식사인원', '성함', '전달말씀', '최초접수', '최종수정', '수정횟수'];
 var COL = { id: 1, side: 2, attend: 3, meal: 4, name: 5, msg: 6, first: 7, last: 8, edits: 9 };
 
@@ -85,7 +85,6 @@ function getSheet_() {
     sh = ss.insertSheet(SHEET_NAME);
     sh.appendRow(HEADERS);
     sh.setFrozenRows(1);
-    return sh;
   }
   return sh;
 }
