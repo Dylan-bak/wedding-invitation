@@ -9,9 +9,10 @@
  * 방문자 ID 가 같으면 새 줄을 만들지 않고 그 줄을 고쳐 쓴다 (하객이 잘못 눌렀을 때 다시 보낼 수 있게).
  */
 
-var SHEET_NAME = 'rsvp';
-var HEADERS = ['최초접수', '최종수정', '수정횟수', '방문자ID', '구분', '참석여부', '식사인원'];
-var COL = { first: 1, last: 2, edits: 3, id: 4, side: 5, attend: 6, meal: 7 };
+// 양식이 바뀔 때마다 이름 뒤 번호를 올린다. 옛 응답을 덮어쓰지 않고 새 시트에 쌓기 위함
+var SHEET_NAME = 'rsvp_v2';
+var HEADERS = ['방문자ID', '구분', '참석여부', '식사인원', '성함', '전달말씀', '최초접수', '최종수정', '수정횟수'];
+var COL = { id: 1, side: 2, attend: 3, meal: 4, name: 5, msg: 6, first: 7, last: 8, edits: 9 };
 
 function doPost(e) {
   var lock = LockService.getScriptLock();       // 동시에 여러 명이 보낼 때 줄이 섞이지 않게
@@ -28,18 +29,20 @@ function doPost(e) {
     var values = [
       String(d.side || ''),
       String(d.attend || ''),
-      Number(d.meal) || 0
+      Number(d.meal) || 0,
+      String(d.name || '').slice(0, 20),
+      String(d.msg || '').slice(0, 200)
     ];
 
     if (row) {
       var edits = Number(sh.getRange(row, COL.edits).getValue()) || 0;
       sh.getRange(row, COL.last).setValue(now);
       sh.getRange(row, COL.edits).setValue(edits + 1);
-      sh.getRange(row, COL.side, 1, 3).setValues([values]);
+      sh.getRange(row, COL.side, 1, 5).setValues([values]);
       return json_({ ok: true, mode: 'update', edits: edits + 1 });
     }
 
-    sh.appendRow([now, now, 0, id].concat(values));
+    sh.appendRow([id].concat(values, [now, now, 0]));
     return json_({ ok: true, mode: 'insert' });
   } catch (err) {
     return json_({ ok: false, error: String(err) });
@@ -57,10 +60,10 @@ function doGet(e) {
   var row = findRowById_(sh, id);
   if (!row) return json_({ ok: true, found: false });
 
-  var v = sh.getRange(row, COL.side, 1, 3).getValues()[0];
+  var v = sh.getRange(row, COL.side, 1, 5).getValues()[0];
   return json_({
     ok: true, found: true,
-    side: v[0], attend: v[1], meal: v[2],
+    side: v[0], attend: v[1], meal: v[2], name: v[3], msg: v[4],
     edits: Number(sh.getRange(row, COL.edits).getValue()) || 0
   });
 }
@@ -83,13 +86,6 @@ function getSheet_() {
     sh.appendRow(HEADERS);
     sh.setFrozenRows(1);
     return sh;
-  }
-  // 예전 양식(성함 기준)으로 만들어진 시트면 새 양식으로 갈아둔다
-  var head = sh.getRange(1, 1, 1, HEADERS.length).getValues()[0].join('|');
-  if (head !== HEADERS.join('|') && sh.getLastRow() <= 1) {
-    sh.clear();
-    sh.appendRow(HEADERS);
-    sh.setFrozenRows(1);
   }
   return sh;
 }

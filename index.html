@@ -219,7 +219,7 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
 
 /* 참석 의사 — 본문 섹션 · 진입 팝업 공용 */
 .btn-primary{
-  display:block; width:100%; margin-top:28px; padding:15px 16px;
+  display:block; width:100%; margin-top:22px; padding:14px 16px;
   border:1px solid rgba(58,53,47,.75); border-radius:4px;
   background:var(--ink); color:#fbf9f6;
   font-family:inherit; font-size:14px; letter-spacing:.14em; cursor:pointer;
@@ -238,7 +238,7 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
 .sheet[data-open]{opacity:1; pointer-events:auto}
 .sheet__panel{
   background:var(--paper); border-radius:14px 14px 0 0;
-  padding:30px 24px calc(26px + env(safe-area-inset-bottom));
+  padding:24px 22px calc(20px + env(safe-area-inset-bottom));
   max-height:92svh; overflow-y:auto; text-align:center; position:relative;
   transform:translateY(14px); transition:transform .3s cubic-bezier(.2,.7,.2,1);
 }
@@ -252,16 +252,16 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
   border:0; background:none; color:inherit; font-size:24px; line-height:1;
   opacity:.45; cursor:pointer;
 }
-.sheet__lead{margin-top:4px}
+.sheet__lead{margin-top:2px; font-size:14px; line-height:1.9}
 
 /* 입력 항목 */
-.rsvp-form{margin-top:30px; text-align:left; display:grid; gap:20px}
-.fld{display:grid; gap:9px}
+.rsvp-form{margin-top:22px; text-align:left; display:grid; gap:15px}
+.fld{display:grid; gap:7px}
 .fld > span{font-size:12.5px; letter-spacing:.14em; opacity:.55}
 .fld > span em{font-style:normal; opacity:.7}
 .fld__hint{margin:-3px 0 2px; font-size:12px; line-height:1.75; opacity:.5}
 .fld input, .fld textarea{
-  width:100%; padding:12px 13px; border:1px solid rgba(58,53,47,.2); border-radius:4px;
+  width:100%; padding:10px 12px; border:1px solid rgba(58,53,47,.2); border-radius:4px;
   background:#fff; color:inherit; font-family:inherit; font-size:15px; resize:none;
 }
 .fld input:focus, .fld textarea:focus{outline:none; border-color:rgba(58,53,47,.55)}
@@ -269,18 +269,19 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
 
 /* 선택 버튼 묶음 */
 .seg{display:grid; grid-template-columns:repeat(2,1fr); gap:8px}
-.seg--num{grid-template-columns:repeat(4,1fr)}
+/* 인원 버튼은 좁아도 읽히므로 폭을 반으로 줄여 가운데 모은다 */
+.seg--num{grid-template-columns:repeat(4,minmax(0,1fr)); width:60%; margin:0 auto}
 .seg button{
-  padding:12px 6px; border:1px solid rgba(58,53,47,.2); border-radius:4px;
+  padding:10px 6px; border:1px solid rgba(58,53,47,.2); border-radius:4px;
   background:#fff; color:inherit; font-family:inherit; font-size:14px; cursor:pointer;
   -webkit-tap-highlight-color:transparent; transition:background .18s ease, border-color .18s ease;
 }
 .seg button[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:#fbf9f6}
 
 /* 인원 증감 */
-.stepper{display:flex; align-items:center; justify-content:center; gap:18px; margin-top:4px}
+.stepper{display:flex; align-items:center; justify-content:center; gap:16px; margin-top:2px}
 .stepper button{
-  width:38px; height:38px; border:1px solid rgba(58,53,47,.2); border-radius:50%;
+  width:34px; height:34px; border:1px solid rgba(58,53,47,.2); border-radius:50%;
   background:#fff; color:inherit; font-size:18px; line-height:1; cursor:pointer;
   -webkit-tap-highlight-color:transparent;
 }
@@ -467,8 +468,8 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
     <button type="button" class="maplink maplink--kakao" data-app="kakao"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>카카오맵</button>
   </div>
   <p class="notice">
-    ※ 예식장 구조상 화환을 모실 자리가 넉넉하지 않아 정중히 사양합니다.<br>
-    대신 <b>화환 리본</b>은 예식장에 준비된 화환에 함께 달아 드리니,<br>
+    ※ 예식장 구조상 화환 들일 자리가 넉넉하지 않아 정중히 사양합니다.<br>
+    대신 <b>화환 리본</b>은 예식장에 준비된 화환에 함께 매어 드리니,<br>
     마음을 담아 보내주시면 곱게 걸어두겠습니다.
   </p>
 </section>
@@ -506,8 +507,7 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
     <div class="kicker">R.S.V.P</div>
     <h2 class="couple" id="rsvpTitle"><b>참석 의사 전달</b></h2>
     <p class="body sheet__lead" id="rsvpLead">
-      귀한 걸음 해주시는 모든 분들을 정성껏 모실 수 있도록,<br>
-      참석 의사를 남겨주시면 감사하겠습니다.
+      정성껏 모실 수 있도록 참석 의사를 남겨주세요.
     </p>
 
     <form class="rsvp-form" id="rsvpForm" novalidate>
@@ -528,8 +528,7 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
       </div>
 
       <div class="fld" id="mealFld">
-        <span>식사 인원수</span>
-        <p class="fld__hint">넉넉하고 따뜻한 식사를 준비할 수 있도록, 함께 오시는 분까지 알려주세요.</p>
+        <span>식사 인원수 <em>· 함께 오시는 분까지</em></span>
         <div class="seg seg--num" data-name="meal">
           <button type="button" value="1" aria-pressed="false">1</button>
           <button type="button" value="2" aria-pressed="false">2</button>
@@ -542,6 +541,16 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
           <button type="button" data-step="1" aria-label="한 명 늘리기">&plus;</button>
         </div>
       </div>
+
+      <label class="fld">
+        <span>성함 <em>(선택)</em></span>
+        <input name="name" type="text" maxlength="20" autocomplete="name" placeholder="남겨주시면 반갑게 맞이하겠습니다">
+      </label>
+
+      <label class="fld">
+        <span>전달 말씀 <em>(선택)</em></span>
+        <textarea name="msg" rows="2" maxlength="200" placeholder="남기실 말씀이 있으면 적어 주세요"></textarea>
+      </label>
 
       <button type="submit" class="btn-primary" id="rsvpSubmit">전달하기</button>
       <p class="fld__msg" id="rsvpMsg" hidden></p>
@@ -721,7 +730,6 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
   // ── 참석 의사 전달 ──────────────────────────
   // Apps Script 웹앱 주소. 비어 있으면 섹션·팝업 모두 노출하지 않는다
   const RSVP_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyOVLJcI5tdUh4WEVvwgWsz3SpTtb5e6SjCTkNdXE5Rutj2HIzIscioyvf1oIgNt3MdJw/exec';
-  const RSVP_SEEN_KEY = 'rsvp-popup-seen';
   const RSVP_ID_KEY = 'rsvp-visitor-id';
   const RSVP_DONE_KEY = 'rsvp-answered';
   const MEAL_MAX = 20;
@@ -844,6 +852,7 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
           body: JSON.stringify({
             id: visitorId, side: pick.side,
             attend: pick.attend, meal: pick.meal,
+            name: form.name.value.trim(), msg: form.msg.value.trim(),
           }),
         });
         say('전달되었습니다. 감사합니다.');
@@ -855,13 +864,6 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
       }
     });
 
-    // 아직 답하지 않은 사람에게만 첫 진입 팝업. 문 열림 연출을 가리지 않도록 조금 뒤에
-    if (!store.get(RSVP_SEEN_KEY) && !store.get(RSVP_DONE_KEY)) {
-      setTimeout(() => {
-        if (!rsvp.hasAttribute('data-open')) openRsvp();
-        store.set(RSVP_SEEN_KEY, '1');
-      }, 2200);
-    }
   }
 
   // ── 지도앱 바로가기 ─────────────────────────
