@@ -36,6 +36,8 @@ npx serve -l 4321 .
 | `assets/gate-src.jpg` | 문짝만 지운 인페인팅 결과(848×1248) — `gate-bg.jpg` 소스 |
 | `assets/qr.svg` · `qr.png` | 배포 주소 QR — **종이 청첩장 인쇄 업체 전달용** |
 | `tools/build-qr.mjs` | QR 생성 |
+| `tools/build-og.mjs` | 공유 미리보기 카드 이미지 생성 → `assets/og.jpg` |
+| `assets/og.jpg` | 카카오톡·문자 공유 시 뜨는 미리보기 카드 (1200×630) |
 | `tools/rsvp.gs` | 참석 의사 수집용 Apps Script (스프레드시트에 붙여넣는 코드) |
 | `tools/measure-scroll.mjs` | 문 열림 구간 프레임·각도 측정 + 구간별 스냅샷 |
 
@@ -233,7 +235,30 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 **기기 이름·계정명도 얻을 수 없다** — 브라우저에 해당 API 가 없다. 성함(선택)을 받는 것이 사람을 특정하는 유일한 수단.
 
 
-## 6. QR 코드 — 종이 청첩장 인쇄용
+## 6. 공유 미리보기 카드 (카카오톡·문자)
+
+링크를 카카오톡·문자로 보낼 때 채팅방에 뜨는 카드. `index.html` `<head>` 의 Open Graph 태그가 내용을 정한다.
+태그가 없으면 카드가 아니라 주소만 덩그러니 뜬다.
+
+```bash
+node tools/build-og.mjs      # 로컬 서버가 4321 에 떠 있어야 배경 사진을 읽는다
+```
+
+| 항목 | 값 |
+|---|---|
+| 이미지 | `assets/og.jpg` 1200×630 (권장 비율 1.91:1) · 약 110KB |
+| 제목 | 유찬 💕 혜진 결혼합니다 |
+| 설명 | 2026. 11. 14. 토요일 오후 6시 30분 · 토브헤세드 |
+
+**`og:image` 는 절대주소여야 한다.** 상대경로를 쓰면 카카오톡이 이미지를 못 가져온다.
+한글 글꼴이 필요해 이미지는 sharp 가 아니라 헤드리스 Chrome 으로 그린다.
+
+### 카드가 안 바뀔 때
+
+카카오톡은 링크별 카드를 오래 캐시한다. 태그를 고친 뒤 옛 카드가 계속 나오면
+[카카오 개발자 도구 → 캐시 초기화](https://developers.kakao.com/tool/clear/og) 에 주소를 넣어 지운다.
+
+## 7. QR 코드 — 종이 청첩장 인쇄용
 
 청첩장 주소를 QR 로 뽑아 **인쇄 업체에 전달**하는 용도. 웹 페이지 안에는 넣지 않는다.
 
@@ -276,7 +301,7 @@ node -e "(async()=>{const sharp=(await import('sharp')).default;const jsQR=(awai
 
 **2) 시안이 나오면 실제 인쇄물을 휴대폰으로 스캔.** 화면에서 읽히는 것과 종이에서 읽히는 것은 다르다 — 잉크 번짐·크기 축소·코팅 반사에서 실패한다.
 
-## 7. 자산 재생성
+## 8. 자산 재생성
 
 `assets/origin/` 의 촬영 원본이 있어야 함. `node_modules` (sharp) 필요.
 
@@ -284,7 +309,7 @@ node -e "(async()=>{const sharp=(await import('sharp')).default;const jsQR=(awai
 npm i && node tools/build-assets.mjs && node tools/build-gen.mjs && node tools/build-photos.mjs
 ```
 
-## 8. Gemini 이미지 생성 (선택)
+## 9. Gemini 이미지 생성 (선택)
 
 `assets/hero/gate-bg.jpg` 는 이미 AI 인페인팅 결과(`assets/gate-src.jpg`)로 적용돼 있음. 다시 만들 때만 아래 사용.
 
@@ -302,7 +327,7 @@ GEMINI_API_KEY=... node tools/vertex-image.mjs assets/gen-gate.png "<프롬프�
 
 **입력은 반드시 촬영 원본 `assets/origin/door-2.jpeg`** — 가공본은 축소로 정보가 손실돼 있어 소스로 부적합.
 
-## 9. 배포
+## 10. 배포
 
 빌드·서버 로직이 없는 순수 정적 사이트 → 정적 호스팅 아무 곳이나 가능.
 **올릴 것은 `index.html` + `assets/hero` + `assets/photo` + `assets/qr.*` 뿐.**
@@ -507,7 +532,7 @@ aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.
 - [ ] `DOC-pending.md` 의 og 태그 · BGM 반영 여부 확인
 - [ ] 모바일 실기기에서 스크롤 문열림 프레임 확인 (iOS Safari · Android Chrome)
 
-## 10. 남은 작업
+## 11. 남은 작업
 
 배포는 이미 동작 중이고, 남은 것은 내용 채우기다.
 

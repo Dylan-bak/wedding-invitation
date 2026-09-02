@@ -1,3 +1,3 @@
-- [ ] index.html | 카카오톡 공유 메타태그(og:title/og:description/og:image 1200x630) 추가 | 2026-08-19
+- [x] index.html | 카카오톡 공유 메타태그(og:title/og:description/og:image 1200x630) 추가 | 2026-08-19
 - [ ] index.html | 배경음악(BGM) 추가 — 자동재생 차단 대응 위해 우측상단 음소거 토글 버튼 + 첫 탭 시 재생 | 2026-08-19
 - [x] 복원 기준점 | 문 열림 연출 정상 동작 = git tag door-ok-inward (커밋 a39a988) | 2026-08-20
