@@ -259,6 +259,7 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
 .fld{display:grid; gap:9px}
 .fld > span{font-size:12.5px; letter-spacing:.14em; opacity:.55}
 .fld > span em{font-style:normal; opacity:.7}
+.fld__hint{margin:-3px 0 2px; font-size:12px; line-height:1.75; opacity:.5}
 .fld input, .fld textarea{
   width:100%; padding:12px 13px; border:1px solid rgba(58,53,47,.2); border-radius:4px;
   background:#fff; color:inherit; font-family:inherit; font-size:15px; resize:none;
@@ -466,8 +467,9 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
     <button type="button" class="maplink maplink--kakao" data-app="kakao"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>카카오맵</button>
   </div>
   <p class="notice">
-    ※ 예식장 사정으로 축하화환은 건물 안으로 들일 수 없어 정중히 사양합니다.<br>
-    대신 <b>화환 리본</b>은 받을 수 있으니, 마음을 담아 보내주시면 예식장 입구에 곱게 걸어두겠습니다.
+    ※ 예식장 구조상 화환을 모실 자리가 넉넉하지 않아 정중히 사양합니다.<br>
+    대신 <b>화환 리본</b>은 예식장에 준비된 화환에 함께 달아 드리니,<br>
+    마음을 담아 보내주시면 곱게 걸어두겠습니다.
   </p>
 </section>
 
@@ -477,12 +479,12 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
   <div class="contact">
     <div class="card">
       <div class="role">GROOM</div>
-      <div class="name">신랑 유찬</div>
+      <div class="name">신랑 박유찬</div>
       <a href="tel:01084496840">전화</a><a href="sms:01084496840">문자</a>
     </div>
     <div class="card">
       <div class="role">BRIDE</div>
-      <div class="name">신부 혜진</div>
+      <div class="name">신부 구혜진</div>
       <a href="tel:01082104248">전화</a><a href="sms:01082104248">문자</a>
     </div>
   </div>
@@ -503,17 +505,12 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
     <button type="button" class="sheet__close" id="rsvpClose" aria-label="닫기">&times;</button>
     <div class="kicker">R.S.V.P</div>
     <h2 class="couple" id="rsvpTitle"><b>참석 의사 전달</b></h2>
-    <p class="body sheet__lead">
+    <p class="body sheet__lead" id="rsvpLead">
       귀한 걸음 해주시는 모든 분들을 정성껏 모실 수 있도록,<br>
       참석 의사를 남겨주시면 감사하겠습니다.
     </p>
 
     <form class="rsvp-form" id="rsvpForm" novalidate>
-      <label class="fld">
-        <span>성함</span>
-        <input name="name" type="text" maxlength="20" autocomplete="name" placeholder="성함을 입력해 주세요">
-      </label>
-
       <div class="fld">
         <span>구분</span>
         <div class="seg" data-name="side">
@@ -531,7 +528,8 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
       </div>
 
       <div class="fld" id="mealFld">
-        <span>식사 인원수 <em>(본인 포함)</em></span>
+        <span>식사 인원수</span>
+        <p class="fld__hint">넉넉하고 따뜻한 식사를 준비할 수 있도록, 함께 오시는 분까지 알려주세요.</p>
         <div class="seg seg--num" data-name="meal">
           <button type="button" value="1" aria-pressed="false">1</button>
           <button type="button" value="2" aria-pressed="false">2</button>
@@ -545,11 +543,6 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
         </div>
       </div>
 
-      <label class="fld">
-        <span>전달 말씀 <em>(선택)</em></span>
-        <textarea name="msg" rows="2" maxlength="200" placeholder="남기실 말씀이 있으면 적어 주세요"></textarea>
-      </label>
-
       <button type="submit" class="btn-primary" id="rsvpSubmit">전달하기</button>
       <p class="fld__msg" id="rsvpMsg" hidden></p>
     </form>
@@ -562,9 +555,9 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
   <div class="info">
     <div class="acct">
       <div class="bank">신랑측</div>
-      <div>우리 1002-766-360702 · 유찬</div>
+      <div>우리 1002-766-360702 · 박유찬</div>
       <div class="bank" style="margin-top:14px">신부측</div>
-      <div>국민 520702-01-180773 · 혜진</div>
+      <div>국민 520702-01-180773 · 구혜진</div>
     </div>
   </div>
 </section>
@@ -724,17 +717,33 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
 
 
 
+
   // ── 참석 의사 전달 ──────────────────────────
   // Apps Script 웹앱 주소. 비어 있으면 섹션·팝업 모두 노출하지 않는다
   const RSVP_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyOVLJcI5tdUh4WEVvwgWsz3SpTtb5e6SjCTkNdXE5Rutj2HIzIscioyvf1oIgNt3MdJw/exec';
   const RSVP_SEEN_KEY = 'rsvp-popup-seen';
+  const RSVP_ID_KEY = 'rsvp-visitor-id';
+  const RSVP_DONE_KEY = 'rsvp-answered';
+  const MEAL_MAX = 20;
+
   // 시크릿 모드·일부 인앱 브라우저는 localStorage 접근만으로도 예외를 던진다.
   // 감싸두지 않으면 이 아래 코드 전체가 실행되지 않는다
-  const seen = {
-    get: () => { try { return !!localStorage.getItem(RSVP_SEEN_KEY); } catch { return false; } },
-    set: () => { try { localStorage.setItem(RSVP_SEEN_KEY, '1'); } catch {} },
+  const store = {
+    get: k => { try { return localStorage.getItem(k); } catch { return null; } },
+    set: (k, v) => { try { localStorage.setItem(k, v); } catch {} },
   };
-  const MEAL_MAX = 20;
+
+  // 방문자 식별값. 브라우저는 MAC 주소·기기 고유번호에 접근할 수 없으므로
+  // 난수를 만들어 저장해 쓴다. 같은 브라우저로 다시 오면 같은 값이 나온다
+  const visitorId = (() => {
+    let v = store.get(RSVP_ID_KEY);
+    if (!v) {
+      v = (crypto.randomUUID?.() ??
+           (Date.now().toString(36) + Math.random().toString(36).slice(2, 10)));
+      store.set(RSVP_ID_KEY, v);
+    }
+    return v;
+  })();
 
   const rsvp = document.getElementById('rsvp');
   const rsvpSection = document.getElementById('rsvpSection');
@@ -749,8 +758,9 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
     const submit = document.getElementById('rsvpSubmit');
     const mealFld = document.getElementById('mealFld');
     const mealOut = document.getElementById('mealOut');
-    const segs = [...form.querySelectorAll('.seg')];
-    const pick = {};              // {side, attend, meal}
+    const openBtn = document.getElementById('rsvpOpen');
+    const lead = document.getElementById('rsvpLead');
+    const pick = {};
 
     const setMeal = n => {
       pick.meal = Math.max(0, Math.min(MEAL_MAX, n));
@@ -760,22 +770,26 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
       form.querySelector('.stepper button[data-step="-1"]').disabled = pick.meal <= 0;
       form.querySelector('.stepper button[data-step="1"]').disabled = pick.meal >= MEAL_MAX;
     };
-    setMeal(0);
 
-    // 선택 버튼 — 같은 묶음에서 하나만
-    segs.forEach(seg => seg.addEventListener('click', e => {
-      const btn = e.target.closest('button');
-      if (!btn) return;
-      const key = seg.dataset.name;
-      if (key === 'meal') { setMeal(+btn.value); return; }
-      pick[key] = btn.value;
-      seg.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
-      // 미참석이면 식사 인원을 물을 필요가 없다
+    const setSeg = (key, value) => {
+      pick[key] = value;
+      const seg = form.querySelector(`.seg[data-name="${key}"]`);
+      seg.querySelectorAll('button').forEach(b =>
+        b.setAttribute('aria-pressed', String(b.value === value)));
       if (key === 'attend') {
-        const off = btn.value === '미참석';
+        const off = value === '미참석';
         mealFld.toggleAttribute('data-off', off);
         if (off) setMeal(0);
       }
+    };
+
+    setMeal(0);
+
+    form.querySelectorAll('.seg').forEach(seg => seg.addEventListener('click', e => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      if (seg.dataset.name === 'meal') setMeal(+btn.value);
+      else setSeg(seg.dataset.name, btn.value);
     }));
 
     form.querySelector('.stepper').addEventListener('click', e => {
@@ -789,7 +803,17 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
       msg.toggleAttribute('data-err', !!isErr);
     };
 
+    // 이미 보낸 사람에게는 버튼 문구와 안내를 바꿔, 고쳐 보낼 수 있다는 것을 알린다
+    const markAnswered = () => {
+      store.set(RSVP_DONE_KEY, '1');
+      openBtn.textContent = '참석 의사 다시 전달하기';
+      lead.innerHTML = '이미 전달해 주셨습니다. 내용이 바뀌었다면<br>다시 보내주시면 마지막 내용으로 반영됩니다.';
+    };
+    if (store.get(RSVP_DONE_KEY)) markAnswered();
+
     const openRsvp = () => {
+      msg.hidden = true;
+      submit.disabled = false;
       rsvp.setAttribute('data-open', '');
       document.body.style.overflow = 'hidden';
     };
@@ -798,7 +822,7 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
       document.body.style.overflow = '';
     };
 
-    document.getElementById('rsvpOpen').addEventListener('click', openRsvp);
+    openBtn.addEventListener('click', openRsvp);
     document.getElementById('rsvpClose').addEventListener('click', closeRsvp);
     rsvp.addEventListener('click', e => { if (e.target === rsvp) closeRsvp(); });
     addEventListener('keydown', e => {
@@ -807,8 +831,6 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
 
     form.addEventListener('submit', async e => {
       e.preventDefault();
-      const name = form.name.value.trim();
-      if (!name) return say('성함을 입력해 주세요.', true);
       if (!pick.side) return say('신랑측 · 신부측을 선택해 주세요.', true);
       if (!pick.attend) return say('참석 여부를 선택해 주세요.', true);
       if (pick.attend === '참석' && !pick.meal) return say('식사 인원수를 선택해 주세요.', true);
@@ -820,13 +842,12 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
         await fetch(RSVP_ENDPOINT, {
           method: 'POST',
           body: JSON.stringify({
-            name, side: pick.side, attend: pick.attend,
-            meal: pick.meal, msg: form.msg.value.trim(),
+            id: visitorId, side: pick.side,
+            attend: pick.attend, meal: pick.meal,
           }),
         });
-        form.querySelectorAll('input,textarea,button').forEach(el => el.disabled = true);
         say('전달되었습니다. 감사합니다.');
-        seen.set();
+        markAnswered();
         setTimeout(closeRsvp, 1600);
       } catch {
         submit.disabled = false;
@@ -834,11 +855,11 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
       }
     });
 
-    // 첫 진입 1회만 팝업. 문 열림 연출을 가리지 않도록 조금 뒤에
-    if (!seen.get()) {
+    // 아직 답하지 않은 사람에게만 첫 진입 팝업. 문 열림 연출을 가리지 않도록 조금 뒤에
+    if (!store.get(RSVP_SEEN_KEY) && !store.get(RSVP_DONE_KEY)) {
       setTimeout(() => {
         if (!rsvp.hasAttribute('data-open')) openRsvp();
-        seen.set();
+        store.set(RSVP_SEEN_KEY, '1');
       }, 2200);
     }
   }
