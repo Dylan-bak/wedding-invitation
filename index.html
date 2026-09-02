@@ -137,7 +137,7 @@ body{
   text-align:center; pointer-events:none;
   color:#FFFFFF;
   font-family:"Cormorant Garamond",serif; font-weight:600;
-  font-size:clamp(30px, 9.5vw, 54px); line-height:1.05;
+  font-size:clamp(30px, 9.5vw, 54px); line-height:1.28;
   letter-spacing:.05em;                      /* 트래킹 +50 = 50/1000 em */
   /* Drop Shadow — 거리 0 / 번짐 21 / 불투명도 48%.
      CSS 에는 spread 가 없어 짧은 그림자를 겹쳐 퍼짐을 흉내낸다 */
@@ -146,11 +146,12 @@ body{
 }
 /* letter-spacing 은 마지막 글자 뒤에도 붙어 가운데정렬이 왼쪽으로 밀린다 → 상쇄 */
 .hero__logo span{display:block; margin-right:-.05em}
-.hero__logo .amp{font-size:.5em; letter-spacing:0; margin:.1em 0; opacity:.92}
+.hero__logo .amp{font-size:.62em; letter-spacing:0; margin:.04em 0; opacity:.92}
 
 /* 문 열리기 전 타이틀 */
 .hero__title{
   position:absolute; inset:auto 0 16svh 0; text-align:center; color:#fff;
+  visibility:hidden;                         /* 잠시 감춤 — 되살릴 때 이 줄만 지운다 */
   text-shadow:0 1px 3px rgba(0,0,0,.5), 0 2px 24px rgba(0,0,0,.55);
   opacity:clamp(0, calc(1 - var(--p) * 9), 1);
 }
