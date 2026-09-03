@@ -317,12 +317,13 @@ GEMINI_API_KEY=... node tools/vertex-image.mjs assets/gen-gate.png "<프롬프�
 **올릴 것은 `index.html` + `assets/hero` + `assets/photo` + `assets/qr.*` 뿐.**
 `assets/origin/`(촬영 원본, git 제외)과 `tools/` 는 자산 재생성용이라 배포 대상이 아니다.
 
-| # | 방식 | 실제 비용 | 세팅 시간 | HTTPS | 자동배포 |
-|---|---|---|---|---|---|
-| **9-1** | **GitHub Pages** | **0원** | **3클릭** | O | O (push 시) |
-| 9-2 | Amplify Hosting | 0원 (12개월 프리티어) | 콘솔 5분 | O | O (push 시) |
-| 9-3 | S3 + CloudFront | **0원** (기본 주소 사용 시) | 20~30분 | O | X (수동 sync) |
-| 9-4 | S3 단독 · EC2 | 0.1 / 3.5~5 USD | — | X / O | X |
+| # | 방식 | 비용 | 세팅 | HTTPS | 자동배포 | 판정 |
+|---|---|---|---|---|---|---|
+| 9-1 | GitHub Pages | 0원 | 3클릭 | O | push 시 | **채택** |
+| 9-2 | Amplify Hosting | 12개월 뒤 유료 | 콘솔 5분 | O | push 시 | 대안 |
+| 9-3 | S3 + CloudFront | 0원 (CloudFront 기본 주소일 때만) | 20~30분 | O | 수동 sync | 대안 |
+| 9-4 | S3 단독 | 월 0.1 USD | 10분 | X (http 만) | 수동 sync | 비권장 |
+| 9-4 | Lightsail · EC2 + nginx | 월 3.5~5 USD | 30분+ | O | 수동 | 비권장 |
 
 ### 9-1. GitHub Pages — 무료 · 가장 쉬움
 
