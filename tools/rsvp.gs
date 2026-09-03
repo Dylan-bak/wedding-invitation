@@ -10,7 +10,7 @@
  */
 
 // 열 구성이 바뀌면 뒤 버전을 올린다 (v1 → v2). 옛 회신은 옛 시트에 그대로 남는다
-var SHEET_NAME = '모청 참석 회신 v1';
+var SHEET_NAME = '모청 참석 회신 v3';
 var HEADERS = ['방문자ID', '구분', '참석여부', '식사인원', '성함', '전달말씀', '최초접수', '최종수정', '수정횟수'];
 var COL = { id: 1, side: 2, attend: 3, meal: 4, name: 5, msg: 6, first: 7, last: 8, edits: 9 };
 
