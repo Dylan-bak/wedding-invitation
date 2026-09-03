@@ -3,11 +3,11 @@ import { mkdirSync } from 'fs';
 
 mkdirSync('assets/hero', { recursive: true });
 
-// 첫 화면 소스 = assets/origin/door-2.jpeg
-// 좌표는 이 이미지에서 가장자리를 4배 확대해 실측한 값
-const SRC = 'assets/origin/door-2.jpeg';
-const W = 1400, H = 2061;
-const D = { L: 244, R: 1151, T: 219, B: 1390, C: 700 };
+// 첫 화면 소스 = assets/origin/door-4.png
+// 좌표는 이 이미지의 가장자리를 픽셀 밝기로 훑어 실측한 값 (문틀 하이라이트가 시작되는 x·y)
+const SRC = 'assets/origin/door-4.png';
+const W = 800, H = 1344;
+const D = { L: 165, R: 633, T: 440, B: 1004, C: 400 };
 
 const jpg = { quality: 84, mozjpeg: true };
 

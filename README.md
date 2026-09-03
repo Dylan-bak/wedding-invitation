@@ -28,8 +28,8 @@ npx serve -l 4321 .
 | `assets/photo/t01~t15.jpg` | 갤러리 썸네일 15장 (336×366) |
 | `assets/photo/f01~f15.jpg` | 썸네일 클릭 시 띄우는 확대본 (장변 2800, 장당 약 260KB) |
 | `assets/photo/map.jpg` | 약도 |
-| `assets/origin/` | 촬영 원본 `1~17` `door-2.jpeg` `map.jpg` — **git 제외**. 확장자가 `.jpg`/`.jpeg` 섞여 있어 빌드 스크립트가 있는 쪽을 찾아 쓴다 |
-| `tools/build-assets.mjs` | `origin/door-2.jpeg` → 문틀·문짝 자산 |
+| `assets/origin/` | 촬영 원본 `1~17` `map.jpg` `door-2.jpeg`, 첫 화면 소스 `door-4.png`, 문짝 조각 참조 `ref-door-pattern.png` — **git 제외**. 확장자가 `.jpg`/`.jpeg` 섞여 있어 빌드 스크립트가 있는 쪽을 찾아 쓴다 |
+| `tools/build-assets.mjs` | `origin/door-4.png` → 문틀·문짝 자산 |
 | `tools/build-gen.mjs` | 인페인팅 결과 → 문 뒤 공간(`gate-bg`) |
 | `tools/build-photos.mjs` | `origin/1~17`·`map.jpg` → 갤러리·약도·reveal |
 | `tools/vertex-image.mjs` | Gemini 이미지 생성/편집 호출 (선택) |
@@ -79,13 +79,15 @@ p 0.55~1.00    사진 + 날짜가 아래에서 위로 상승
 
 ### 문짝 위치가 문틀과 어긋날 때
 
-`index.html` 의 `:root` 값만 조정. `assets/origin/door-2.jpeg`(1400×2061) 기준 백분율.
+`index.html` 의 `:root` 값만 조정. `assets/origin/door-4.png`(800×1344) 기준 백분율.
+
+소스를 더 크게 받으려는 시도 = 무의미. Gemini 는 1400×2352 를 요청해도 800×1344 로만 출력(2회 실측). 폰에서 2.2배 확대되므로 나뭇결이 다소 무르다.
 
 ```css
---door-l: 17.429%;  /* 문 왼쪽 끝 */
---door-r: 82.214%;  /* 문 오른쪽 끝 */
---door-t: 10.626%;  /* 문 위쪽 */
---door-b: 67.443%;  /* 문 아래쪽 */
+--door-l: 20.625%;  /* 문 왼쪽 끝 */
+--door-r: 79.125%;  /* 문 오른쪽 끝 */
+--door-t: 32.738%;  /* 문 위쪽 */
+--door-b: 74.702%;  /* 문 아래쪽 */
 --door-c: 50.000%;  /* 두 문짝 분할선 */
 --shift-x:  0.35%;  /* 첫 화면 좌우 이동. +면 오른쪽 */
 ```
