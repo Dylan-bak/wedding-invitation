@@ -1,18 +1,15 @@
 # 모바일 청첩장 — 스크롤로 문이 열리는 청첩장
-
 베뉴(Tov Hesed) 실제 입구 사진을 좌·우 문짝으로 잘라, 스크롤 진행률에 맞춰 `rotateY` 로 열리게 한 단일 파일 모바일 청첩장.
 동영상·GIF·이미지 시퀀스 미사용 → 첫 화면 자산 400KB 미만, 스크롤 역방향도 그대로 되감김.
 
 **배포 주소** — https://dylan-bak.github.io/wedding-invitation/ (GitHub Pages, `main` 에 push 하면 1~2분 뒤 자동 반영)
 
 ## 1. 실행
-
 ```bash
 npx serve -l 4321 .
 ```
 
-→ http://localhost:4321 · 모바일 폭(375px)에서 확인 권장
-
+http://localhost:4321
 빌드 과정 없음. `index.html` 하나 + `assets/` 뿐.
 
 ## 2. 파일 구성
@@ -42,7 +39,6 @@ npx serve -l 4321 .
 | `tools/measure-scroll.mjs` | 문 열림 구간 프레임·각도 측정 + 구간별 스냅샷 |
 
 ## 3. 동작 원리
-
 스크롤 구간 `460svh` 를 진행률 `p` (0~1) 로 환산 → CSS 변수에 주입.
 
 ```
@@ -133,20 +129,21 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 
 ### 텍스트
 
-이름·일시·연락처·계좌는 채워져 있다. `index.html` 에 `OO` 로 남은 곳만 확인하면 된다.
+문구는 전부 채워져 있다. 플레이스홀더 잔존 0건.
 
-| 위치 | 상태 |
+| 위치 | 내용 |
 |---|---|
 | 대문 중앙 로고 `.hero__logo` | Yuchan & Hyejin |
-| 대문 하단 `.names` `.when` | 유찬💕혜진 / 11/14(토) 오후 6:30 |
-| 예식 안내 일시 | 2026년 11월 14일 토요일 오후 6시 30분 |
-| 연락처 카드 · 계좌 | 채워짐 |
-| **예식장 주소 · 오시는 길(지하철·버스)** | **`OO` 로 비어 있음** |
+| 대문 하단 `.hero__title` | 유찬💕혜진 / 11/14(토) 오후 6:30 — `visibility:hidden` 으로 감춰둠. 되살리려면 그 한 줄 삭제 |
+| 예식 안내 | 2026년 11월 14일 토요일 오후 6시 30분 · 토브헤세드 |
+| 예식장 주소 | 서울시 강남구 논현 2동 도산대로 38길 32 (논현동 72-8번지) |
+| 오시는 길 | 약도 이미지 + 네이버·카카오 지도 앱 버튼. 지하철·버스 안내문은 두지 않는다 |
+| 연락처 카드 · 계좌 | 신랑·신부 양가 |
 
 ### 대문 중앙 로고
 
 `.hero__logo` — Cormorant Garamond SemiBold(600), 흰색, 트래킹 `.05em`(+50).
-`&` 는 이름의 `0.5em`.
+`&` 는 이름의 `0.62em`, 행간 `1.28`.
 
 **Photoshop 과 달리 CSS `text-shadow` 에 spread 미존재.** 값 4개 중 `offset-x offset-y blur color` 만 지원 → 퍼짐은 짧은 그림자를 겹쳐 흉내낸다. 현재값 = `0 0 21px rgba(0,0,0,.48)` + `0 0 7px rgba(0,0,0,.34)`. 정확히 재현하려면 SVG `feMorphology` + `feGaussianBlur` 필요.
 마지막 글자 뒤에 붙는 자간 때문에 가운데정렬이 왼쪽으로 밀리므로 `margin-right:-.05em` 로 상쇄한다.
@@ -294,25 +291,7 @@ node tools/build-qr.mjs
 
 오류정정 수준 **Q** (25% 손상까지 복원) — 인쇄물이 접히거나 가운데에 작은 로고를 얹어도 읽힌다.
 
-### 넘기기 전 확인 (2가지 모두)
-
-**1) 파일이 올바른 주소를 담고 있는지 디코딩으로 확인.** 눈으로는 틀린 QR 을 구별할 수 없다.
-
-```bash
-node -e "(async()=>{const sharp=(await import('sharp')).default;const jsQR=(await import('jsqr')).default;const {data,info}=await sharp('assets/qr.png').ensureAlpha().raw().toBuffer({resolveWithObject:true});console.log(jsQR(new Uint8ClampedArray(data),info.width,info.height).data)})()"
-```
-
-**2) 시안이 나오면 실제 인쇄물을 휴대폰으로 스캔.** 화면에서 읽히는 것과 종이에서 읽히는 것은 다르다 — 잉크 번짐·크기 축소·코팅 반사에서 실패한다.
-
-## 8. 자산 재생성
-
-`assets/origin/` 의 촬영 원본이 있어야 함. `node_modules` (sharp) 필요.
-
-```bash
-npm i && node tools/build-assets.mjs && node tools/build-gen.mjs && node tools/build-photos.mjs
-```
-
-## 9. Gemini 이미지 생성 (선택)
+## 8. Gemini 이미지 생성 (선택)
 
 `assets/hero/gate-bg.jpg` 는 이미 AI 인페인팅 결과(`assets/gate-src.jpg`)로 적용돼 있음. 다시 만들 때만 아래 사용.
 
@@ -330,29 +309,22 @@ GEMINI_API_KEY=... node tools/vertex-image.mjs assets/gen-gate.png "<프롬프�
 
 **입력은 반드시 촬영 원본 `assets/origin/door-2.jpeg`** — 가공본은 축소로 정보가 손실돼 있어 소스로 부적합.
 
-## 10. 배포
+## 9. 배포
+
+**지금 쓰는 방식 = GitHub Pages.** 완전 무료 + 가장 쉬움. AWS 는 학습 목적이거나 접속 로그·세밀한 캐시 제어가 필요할 때만.
 
 빌드·서버 로직이 없는 순수 정적 사이트 → 정적 호스팅 아무 곳이나 가능.
 **올릴 것은 `index.html` + `assets/hero` + `assets/photo` + `assets/qr.*` 뿐.**
 `assets/origin/`(촬영 원본, git 제외)과 `tools/` 는 자산 재생성용이라 배포 대상이 아니다.
 
-### 결론
-
-**GitHub Pages 가 완전 무료 + 가장 쉽다. 청첩장 용도면 이걸로 끝내면 된다.**
-AWS 는 학습 목적이거나 접속 로그·세밀한 캐시 제어가 필요할 때만.
-
 | # | 방식 | 실제 비용 | 세팅 시간 | HTTPS | 자동배포 |
 |---|---|---|---|---|---|
-| **8-1** | **GitHub Pages** | **0원** | **3클릭** | O | O (push 시) |
-| 8-2 | Amplify Hosting | 0원 (12개월 프리티어) | 콘솔 5분 | O | O (push 시) |
-| 8-3 | S3 + CloudFront | **0원** (기본 주소 사용 시) | 20~30분 | O | X (수동 sync) |
-| 8-4 | S3 단독 · EC2 | 0.1 / 3.5~5 USD | — | X / O | X |
+| **9-1** | **GitHub Pages** | **0원** | **3클릭** | O | O (push 시) |
+| 9-2 | Amplify Hosting | 0원 (12개월 프리티어) | 콘솔 5분 | O | O (push 시) |
+| 9-3 | S3 + CloudFront | **0원** (기본 주소 사용 시) | 20~30분 | O | X (수동 sync) |
+| 9-4 | S3 단독 · EC2 | 0.1 / 3.5~5 USD | — | X / O | X |
 
-**React 로 바꿀 필요 없다.** Amplify Hosting 은 React 전용이 아니라 정적 파일을 그대로 받는다. React 로 옮기면 번들러·빌드 파이프라인이 추가되고 스크롤 문열림 로직도 다시 짜야 해서 더 어려워진다.
-
----
-
-### 8-1. GitHub Pages — 무료 · 가장 쉬움
+### 9-1. GitHub Pages — 무료 · 가장 쉬움
 
 저장소가 **public** 이어야 무료다. private 이면 GitHub Pro 필요.
 
@@ -382,7 +354,7 @@ AWS 는 학습 목적이거나 접속 로그·세밀한 캐시 제어가 필요�
 
 ---
 
-### 8-2. Amplify Hosting — 콘솔 5분 · git 연동 자동배포
+### 9-2. Amplify Hosting — 콘솔 5분 · git 연동 자동배포
 
 빌드 스텝이 없으므로 아래 파일만 저장소 루트에 두면 된다.
 
@@ -421,7 +393,7 @@ Route 53 에 있으면 레코드까지 자동 생성, 외부 등록기관이면 
 
 ---
 
-### 8-3. S3 + CloudFront — 커스텀 도메인 없이 쓰면 무료
+### 9-3. S3 + CloudFront — 커스텀 도메인 없이 쓰면 무료
 
 **CloudFront 기본 주소(`dxxxxxxxx.cloudfront.net`)만 쓰면 인증서·DNS 비용이 아예 발생하지 않는다.**
 CloudFront 무료 티어(월 1TB 전송 · 1,000만 요청)는 계정 나이와 무관한 영구 무료라, 남는 과금 요소는 S3 스토리지 1.3MB 뿐 → 월 0.003센트, 청구서엔 `$0.00` 으로 찍힌다.
@@ -485,7 +457,7 @@ aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.
 
 ---
 
-### 8-4. 나머지 (비권장)
+### 9-4. 나머지 (비권장)
 
 | 방식 | 판정 | 사유 |
 |---|---|---|
@@ -494,7 +466,7 @@ aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.
 
 ---
 
-### 8-5. 비용 — 어디까지 무료인가
+### 9-5. 비용 — 어디까지 무료인가
 
 자산 총량 약 1.3MB, 하객 500명이 각 3회 열어도 월 전송량 2GB 미만. **어느 방식을 골라도 트래픽 요금 구간에 도달하지 않는다.** 돈이 새는 곳은 트래픽이 아니라 **DNS 호스팅 영역과 도메인 등록비** 뿐이다.
 
@@ -516,7 +488,7 @@ aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.
 - 커스텀 도메인 + Route 53 = **월 $0.50 고정** + 도메인 등록비
 - Route 53 우회 = **Cloudflare DNS(무료)** 에 도메인 올리고 CNAME 만 CloudFront 로 → 월 $0.50 도 안 낸다
 
-### 8-6. AWS 를 아예 안 쓰는 무료 대안
+### 9-6. AWS 를 아예 안 쓰는 무료 대안
 
 정적 사이트라 결과물은 동일하다.
 
@@ -527,24 +499,3 @@ aws cloudfront create-invalidation --distribution-id <배포ID> --paths "/index.
 | Vercel / Netlify | 월 100GB 전송 | 무료 |
 
 도메인 등록비는 어디서도 못 피한다. 그것마저 안 쓰면 `<계정>.github.io/wedding-invitation` 무료 주소로 끝낼 수 있다.
-
-### 8-7. 배포 전 체크
-
-- [ ] `index.html` 의 `OOO` · `0월 0일` 플레이스홀더 전부 교체
-- [ ] `assets/temp/couple-placeholder.jpg` 를 실제 웨딩 사진으로 교체
-- [ ] `DOC-pending.md` 의 og 태그 · BGM 반영 여부 확인
-- [ ] 모바일 실기기에서 스크롤 문열림 프레임 확인 (iOS Safari · Android Chrome)
-
-## 11. 남은 작업
-
-배포는 이미 동작 중이고, 남은 것은 내용 채우기다.
-
-| 구분 | 내용 |
-|---|---|
-| **필수** | `index.html` 의 `OOO` · `0월 0일` 플레이스홀더 전부 교체 (이름·일시·장소·주소·연락처·계좌) |
-| **필수** | `assets/temp/couple-placeholder.jpg` 를 실제 웨딩 사진으로 교체 |
-| 권장 | `assets/g1~g3.jpg` · `hall-wide.jpg` · `aisle.jpg` 도 현재 베뉴 사진(임시)이라 촬영본으로 교체 |
-| 권장 | 실기기(iOS Safari · Android Chrome)에서 문 열림 확인 |
-| 보류 | 카카오톡 공유 메타태그(og:image), 배경음악 — `DOC-pending.md` 참조 |
-
-내용을 채운 뒤에는 **QR 을 다시 뽑을 필요가 없다.** 주소가 그대로이므로 이미 만든 QR 이 계속 유효하다.
