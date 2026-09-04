@@ -7,7 +7,7 @@ mkdirSync('assets/hero', { recursive: true });
 // 좌표는 그 스크립트가 출력한다
 const SRC = 'assets/origin/door-5.jpg';
 const W = 1400, H = 2025;
-const D = { L: 244, R: 1151, T: 386, B: 1557, C: 700 };
+const D = { L: 244, R: 1151, T: 789, B: 1960, C: 700 };
 
 const jpg = { quality: 84, mozjpeg: true };
 
