@@ -36,7 +36,7 @@ http://localhost:4321
 | `tools/build-qr.mjs` | QR 생성 |
 | `tools/build-og.mjs` | 공유 미리보기 카드 이미지 생성 → `assets/og.jpg` |
 | `assets/og.jpg` | 카카오톡·문자 공유 시 뜨는 미리보기 카드 (1200×630) |
-| `assets/bgm.mp3` | 배경음악. **없으면 재생 버튼이 뜨지 않는다** |
+| `assets/bgm.mp3` | 배경음악 — Pixabay "Wedding" (PaulYudin, 1:59, 3.64MB). **없으면 재생 버튼이 뜨지 않는다** |
 | `tools/rsvp.gs` | 참석 의사 수집용 Apps Script (스프레드시트에 붙여넣는 코드) |
 | `tools/measure-scroll.mjs` | 문 열림 구간 프레임·각도 측정 + 구간별 스냅샷 |
 
@@ -158,7 +158,9 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 | 껐으면 다음에 와도 꺼짐 | 브라우저에 `bgm-off` 로 기록 |
 | 다른 탭으로 가면 멈춤 | 돌아오면 다시 켜진다 |
 
-음원 조건 = **저작권 걸리지 않는 것**(CC0·로열티 프리 또는 직접 구매). 카카오톡·인스타 공유 시 문제되는 상용 음원은 피한다. 길이 1~3분, 파일 3MB 이하 권장.
+지금 음원 = Pixabay **"Wedding"** by PaulYudin · 1:59 · 3.64MB · 라이선스 `Pixabay Content License`(상업적 이용 무료·출처 표기 불필요). 출처 = https://pixabay.com/music/modern-classical-wedding-485932/
+
+바꾸려면 `assets/bgm.mp3` 만 덮어쓴다. 조건 = 저작권 걸리지 않는 것(CC0·로열티 프리 또는 직접 구매), 1~3분. `preload="none"` 이라 첫 조작 전에는 내려받지 않으므로 용량이 첫 로딩에 영향을 주지 않는다.
 
 ### 텍스트
 

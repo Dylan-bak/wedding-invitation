@@ -52,7 +52,9 @@ body{
 
 /* 1) 문 열림 히어로 */
 .hero{height:300svh; position:relative}
-.hero__sticky{position:sticky; top:0; height:100svh; overflow:hidden}
+/* 높이는 lvh(주소창이 사라진 가장 큰 화면) 기준. svh 로 잡으면 모바일에서 주소창이
+   내려간 순간 계단 아래에 배경색 띠가 드러난다 */
+.hero__sticky{position:sticky; top:0; height:100vh; height:100lvh; overflow:hidden}
 
 /* 이미지 로드 실패 시 드러나는 색. 검정이면 화면이 통째로 검게 보이므로 본문과 같은 크림톤으로 */
 .stage{position:absolute; inset:0; background:var(--paper)}
@@ -60,7 +62,7 @@ body{
 /* 원본 사진 비율 박스를 cover 로 채움 → 자식은 % 좌표로 정확히 정렬 */
 .photo{
   position:absolute; top:50%; left:50%;
-  width:max(100vw, calc(100svh * var(--img-w) / var(--img-h)));
+  width:max(100vw, calc(100lvh * var(--img-w) / var(--img-h)));
   aspect-ratio: var(--img-w) / var(--img-h);
   transform:translate(calc(-50% + var(--shift-x)),-50%) scale(var(--zoom));
   will-change:transform;
@@ -137,7 +139,8 @@ body{
 /* 대문 중앙 로고 — 이름을 정보가 아니라 로고처럼 얹는다.
    문이 주역이므로 크기는 문 폭 안에 머물게 하고, 글자만 떠 보이도록 그림자로 분리 */
 .hero__logo{
-  position:absolute; left:0; right:0; top:46%; translate:0 -50%;
+  /* 문의 세로 중앙. 문 좌표가 바뀌면 따라간다 */
+  position:absolute; left:0; right:0; top:calc((var(--door-t) + var(--door-b)) / 2); translate:0 -50%;
   text-align:center; pointer-events:none;
   color:#FFFFFF;
   font-family:"Cormorant Garamond",serif; font-weight:600;
@@ -166,7 +169,8 @@ body{
 
 /* 스크롤 안내 — 테두리 박스 안에서 점이 아래에서 위로 반복 이동 */
 .hint{
-  position:absolute; left:50%; bottom:4svh; translate:-50% 0;
+  /* 박스는 lvh 높이지만 안내는 주소창이 있는 화면(svh)에서도 보여야 한다 → 그 차이만큼 올린다 */
+  position:absolute; left:50%; bottom:calc(100lvh - 96svh); translate:-50% 0;
   display:flex; flex-direction:column; align-items:center; gap:10px;
   color:#fff; text-shadow:0 2px 16px rgba(0,0,0,.45);
   opacity:clamp(0, calc(1 - var(--p) * 12), 1);

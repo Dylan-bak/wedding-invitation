@@ -1,5 +1,5 @@
 - [x] index.html | 카카오톡 공유 메타태그(og:title/og:description/og:image 1200x630) 추가 | 2026-08-19
 - [x] index.html | 배경음악(BGM) 재생기 추가 — 우측상단 토글 + 첫 조작 시 재생 | 2026-08-19
-- [ ] 음원 파일 | assets/bgm.mp3 미확보. 파일을 넣으면 버튼이 자동으로 나타난다
+- [x] 음원 파일 | assets/bgm.mp3 = Pixabay "Wedding" (PaulYudin, 1:59, 3.64MB, Pixabay Content License)
 - [x] 복원 기준점 | 문 열림 연출 정상 동작 = git tag door-ok-inward (커밋 a39a988) | 2026-08-20
 - [ ] 실기기 확인 | iOS Safari · Android Chrome 에서 스크롤 문열림 프레임 확인 (헤드리스 Chrome 으로만 검증한 상태)
