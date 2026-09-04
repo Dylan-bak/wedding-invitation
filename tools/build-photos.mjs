@@ -27,8 +27,8 @@ await sharp(src(1)).rotate()
 
 // 갤러리 3~17 — 썸네일 격자 + 클릭 시 확대
 // 썸네일은 화면에서 112x122 로 보이므로 고밀도 화면(DPR3)까지 커버하도록 3배 크기
-// 8 은 단독 게재로 빠졌다
-const GALLERY = [3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+// 8 은 단독 게재로 빠졌다. 1 은 문 열린 뒤 올라오는 사진과 같은 컷이지만 갤러리 4번째로도 쓴다
+const GALLERY = [3, 4, 5, 1, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17];
 for (const [i, n] of GALLERY.entries()) {
   const id = String(i + 1).padStart(2, '0');
   await sharp(src(n)).rotate()

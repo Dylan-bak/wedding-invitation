@@ -8,7 +8,7 @@ mkdirSync('assets/hero', { recursive: true });
 const SRC = 'assets/origin/door-4.png';
 // 위 130 / 아래 54 를 잘라낸다. 세로가 짧아지면 화면 높이에 맞추느라 문이 커진다
 // (door-2 시절 문 크기와 door-4 원본의 중간). 위쪽 유리천장·아이비 길이도 함께 줄어든다
-const CUT_TOP = 130, CUT_BOT = 54;
+const CUT_TOP = 240, CUT_BOT = 54;
 const W = 800, H = 1344 - CUT_TOP - CUT_BOT;
 const D0 = { L: 165, R: 633, T: 440, B: 1004, C: 400 };
 const D = { ...D0, T: D0.T - CUT_TOP, B: D0.B - CUT_TOP };

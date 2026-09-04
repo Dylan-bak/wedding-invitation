@@ -25,11 +25,11 @@
 <link rel="preload" as="image" href="assets/hero/door-r.jpg">
 <link rel="preload" as="image" href="assets/hero/gate-bg.jpg">
 <style>
-/* 문 좌표 — assets/origin/door-4.png 를 위 130 / 아래 54 잘라낸 800x1160 기준 % (tools/build-assets.mjs 가 출력) */
+/* 문 좌표 — assets/origin/door-4.png 를 위 240 / 아래 54 잘라낸 800x1050 기준 % (tools/build-assets.mjs 가 출력) */
 :root{
-  --img-w: 800; --img-h: 1160;
+  --img-w: 800; --img-h: 1050;
   --door-l: 20.625%;  --door-r: 79.125%;
-  --door-t: 26.724%;  --door-b: 75.345%;
+  --door-t: 19.048%;  --door-b: 72.762%;
   --door-c: 50.000%;
   --ink:#3a352f; --paper:#fbf9f6;
   --p:0;            /* 스크롤 진행률 0~1 */
@@ -50,7 +50,7 @@ body{
 }
 
 /* 1) 문 열림 히어로 */
-.hero{height:460svh; position:relative}
+.hero{height:300svh; position:relative}
 .hero__sticky{position:sticky; top:0; height:100svh; overflow:hidden}
 
 /* 이미지 로드 실패 시 드러나는 색. 검정이면 화면이 통째로 검게 보이므로 본문과 같은 크림톤으로 */
@@ -127,9 +127,11 @@ body{
 
 /* 타이틀·스크롤 안내가 밝은 대리석 바닥 위에 놓여 흰 글자가 묻힌다.
    글자 뒤에만 어두운 그라데이션을 깔아 대비를 만든다. */
+/* 위아래를 눌러 가운데 문과 이름으로 시선을 모은다.
+   위쪽을 안 누르면 간판의 금색 글자가 이름보다 먼저 눈에 들어온다 */
 .hero__veil{
-  position:absolute; inset:auto 0 0 0; height:46svh; pointer-events:none;
-  background:linear-gradient(180deg, rgba(20,16,12,0) 0%, rgba(20,16,12,.42) 55%, rgba(20,16,12,.62) 100%);
+  position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(180deg, rgba(20,16,12,.52) 0%, rgba(20,16,12,.30) 22%, rgba(20,16,12,0) 42%, rgba(20,16,12,.30) 78%, rgba(20,16,12,.55) 100%);
   opacity:clamp(0, calc(1 - var(--p) * 9), 1);
 }
 
@@ -231,8 +233,8 @@ figcaption{margin-top:14px; font-size:12px; letter-spacing:.2em; opacity:.5}
    .when 은 대문 서브타이틀이 이미 쓰는 이름이라 겹치면 안 된다 */
 .venue{margin:11svh 0}
 footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garamond",serif; letter-spacing:.3em; opacity:.4; font-size:12px}
-/* 제작 표기 — THANK YOU 보다 한 단 낮게 */
-footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.62}
+/* 제작 표기 — 글자만 작고 진하기는 THANK YOU 와 같게 */
+footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 
 /* 참석 의사 — 본문 섹션 · 진입 팝업 공용 */
 .btn-primary{
@@ -383,11 +385,6 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
 .maplink--kakao{background:#FEE500; border-color:rgba(0,0,0,.08)}
 .maplink--kakao:active{background:#f2da00}
 
-/* ※ 안내문 — 교통 정보와 성격이 달라 구분 */
-.notice b{font-weight:600; opacity:.95}
-.notice{margin-top:26px; padding-top:18px; border-top:1px solid rgba(58,53,47,.14);
-  font-size:12.5px; line-height:1.9; opacity:.6; text-align:left}
-
 @media (prefers-reduced-motion: reduce){ .rv{opacity:1; transform:none; transition:none} }
 </style>
 </head>
@@ -484,11 +481,6 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
     <button type="button" class="maplink maplink--naver" data-app="naver"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>네이버 지도</button>
     <button type="button" class="maplink maplink--kakao" data-app="kakao"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>카카오맵</button>
   </div>
-  <p class="notice">
-    ※ 예식장 구조상 화환을 들일 자리가 넉넉하지 않아 정중히 사양합니다.<br>
-    다만 <b>화환 리본</b>은 예식장에 준비된 화환에 함께 매어 드리니,<br>
-    마음을 담아 보내주시면 곱게 걸어두겠습니다.
-  </p>
 </section>
 
 <section class="block rv">
@@ -677,7 +669,7 @@ footer .credit{margin-top:1.6em; font-size:10px; letter-spacing:.24em; opacity:.
   document.querySelectorAll('.rv').forEach(el => io.observe(el));
 
   // ── 갤러리 썸네일 + 확대 보기 ─────────────────
-  const GALLERY_COUNT = 14;
+  const GALLERY_COUNT = 15;
   const pad = n => String(n).padStart(2, '0');
 
   const thumbs = document.getElementById('thumbs');
