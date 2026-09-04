@@ -37,6 +37,7 @@ http://localhost:4321
 | `tools/build-og.mjs` | 공유 미리보기 카드 이미지 생성 → `assets/og.jpg` |
 | `assets/og.jpg` | 카카오톡·문자 공유 시 뜨는 미리보기 카드 (1200×630) |
 | `assets/bgm.mp3` | 배경음악 — Pixabay "Wedding" (PaulYudin, 1:59, 3.64MB). **없으면 재생 버튼이 뜨지 않는다** |
+| `HANDOFF.md` | 남은 작업·함정·종결 판정 (진행상황은 이쪽 소관) |
 | `tools/rsvp.gs` | 참석 의사 수집용 Apps Script (스프레드시트에 붙여넣는 코드) |
 | `tools/measure-scroll.mjs` | 문 열림 구간 프레임·각도 측정 + 구간별 스냅샷 |
 
