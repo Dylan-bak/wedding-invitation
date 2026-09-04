@@ -25,11 +25,11 @@
 <link rel="preload" as="image" href="assets/hero/door-r.jpg">
 <link rel="preload" as="image" href="assets/hero/gate-bg.jpg">
 <style>
-/* 실측 문 좌표 (assets/origin/door-4.png — 800x1344 기준 %) */
+/* 문 좌표 — assets/origin/door-4.png 를 위 130 / 아래 54 잘라낸 800x1160 기준 % (tools/build-assets.mjs 가 출력) */
 :root{
-  --img-w: 800; --img-h: 1344;
+  --img-w: 800; --img-h: 1160;
   --door-l: 20.625%;  --door-r: 79.125%;
-  --door-t: 32.738%;  --door-b: 74.702%;
+  --door-t: 26.724%;  --door-b: 75.345%;
   --door-c: 50.000%;
   --ink:#3a352f; --paper:#fbf9f6;
   --p:0;            /* 스크롤 진행률 0~1 */
@@ -73,12 +73,15 @@ body{
 .doors{position:absolute; inset:0; perspective:1500px; perspective-origin:50% 42%}
 .photo__frame{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block}
 
-/* 문 뒤에서 새어나오는 빛 */
+/* 문 뒤에서 새어나오는 빛.
+   문짝과 정확히 같은 크기로 두면 소수점 좌표가 반올림되는 자리에서 밝은 배경이
+   문짝 가장자리 밖으로 1px 새어 흰 테두리로 보인다 → 1px 안쪽으로 넣는다.
+   덮이는 1px 은 뒤에 깔린 닫힌 문 사진이라 티가 나지 않는다 */
 .gate{
   position:absolute;
-  left:var(--door-l); top:var(--door-t);
-  width:calc(var(--door-r) - var(--door-l));
-  height:calc(var(--door-b) - var(--door-t));
+  left:calc(var(--door-l) + 1px); top:calc(var(--door-t) + 1px);
+  width:calc(var(--door-r) - var(--door-l) - 2px);
+  height:calc(var(--door-b) - var(--door-t) - 2px);
   background:#fff url(assets/hero/gate-bg.jpg) center/cover no-repeat;
   overflow:hidden;
 }
