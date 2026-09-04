@@ -25,8 +25,9 @@ http://localhost:4321
 | `assets/photo/t01~t15.jpg` | 갤러리 썸네일 15장 (336×366) |
 | `assets/photo/f01~f15.jpg` | 썸네일 클릭 시 띄우는 확대본 (장변 2800, 장당 약 260KB) |
 | `assets/photo/map.jpg` | 약도 |
-| `assets/origin/` | 촬영 원본 `1~17` `map.jpg` `door-2.jpeg`, 첫 화면 소스 `door-4.png`, 문짝 조각 참조 `ref-door-pattern.png` — **git 제외**. 확장자가 `.jpg`/`.jpeg` 섞여 있어 빌드 스크립트가 있는 쪽을 찾아 쓴다 |
-| `tools/build-assets.mjs` | `origin/door-4.png` → 문틀·문짝 자산 |
+| `assets/origin/` | 촬영 원본 `1~17` `map.jpg` `door-2.jpeg`, AI 로 문 위를 채운 `door-4.png`, 둘을 합친 첫 화면 소스 `door-5.jpg` — **git 제외**. 확장자가 `.jpg`/`.jpeg` 섞여 있어 빌드 스크립트가 있는 쪽을 찾아 쓴다 |
+| `tools/build-door.mjs` | `origin/door-2.jpeg` + `door-4.png` → 첫 화면 소스 `origin/door-5.jpg` |
+| `tools/build-assets.mjs` | `origin/door-5.jpg` → 문틀·문짝 자산 |
 | `tools/build-gen.mjs` | 인페인팅 결과 → 문 뒤 공간(`gate-bg`) |
 | `tools/build-photos.mjs` | `origin/1~17`·`map.jpg` → 갤러리·약도·reveal. 어느 원본이 어디로 가는지는 §4 사진 교체 |
 | `tools/vertex-image.mjs` | Gemini 이미지 생성/편집 호출 (선택) |
@@ -75,34 +76,31 @@ p 0.55~1.00    사진 + 날짜가 아래에서 위로 상승
 
 ### 문짝 위치가 문틀과 어긋날 때
 
-`index.html` 의 `:root` 값만 조정. `assets/origin/door-4.png` 를 위 240 / 아래 54 잘라낸 800×1050 기준 백분율 — 자르는 양은 `tools/build-assets.mjs` 의 `CUT_TOP`·`CUT_BOT`, 잘라낸 뒤 값은 그 스크립트가 출력한다.
+`index.html` 의 `:root` 값만 조정. `assets/origin/door-5.jpg`(1400×2025) 기준 백분율 — `tools/build-assets.mjs` 를 돌리면 그대로 출력된다.
 
-소스를 더 크게 받으려는 시도 = 무의미. Gemini 는 1400×2352 를 요청해도 800×1344 로만 출력(2회 실측). 폰에서 2.2배 확대되므로 나뭇결이 다소 무르다.
+문이 화면에서 차지하는 크기(= 카메라가 얼마나 앞인지)는 `tools/build-door.mjs` 의 `H` 로 정해진다. 세로가 짧을수록 화면 높이에 맞추느라 문이 커진다. 문이 화면에서 얼마나 아래에 놓이는지는 `PAD`(문 위에 붙이는 아이비 띠 높이). 아이폰(390×844) 기준 실측.
 
-문이 화면에서 차지하는 크기(= 카메라가 얼마나 앞인지)는 `CUT_TOP`·`CUT_BOT` 으로 정해진다. 세로를 자를수록 화면 높이에 맞추느라 문이 커진다. 아이폰(390×844) 기준 왼쪽 문짝 폭 실측.
+| 대문 사진 | 문짝(좌) 폭 | 문 높이 | 문 상단 위치 |
+|---|---|---|---|
+| door-2 원본 | 187px | 480px | 90px |
+| door-4 (AI 로 문 위를 채운 것) | 148px | 354px | 276px |
+| **door-5 (지금)** | **190px** | **488px** | **161px** |
 
-| 대문 사진 | 자른 양 | 문짝(좌) 폭 | 문 높이 | 문 상단 위치 |
-|---|---|---|---|---|
-| door-2 (지난 사진) | 없음 | 187px | 480px | 90px |
-| door-4 (자르기 전) | 없음 | 148px | 354px | 276px |
-| door-4 (거쳐간 값) | 위 130 · 아래 54 | 171px | 410px | 226px |
-| door-4 (지금) | 위 240 · 아래 54 | 189px | 453px | 161px |
-
-지금 값(위 240)은 문 위 유리천장을 걷어내 첫 화면 요소를 줄인 것이다. 유리천장·아이비·벽·간판·문 5겹이 겹쳐 이름이 묻히고 간판의 금색 글자가 이름보다 먼저 눈에 들어왔다. 문 크기도 결과적으로 지난 사진(187px)과 거의 같아졌다.
+door-4 를 그대로 쓰지 않는 이유 = 800px 로 작아 나뭇결·조각이 뭉갠다. Gemini 는 1400×2352 를 요청해도 800×1344 로만 출력한다(2회 실측). 그래서 문짝·문틀은 촬영 원본 door-2(1400px)를 그대로 쓰고, 문 위 여백만 door-4 의 아이비 띠로 채웠다.
 
 ```css
---door-l: 20.625%;  /* 문 왼쪽 끝 */
---door-r: 79.125%;  /* 문 오른쪽 끝 */
---door-t: 19.048%;  /* 문 위쪽 */
---door-b: 72.762%;  /* 문 아래쪽 */
+--door-l: 17.429%;  /* 문 왼쪽 끝 */
+--door-r: 82.214%;  /* 문 오른쪽 끝 */
+--door-t: 19.062%;  /* 문 위쪽 */
+--door-b: 76.889%;  /* 문 아래쪽 */
 --door-c: 50.000%;  /* 두 문짝 분할선 */
 --shift-x:  0.35%;  /* 첫 화면 좌우 이동. +면 오른쪽 */
 ```
 
-바꿨으면 문짝 이미지도 같은 좌표로 다시 잘라야 함 → `tools/build-assets.mjs` 상단 `D` 상수 수정 후
+대문 사진 자체를 다시 만들려면 `tools/build-door.mjs` 를 먼저 돌린다. 문 좌표를 출력하므로 그 값을 `build-assets.mjs` 의 `D`·`H` 와 `index.html` 의 `:root` 에 옮긴다.
 
 ```bash
-node tools/build-assets.mjs
+node tools/build-door.mjs && node tools/build-assets.mjs
 ```
 
 ### 열리는 속도·각도·연출

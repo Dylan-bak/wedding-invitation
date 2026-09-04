@@ -3,28 +3,23 @@ import { mkdirSync } from 'fs';
 
 mkdirSync('assets/hero', { recursive: true });
 
-// 첫 화면 소스 = assets/origin/door-4.png
-// 좌표는 이 이미지의 가장자리를 픽셀 밝기로 훑어 실측한 값 (문틀 하이라이트가 시작되는 x·y)
-const SRC = 'assets/origin/door-4.png';
-// 위 130 / 아래 54 를 잘라낸다. 세로가 짧아지면 화면 높이에 맞추느라 문이 커진다
-// (door-2 시절 문 크기와 door-4 원본의 중간). 위쪽 유리천장·아이비 길이도 함께 줄어든다
-const CUT_TOP = 240, CUT_BOT = 54;
-const W = 800, H = 1344 - CUT_TOP - CUT_BOT;
-const D0 = { L: 165, R: 633, T: 440, B: 1004, C: 400 };
-const D = { ...D0, T: D0.T - CUT_TOP, B: D0.B - CUT_TOP };
+// 첫 화면 소스 = assets/origin/door-5.jpg (tools/build-door.mjs 가 만든다)
+// 좌표는 그 스크립트가 출력한다
+const SRC = 'assets/origin/door-5.jpg';
+const W = 1400, H = 2025;
+const D = { L: 244, R: 1151, T: 386, B: 1557, C: 700 };
 
 const jpg = { quality: 84, mozjpeg: true };
 
 // 문틀 배경 (문 포함 전체)
-await sharp(SRC).extract({ left: 0, top: CUT_TOP, width: W, height: H })
-  .jpeg(jpg).toFile('assets/hero/frame.jpg');
+await sharp(SRC).jpeg(jpg).toFile('assets/hero/frame.jpg');
 
-// 좌/우 문짝 — 원본 해상도가 낮아 확대하지 않고 그대로 잘라낸다
+// 좌/우 문짝 — 촬영 원본 화소를 그대로 쓴다
 await sharp(SRC)
-  .extract({ left: D0.L, top: D0.T, width: D0.C - D0.L, height: D0.B - D0.T })
+  .extract({ left: D.L, top: D.T, width: D.C - D.L, height: D.B - D.T })
   .jpeg(jpg).toFile('assets/hero/door-l.jpg');
 await sharp(SRC)
-  .extract({ left: D0.C, top: D0.T, width: D0.R - D0.C, height: D0.B - D0.T })
+  .extract({ left: D.C, top: D.T, width: D.R - D.C, height: D.B - D.T })
   .jpeg(jpg).toFile('assets/hero/door-r.jpg');
 
 console.log(JSON.stringify({

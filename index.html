@@ -25,11 +25,11 @@
 <link rel="preload" as="image" href="assets/hero/door-r.jpg">
 <link rel="preload" as="image" href="assets/hero/gate-bg.jpg">
 <style>
-/* 문 좌표 — assets/origin/door-4.png 를 위 240 / 아래 54 잘라낸 800x1050 기준 % (tools/build-assets.mjs 가 출력) */
+/* 문 좌표 — assets/origin/door-5.jpg (1400x2025) 기준 % (tools/build-assets.mjs 가 출력) */
 :root{
-  --img-w: 800; --img-h: 1050;
-  --door-l: 20.625%;  --door-r: 79.125%;
-  --door-t: 19.048%;  --door-b: 72.762%;
+  --img-w: 1400; --img-h: 2025;
+  --door-l: 17.429%;  --door-r: 82.214%;
+  --door-t: 19.062%;  --door-b: 76.889%;
   --door-c: 50.000%;
   --ink:#3a352f; --paper:#fbf9f6;
   --p:0;            /* 스크롤 진행률 0~1 */
@@ -127,11 +127,9 @@ body{
 
 /* 타이틀·스크롤 안내가 밝은 대리석 바닥 위에 놓여 흰 글자가 묻힌다.
    글자 뒤에만 어두운 그라데이션을 깔아 대비를 만든다. */
-/* 위아래를 눌러 가운데 문과 이름으로 시선을 모은다.
-   위쪽을 안 누르면 간판의 금색 글자가 이름보다 먼저 눈에 들어온다 */
 .hero__veil{
-  position:absolute; inset:0; pointer-events:none;
-  background:linear-gradient(180deg, rgba(20,16,12,.52) 0%, rgba(20,16,12,.30) 22%, rgba(20,16,12,0) 42%, rgba(20,16,12,.30) 78%, rgba(20,16,12,.55) 100%);
+  position:absolute; inset:auto 0 0 0; height:46svh; pointer-events:none;
+  background:linear-gradient(180deg, rgba(20,16,12,0) 0%, rgba(20,16,12,.42) 55%, rgba(20,16,12,.62) 100%);
   opacity:clamp(0, calc(1 - var(--p) * 9), 1);
 }
 
