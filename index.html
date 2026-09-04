@@ -408,6 +408,18 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 .bgm[aria-pressed="true"] svg{animation:bgmPulse 2.4s ease-in-out infinite}
 @keyframes bgmPulse{0%,100%{opacity:.75; scale:1} 50%{opacity:1; scale:1.12}}
 @media (prefers-reduced-motion: reduce){ .bgm svg{animation:none} }
+/* 재생이 시작된 순간 한 번만 — 버튼 왼쪽에 작은 안내 + 버튼 테두리가 두 번 퍼진다 */
+.bgm__tip{
+  position:fixed; top:calc(env(safe-area-inset-top, 0px) + 14px); right:60px; z-index:60;
+  height:38px; display:flex; align-items:center; padding:0 12px; border-radius:19px;
+  background:rgba(28,22,16,.55); backdrop-filter:blur(6px); color:#fff;
+  font-size:12px; letter-spacing:.02em; white-space:nowrap; pointer-events:none;
+  opacity:0; translate:6px 0; transition:opacity .4s, translate .4s;
+}
+.bgm__tip.is-on{opacity:1; translate:0 0}
+.bgm.is-hint{animation:bgmRing 1.4s ease-out 2}
+@keyframes bgmRing{0%{box-shadow:0 0 0 0 rgba(255,255,255,.6)} 100%{box-shadow:0 0 0 12px rgba(255,255,255,0)}}
+@media (prefers-reduced-motion: reduce){ .bgm.is-hint{animation:none} }
 </style>
 </head>
 <body>
@@ -418,6 +430,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   <svg class="on" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
   <svg class="off" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z" opacity=".45"/><path d="M4 3.5 20.5 20l-1.4 1.4L2.6 4.9 4 3.5z"/></svg>
 </button>
+<div class="bgm__tip" id="bgmTip" role="status">배경음악 재생 중 · 탭하여 끄기</div>
 
 <!-- HERO : 스크롤 → 문 열림 → 화이트아웃 → 아래에서 상승 -->
 <div class="hero" id="hero">
@@ -961,7 +974,18 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 (() => {
   const audio = document.getElementById('bgmAudio');
   const btn = document.getElementById('bgmBtn');
+  const tip = document.getElementById('bgmTip');
   if (!audio || !btn) return;
+
+  // 재생이 처음 시작될 때 한 번만 안내를 띄우고 3초 뒤 거둔다
+  let tipDone = false, tipTimer = 0;
+  function hint() {
+    if (tipDone || !tip) return;
+    tipDone = true;
+    tip.classList.add('is-on'); btn.classList.add('is-hint');
+    tipTimer = setTimeout(hideHint, 3200);
+  }
+  function hideHint() { clearTimeout(tipTimer); tip?.classList.remove('is-on'); btn.classList.remove('is-hint'); }
 
   const KEY = 'bgm-off';
   const store = {
@@ -992,12 +1016,13 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   }
 
   async function play() {
-    try { await audio.play(); if (broken || audio.error) return false; btn.hidden = false; setUI(true); fadeTo(0.35); return true; }
+    try { await audio.play(); if (broken || audio.error) return false; btn.hidden = false; setUI(true); fadeTo(0.35); hint(); return true; }
     catch { return false; }
   }
   function pause() { clearInterval(fade); audio.volume = 0; audio.pause(); setUI(false); }
 
   btn.addEventListener('click', () => {
+    hideHint();
     if (btn.getAttribute('aria-pressed') === 'true') { wanted = false; store.set(KEY, '1'); pause(); }
     else { wanted = true; store.del(KEY); play(); }
   });
