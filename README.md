@@ -180,7 +180,7 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 ### 대문 중앙 로고
 
 `.hero__logo` — Cormorant Garamond SemiBold(600), 흰색, 트래킹 `.05em`(+50).
-이름 `clamp(68px, 21.54vw, 122px)` = 화면 폭 비례(390px 폰에서 84px), `&` 는 이름의 `0.7em`(390px 폰에서 59px), 행간 `1`. 위치 = 문 세로 중앙에서 문 높이의 15% 위 (문 좌표로 계산).
+이름 `clamp(47px, 15vw, 85px)` = 화면 폭 비례(390px 폰에서 58.5px), `&` 는 이름의 `0.7em`(390px 폰에서 41px), 행간 `1`. 위치 = 문 세로 중앙에서 문 높이의 15% 위 (문 좌표로 계산).
 
 **Photoshop 과 달리 CSS `text-shadow` 에 spread 미존재.** 값 4개 중 `offset-x offset-y blur color` 만 지원 → 퍼짐은 짧은 그림자를 겹쳐 흉내낸다. 현재값 = `0 0 21px rgba(0,0,0,.48)` + `0 0 7px rgba(0,0,0,.34)`. 정확히 재현하려면 SVG `feMorphology` + `feGaussianBlur` 필요.
 마지막 글자 뒤에 붙는 자간 때문에 가운데정렬이 왼쪽으로 밀리므로 `margin-right:-.05em` 로 상쇄한다.
