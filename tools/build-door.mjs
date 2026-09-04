@@ -10,6 +10,7 @@ import sharp from 'sharp';
 
 const D2 = 'assets/origin/door-2.jpeg';   // 1400x2061, 문 = L244 R1151 T219 B1390 C700
 const D4 = 'assets/origin/door-4.png';    // 800x1344. 유리천장 y0~190 · 아이비 y190~358
+const IVY_H = 56;   // 아이비 띠에서 쓸 높이(door-4 기준). 잎이 빽빽한 위쪽만 남기고 늘어진 덩굴·빈 벽은 자른다
 
 const DROP  = 57;   // door-2 맨 위 유리천장 조각 — 이어 붙일 자리라 버린다
 const GLASS = 150;  // 유리천장 띠를 이 높이로 눌러 넣는다 (그대로면 333px). 키우면 계단이 줄어든다
@@ -17,7 +18,7 @@ const H     = 2025; // 최종 높이. 이 값이 화면에서 문이 얼마나 �
 
 const glass = await sharp(D4).extract({ left: 0, top: 0, width: 800, height: 190 })
   .resize({ width: 1400, height: GLASS, fit: 'fill' }).toBuffer();
-const ivy = await sharp(D4).extract({ left: 0, top: 190, width: 800, height: 168 })
+const ivy = await sharp(D4).extract({ left: 0, top: 190, width: 800, height: IVY_H })
   .resize({ width: 1400 }).toBuffer();                       // 아이비는 비율 그대로 (눌리면 티가 난다)
 const PAD = GLASS + (await sharp(ivy).metadata()).height;
 const body = await sharp(D2).rotate()
