@@ -139,12 +139,13 @@ body{
 /* 대문 중앙 로고 — 이름을 정보가 아니라 로고처럼 얹는다.
    문이 주역이므로 크기는 문 폭 안에 머물게 하고, 글자만 떠 보이도록 그림자로 분리 */
 .hero__logo{
-  /* 문의 세로 중앙. 문 좌표가 바뀌면 따라간다 */
-  position:absolute; left:0; right:0; top:calc((var(--door-t) + var(--door-b)) / 2); translate:0 -50%;
+  /* 문 세로 중앙에서 문 높이의 15% 위. 문 좌표가 바뀌면 따라간다 */
+  position:absolute; left:0; right:0;
+  top:calc((var(--door-t) + var(--door-b)) / 2 - (var(--door-b) - var(--door-t)) * 0.15); translate:0 -50%;
   text-align:center; pointer-events:none;
   color:#FFFFFF;
   font-family:"Cormorant Garamond",serif; font-weight:600;
-  font-size:clamp(44px, 13.9vw, 79px); line-height:1.28;
+  font-size:50px; line-height:1.15;
   letter-spacing:.05em;                      /* 트래킹 +50 = 50/1000 em */
   /* Drop Shadow — 거리 0 / 번짐 21 / 불투명도 48%.
      CSS 에는 spread 가 없어 짧은 그림자를 겹쳐 퍼짐을 흉내낸다 */
@@ -153,7 +154,7 @@ body{
 }
 /* letter-spacing 은 마지막 글자 뒤에도 붙어 가운데정렬이 왼쪽으로 밀린다 → 상쇄 */
 .hero__logo span{display:block; margin-right:-.05em}
-.hero__logo .amp{font-size:.62em; letter-spacing:0; margin:.04em 0; opacity:.92}
+.hero__logo .amp{font-size:.7em; letter-spacing:0; margin:.04em 0; opacity:.92}
 
 /* 문 열리기 전 타이틀 */
 .hero__title{
