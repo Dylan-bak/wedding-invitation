@@ -21,14 +21,14 @@ http://localhost:4321
 | `assets/hero/door-l.jpg` · `door-r.jpg` | 좌·우 문짝 (각각 경첩 기준 회전) |
 | `assets/hero/gate-bg.jpg` | 문 뒤로 보이는 공간 (문짝을 지운 인페인팅 결과에서 개구부만 크롭) |
 | `assets/photo/reveal.jpg` | 문 열린 뒤 아래에서 올라오는 사진 |
-| `assets/photo/s1~s2.jpg` | 갤러리 단독 게재 2장 (원본 비율 유지) |
-| `assets/photo/t01~t15.jpg` | 갤러리 썸네일 15장 (336×366) |
-| `assets/photo/f01~f15.jpg` | 썸네일 클릭 시 띄우는 확대본 (장변 2800, 장당 약 260KB) |
+| `assets/photo/s1~s2.jpg` | 갤러리 단독 게재 2장 — origin `2`·`8` (원본 비율 유지) |
+| `assets/photo/t01~t14.jpg` | 갤러리 썸네일 14장 (336×366) |
+| `assets/photo/f01~f14.jpg` | 썸네일 클릭 시 띄우는 확대본 (장변 2800, 장당 약 260KB) |
 | `assets/photo/map.jpg` | 약도 |
 | `assets/origin/` | 촬영 원본 `1~17` `map.jpg` `door-2.jpeg`, 첫 화면 소스 `door-4.png`, 문짝 조각 참조 `ref-door-pattern.png` — **git 제외**. 확장자가 `.jpg`/`.jpeg` 섞여 있어 빌드 스크립트가 있는 쪽을 찾아 쓴다 |
 | `tools/build-assets.mjs` | `origin/door-4.png` → 문틀·문짝 자산 |
 | `tools/build-gen.mjs` | 인페인팅 결과 → 문 뒤 공간(`gate-bg`) |
-| `tools/build-photos.mjs` | `origin/1~17`·`map.jpg` → 갤러리·약도·reveal |
+| `tools/build-photos.mjs` | `origin/1~17`·`map.jpg` → 갤러리·약도·reveal. 어느 원본이 어디로 가는지는 §4 사진 교체 |
 | `tools/vertex-image.mjs` | Gemini 이미지 생성/편집 호출 (선택) |
 | `assets/gate-src.jpg` | 문짝만 지운 인페인팅 결과(848×1248) — `gate-bg.jpg` 소스 |
 | `assets/qr.svg` · `qr.png` | 배포 주소 QR — **종이 청첩장 인쇄 업체 전달용** |
@@ -122,9 +122,10 @@ const MAX_ZOOM = 1.22;       // 최대 확대
 
 | origin | 쓰이는 곳 | 처리 |
 |---|---|---|
-| `1` | 갤러리 단독 1번 + 문 열린 뒤 올라오는 사진 | 단독은 원본 비율, reveal 은 3:4 |
-| `2` | 갤러리 단독 2번 | 원본 비율 유지 (자르지 않음) |
-| `3~17` | 갤러리 썸네일 격자 15장 | 썸네일은 112:122 중앙 크롭(336×366), 확대본은 원본 비율 장변 2800 |
+| `1` | 문 열린 뒤 올라오는 사진(`reveal.jpg`) 전용 | 3:4 중앙 크롭. 갤러리에는 넣지 않는다 — 같은 컷이 두 번 보인다 |
+| `2` | 갤러리 단독 1번(`s1.jpg`) | 원본 비율 유지 (자르지 않음) |
+| `8` | 갤러리 단독 2번(`s2.jpg`) | 원본 비율 유지 (자르지 않음) |
+| `3~7` `9~17` | 갤러리 썸네일 격자 14장 | 썸네일은 112:122 중앙 크롭(336×366), 확대본은 원본 비율 장변 2800 |
 | `map.jpg` | 약도 | 폭 932 그대로, 품질 90 |
 
 ### 텍스트

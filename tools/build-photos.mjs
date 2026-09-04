@@ -14,7 +14,8 @@ const src = n => {
 };
 
 // 단독 게재 2장 — 원본 비율 유지 (자르지 않는다)
-for (const [i, n] of [1, 2].entries()) {
+// 1 은 쓰지 않는다. 문 열린 뒤 올라오는 사진과 같은 컷이라 두 번 보이게 된다
+for (const [i, n] of [2, 8].entries()) {
   await sharp(src(n)).rotate().resize({ width: 1200 }).jpeg(jpg)
     .toFile(`assets/photo/s${i + 1}.jpg`);
 }
@@ -26,7 +27,8 @@ await sharp(src(1)).rotate()
 
 // 갤러리 3~17 — 썸네일 격자 + 클릭 시 확대
 // 썸네일은 화면에서 112x122 로 보이므로 고밀도 화면(DPR3)까지 커버하도록 3배 크기
-const GALLERY = [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
+// 8 은 단독 게재로 빠졌다
+const GALLERY = [3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17];
 for (const [i, n] of GALLERY.entries()) {
   const id = String(i + 1).padStart(2, '0');
   await sharp(src(n)).rotate()
