@@ -46,7 +46,7 @@
 body{
   background:var(--paper); color:var(--ink);
   font-family:"Noto Serif KR",serif; font-weight:300;
-  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  -webkit-font-smoothing:antialiased; overflow-x:clip;   /* hidden 은 iOS 에서 body 가 스크롤 컨테이너가 되어 sticky 가 떨린다 */
   word-break:keep-all;   /* 한글을 어절 단위로 끊는다. 없으면 "있도록," 이 "있도 / 록," 로 갈라진다 */
 }
 
@@ -203,10 +203,14 @@ body{
   transform:translateY(calc(var(--rise) * 34svh));
   will-change:transform,opacity;
 }
-.reveal__inner{text-align:center; padding:0 28px}
-.reveal__photo{width:min(64vw,300px); aspect-ratio:3/4; object-fit:cover; border-radius:200px 200px 8px 8px;
-  box-shadow:0 18px 50px rgba(90,70,50,.18)}
-.reveal__cap{margin-top:26px; font-size:clamp(15px,4.2vw,19px); letter-spacing:.16em; line-height:2}
+.reveal__inner{text-align:center; padding:0 28px; width:100%}
+.reveal__date{font-family:"Cormorant Garamond",serif; font-size:13px; letter-spacing:.18em; opacity:.6}
+.reveal__our{margin-top:8px; font-family:"Cormorant Garamond",serif; font-weight:500; text-transform:uppercase;
+  font-size:clamp(34px,10.5vw,46px); line-height:1.02; letter-spacing:.06em}
+/* 아치 사진 — 폭은 화면 폭 -80px(참고안), 작은 화면에서는 높이가 넘치지 않게 56lvh 로 제한 */
+.reveal__photo{display:block; margin:24px auto 0; width:min(calc(100vw - 80px), calc(56lvh * 2 / 3), 440px);
+  aspect-ratio:2/3; object-fit:cover; border-radius:999px 999px 0 0}
+.reveal__cap{margin-top:22px; font-size:clamp(14px,3.9vw,17px); letter-spacing:.06em; line-height:1.9}
 .reveal__sub{margin-top:10px; font-family:"Cormorant Garamond",serif; font-style:italic; opacity:.6; letter-spacing:.12em}
 
 /* 2) 이후 섹션 */
@@ -219,11 +223,9 @@ h2{font-weight:400; font-size:clamp(19px,5vw,24px); letter-spacing:.14em; margin
 /* kicker 는 기본이 대문자 변환. 표기를 준 그대로 두는 경우에만 해제 */
 .kicker--asis{text-transform:none}
 .couple{letter-spacing:.08em}
-/* 사진 사이에 들어가는 글 — 위아래 사진과 붙지 않게 여백 */
-.invite{margin:11svh 0}
 
 /* 혼주 — 두 줄의 글자 수가 같아 가운데정렬만으로 열이 맞는다 */
-.parents{margin:5svh 0 4svh; font-size:15px; line-height:2.4; letter-spacing:.04em}
+.parents{margin:34px 0 8px; font-size:15px; line-height:2.4; letter-spacing:.04em}
 .parents .rel{opacity:.5; margin:0 .1em}
 .parents b{font-weight:600; margin-left:.15em}
 .couple b{font-weight:600}
@@ -308,20 +310,23 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 .fld__msg{margin-top:14px; font-size:13px; line-height:1.8; text-align:center}
 .fld__msg[data-err]{color:#a4433a}
 
-/* 갤러리 — 단독 2장은 원본 비율 그대로, 이어서 3열 썸네일 격자 */
-.solo{display:grid; gap:10px}
-.solo img{width:100%; height:auto; border-radius:3px; display:block}
+/* 본문 사진 한 장 — 좌우 여백 안에 원본 비율 그대로 */
+.photo-in{margin:28px 0 0}
+.photo-in img{width:100%; height:auto; display:block; border-radius:4px}
 
-/* 썸네일 격자. 112x122 비율은 참고한 청첩장과 같은 값 */
-.thumbs{display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-top:10px}
+/* 갤러리 — 참고안과 같은 2열 · 8:9 · 둥근 모서리. 접힌 상태에서는 6장 + 아래 흐림 */
+.thumbs{position:relative; display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px}
 .thumbs button{
   padding:0; border:0; background:none; cursor:pointer; display:block;
-  border-radius:3px; overflow:hidden; -webkit-tap-highlight-color:transparent;
+  border-radius:10px; overflow:hidden; -webkit-tap-highlight-color:transparent;
 }
-.thumbs img{width:100%; aspect-ratio:112/122; object-fit:cover; display:block;
+.thumbs img{width:100%; aspect-ratio:8/9; object-fit:cover; display:block;
   transition:transform .35s cubic-bezier(.2,.7,.2,1)}
-.thumbs button:hover img, .thumbs button:focus-visible img{transform:scale(1.06)}
+.thumbs button:hover img, .thumbs button:focus-visible img{transform:scale(1.04)}
 .thumbs button:focus-visible{outline:2px solid rgba(58,53,47,.5); outline-offset:2px}
+.thumbs.is-folded button:nth-child(n+7){display:none}
+.thumbs.is-folded::after{content:""; position:absolute; left:0; right:0; bottom:0; height:130px; pointer-events:none;
+  background:linear-gradient(180deg, rgba(251,249,246,0), var(--paper) 90%)}
 
 /* 확대 보기 */
 .lb{
@@ -359,7 +364,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 .card a{display:inline-block; font-size:12px; letter-spacing:.1em; color:inherit; text-decoration:none;
   border:1px solid rgba(58,53,47,.2); border-radius:99px; padding:6px 14px; margin:3px 2px}
 .map{margin-top:22px; border-radius:4px; overflow:hidden; border:1px solid rgba(58,53,47,.14)}
-/* 약도는 지하철 노선색이 정보이므로 색을 깎지 않는다 */
+/* 지도는 노선색이 정보이므로 색을 깎지 않는다 */
 .map img{width:100%; display:block}
 /* 지도앱 바로가기 */
 .maplinks{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px}
@@ -380,77 +385,111 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 .maplink--kakao:active{background:#f2da00}
 
 
-/* 테두리만 있는 버튼 — 연락하기·공유 */
+/* 참고안처럼 절이 번갈아 살짝 어두운 배경 */
+.block--tint{background:rgba(58,53,47,.035)}
+
+/* 테두리만 있는 버튼 — 연락하기·사진 더 보기·전달하기 */
 .btn-line{
-  display:block; width:100%; margin-top:22px; padding:13px 16px;
-  border:1px solid rgba(58,53,47,.3); border-radius:4px; background:#fff; color:inherit;
+  display:block; width:100%; margin-top:26px; padding:12px 16px;
+  border:1px solid rgba(58,53,47,.55); border-radius:2px; background:transparent; color:inherit;
   font-family:inherit; font-size:14px; letter-spacing:.14em; cursor:pointer;
   -webkit-tap-highlight-color:transparent; transition:background .2s ease;
 }
-.btn-line:active{background:rgba(58,53,47,.05)}
+.btn-line:active{background:rgba(58,53,47,.06)}
 .btn-line--narrow{width:min(60%,220px); margin-inline:auto}
 
-/* 예식 날짜 — 달력 · 남은 시간 */
-.date{margin-top:-14px; font-size:15px; letter-spacing:.1em; opacity:.7}
-.cal{margin:26px auto 0; max-width:340px; padding:16px 0 12px;
-  border-top:1px solid rgba(58,53,47,.15); border-bottom:1px solid rgba(58,53,47,.15)}
+/* 예식 날짜 — 일시 · 달력 · 남은 시간 띠 */
+.date-title{margin:18px 0 22px; font-size:clamp(15px,4.3vw,18px); letter-spacing:.04em}
+.cal{margin:0 auto; max-width:340px; padding:6px 0 10px}
 .cal table{width:100%; border-collapse:collapse; font-size:14px}
-.cal th{font-weight:400; font-size:11px; letter-spacing:.12em; opacity:.5; padding-bottom:8px}
-.cal td{height:38px; text-align:center}
-.cal th:first-child, .cal td:first-child{color:#b5574c}
-.cal td span{display:inline-grid; place-items:center; width:32px; height:32px; border-radius:50%}
-.cal td.is-day span{background:var(--ink); color:#fbf9f6; font-weight:600}
-.dday{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:24px auto 0; max-width:340px}
-.dday div{border:1px solid rgba(58,53,47,.14); border-radius:4px; padding:12px 0 10px; background:#fff}
-.dday b{display:block; font-family:"Cormorant Garamond",serif; font-weight:600; font-size:26px; line-height:1; font-variant-numeric:tabular-nums}
-.dday small{display:block; margin-top:6px; font-size:10px; letter-spacing:.2em; opacity:.5; text-transform:uppercase}
-.dday__msg{margin-top:22px}
+.cal th{font-weight:400; font-size:13px; letter-spacing:.3em; padding:10px 0 14px; opacity:.8}
+.cal td{height:44px; text-align:center; font-size:14px}
+.cal td span{display:inline-grid; place-items:center; width:34px; height:34px}
+/* 예식일 = 참고안과 같은 하트 표식 위에 흰 글자 */
+.cal td.is-day span{background:url(assets/photo/heart.png) center/34px 30px no-repeat; color:#fff; font-weight:600; padding-bottom:3px}
+.banner{
+  position:relative; margin:22px -24px 0; padding:32px 12px;
+  background:url(assets/photo/banner.jpg) center/cover no-repeat;
+}
+.banner::before{content:""; position:absolute; inset:0; background:rgba(0,0,0,.42)}
+.dday{position:relative; list-style:none; display:flex; justify-content:center; align-items:center; gap:6px; color:#fff}
+.dday li{width:62px; text-align:center}
+.dday li b{display:block; padding:8px 0 7px; border-radius:6px; background:rgba(40,40,40,.88);
+  font-family:"Cormorant Garamond",serif; font-weight:600; font-size:30px; line-height:1.1; font-variant-numeric:tabular-nums}
+.dday li span{display:block; margin-top:8px; font-size:12px; letter-spacing:.02em}
+.dday__colon{width:auto; font-size:26px; line-height:1; padding-bottom:26px; opacity:.9}
+.dday__msg{margin-top:26px}
 .dday__msg b{font-weight:600}
-.heart{color:#c2857c}
+.heart{color:#e0736c}
 
-/* 신랑 · 신부 소개 */
-.intro{display:grid; gap:12px; margin-top:26px}
-@media (min-width:420px){ .intro{grid-template-columns:1fr 1fr} }
-.who{border:1px solid rgba(58,53,47,.14); border-radius:4px; padding:22px 14px; background:#fff}
-.who__role{font-family:"Cormorant Garamond",serif; letter-spacing:.3em; font-size:12px; opacity:.55; text-transform:uppercase}
-.who__name{margin-top:8px; font-size:19px; letter-spacing:.3em}
-.who__tag{margin-top:5px; font-size:12px; letter-spacing:.1em; opacity:.5}
-.who ul{list-style:none; margin-top:14px; font-size:13.5px; line-height:2; opacity:.85}
+/* 신랑 · 신부 소개 — 어린 시절 사진 두 장 + 하트, 아래 두 열 */
+.intro__pics{display:flex; justify-content:center; align-items:center; gap:14px; margin-top:6px}
+.intro__pics img{width:min(36vw,150px); aspect-ratio:1; object-fit:cover; border-radius:50%}
+.intro__pics .heart{font-size:18px}
+.intro{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:22px}
+.who__role{font-family:"Cormorant Garamond",serif; letter-spacing:.3em; font-size:14px; opacity:.6}
+.who__name{margin-top:4px; font-size:17px; font-weight:600; letter-spacing:.3em}
+.who__tag{display:inline-block; margin-top:10px; padding:4px 12px; border-radius:99px; font-size:11px; letter-spacing:.04em; font-weight:600}
+.who__tag--g{background:#d4efff; color:#1fa9f5}
+.who__tag--b{background:#ffe1e6; color:#f0648a}
+.who ul{list-style:none; margin-top:14px; font-size:13.5px; line-height:1.95; opacity:.85}
 
-/* 오시는 길 — 주소 · 교통 */
-.addr{margin-top:-8px; font-size:15px; line-height:1.9; letter-spacing:.02em}
-.addr span{opacity:.6}
-.ways{margin-top:30px; text-align:left; display:grid; gap:20px}
-.way b{display:block; font-weight:600; font-size:14px; letter-spacing:.1em}
-.way p{margin-top:6px; font-size:13.5px; line-height:2; opacity:.8}
-.tag{display:inline-block; margin-right:6px; padding:1px 8px; border-radius:99px;
-  font-size:11px; letter-spacing:.04em; background:rgba(58,53,47,.08)}
-.tag--7{background:#747f00; color:#fff}   /* 서울 7호선 노선색 */
+/* 오시는 길 — 주소 · 지도 · 앱 버튼 · 교통 안내 */
+.addr{margin:-6px 0 22px; font-size:15px; line-height:1.9; letter-spacing:.02em}
+.map{margin:0 -24px; border-radius:0; border:0}
+.map img{width:100%; display:block}
+.maplinks{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:16px}
+.maplink{
+  display:flex; align-items:center; justify-content:center; gap:6px;
+  padding:13px 4px; border:1px solid rgba(58,53,47,.12); border-radius:8px;
+  background:#fff; color:inherit; font-family:inherit; font-size:13px;
+  letter-spacing:0; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  box-shadow:0 2px 8px rgba(58,53,47,.05);
+}
+.maplink img{width:20px; height:20px}
+.maplink:active{background:rgba(58,53,47,.04)}
+.way{margin-top:26px; text-align:left; border-top:1px solid rgba(58,53,47,.35); border-bottom:1px solid rgba(58,53,47,.35)}
+.way summary{list-style:none; display:flex; justify-content:space-between; align-items:center; padding:16px 4px;
+  font-size:18px; letter-spacing:.06em; cursor:pointer; -webkit-tap-highlight-color:transparent}
+.way summary::-webkit-details-marker{display:none}
+.way summary::after{content:""; width:8px; height:8px; margin-right:6px; opacity:.6;
+  border-right:1px solid currentColor; border-bottom:1px solid currentColor; transform:rotate(-135deg); transition:transform .2s ease}
+.way:not([open]) summary::after{transform:rotate(45deg)}
+.way__grp{padding:18px 4px; border-top:1px solid rgba(58,53,47,.12)}
+.way__grp b{display:block; font-weight:600; font-size:15px; letter-spacing:.06em; margin-bottom:10px}
+.way__grp p{font-size:13.5px; line-height:1.9; opacity:.85}
+.way__grp strong{font-weight:600; opacity:1}
+.tag{display:inline-block; margin-right:6px; padding:0 6px; font-size:12px; letter-spacing:0; color:#fff; line-height:1.6}
+.tag--blue{background:#395cb4}
+.tag--green{background:#4a972e}
+.tag--red{background:#e02b2b}
+.tag--7{background:#7f9e1a}
 
 /* 안내사항 탭 */
-.tabs{display:flex; justify-content:center; gap:34px; margin-top:-8px;
+.tabs{display:flex; justify-content:center; gap:0; margin-top:-8px;
   border-top:1px solid rgba(58,53,47,.15); border-bottom:1px solid rgba(58,53,47,.15)}
 .tabs button{
-  position:relative; padding:14px 2px; border:0; background:none; color:inherit;
-  font-family:inherit; font-size:14px; letter-spacing:.1em; opacity:.45; cursor:pointer;
+  position:relative; flex:1; padding:14px 2px; border:0; background:none; color:inherit;
+  font-family:inherit; font-size:14px; letter-spacing:.06em; opacity:.4; cursor:pointer;
   -webkit-tap-highlight-color:transparent; transition:opacity .2s ease;
 }
-.tabs button[aria-selected="true"]{opacity:1}
-.tabs button[aria-selected="true"]::after{content:""; position:absolute; left:0; right:0; bottom:-1px; height:1px; background:var(--ink)}
-.tabpanel{margin-top:26px}
+.tabs button[aria-selected="true"]{opacity:1; font-weight:600}
+.tabs button[aria-selected="true"]::after{content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px; background:var(--ink)}
+.tabpanel .photo-in{margin-top:24px}
+.tabpanel .body{margin-top:26px}
 .tabpanel b{font-weight:600}
 
 /* 계좌 — 접었다 펴기 */
 .acc{margin-top:26px; display:grid; gap:10px}
-.acc details{border:1px solid rgba(58,53,47,.14); border-radius:4px; background:#fff; text-align:left}
+.acc details{border:1px solid rgba(58,53,47,.25); border-radius:2px; background:#fff; text-align:left}
 .acc summary{
-  list-style:none; display:flex; justify-content:space-between; align-items:center;
-  padding:15px 18px; font-size:14px; letter-spacing:.1em; cursor:pointer; -webkit-tap-highlight-color:transparent;
+  list-style:none; display:flex; justify-content:center; align-items:center; position:relative;
+  padding:16px 44px 16px 18px; font-size:14px; font-weight:600; letter-spacing:.04em; cursor:pointer; -webkit-tap-highlight-color:transparent;
 }
 .acc summary::-webkit-details-marker{display:none}
-.acc summary::after{content:""; width:7px; height:7px; margin-top:-4px; opacity:.5;
+.acc summary::after{content:""; position:absolute; right:22px; top:50%; width:8px; height:8px; margin-top:-6px; opacity:.6;
   border-right:1px solid currentColor; border-bottom:1px solid currentColor; transform:rotate(45deg); transition:transform .2s ease}
-.acc details[open] summary::after{margin-top:4px; transform:rotate(-135deg)}
+.acc details[open] summary::after{margin-top:-1px; transform:rotate(-135deg)}
 .acc__row{display:grid; grid-template-columns:1fr auto; gap:0 10px; align-items:center;
   padding:13px 18px; border-top:1px solid rgba(58,53,47,.1); font-size:13.5px; line-height:1.9}
 .acc__row > div{grid-column:1}
@@ -459,9 +498,14 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   background:#fff; color:inherit; font-family:inherit; font-size:12px; letter-spacing:.1em; cursor:pointer;
   -webkit-tap-highlight-color:transparent}
 
-/* 공유 */
-.share{display:grid; gap:10px; padding-top:0}
-.share .btn-line{margin-top:0}
+/* 참석 여부 — 제목 아래 가는 선 (참고안) */
+.h2--line{padding-bottom:22px; border-bottom:1px solid rgba(58,53,47,.15)}
+
+/* 공유 — 아이콘 + 글자만 */
+.share{display:grid; gap:14px; justify-items:center; padding-top:0}
+.share__btn{display:flex; align-items:center; gap:10px; border:0; background:none; color:inherit;
+  font-family:inherit; font-size:14px; font-weight:600; letter-spacing:.04em; cursor:pointer; -webkit-tap-highlight-color:transparent}
+.share__btn svg{width:26px; height:26px; padding:5px; border-radius:50%; background:rgba(58,53,47,.08); fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round}
 
 /* 짧은 알림 — 복사됨 · 줌 전환 */
 .toast{
@@ -470,6 +514,9 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   font-size:13px; letter-spacing:.06em; opacity:0; pointer-events:none; transition:opacity .25s ease;
 }
 .toast.is-on{opacity:1}
+/* 줌 켠 판(dev) 표식 — 어느 판을 보고 있는지 항상 보이게 */
+.devbadge{position:fixed; left:12px; top:calc(env(safe-area-inset-top, 0px) + 14px); z-index:70;
+  padding:5px 10px; border-radius:99px; background:#c2412f; color:#fff; font-size:11px; letter-spacing:.08em; pointer-events:none}
 
 @media (prefers-reduced-motion: reduce){ .rv{opacity:1; transform:none; transition:none} }
 
@@ -547,7 +594,9 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 
       <div class="reveal">
         <div class="reveal__inner">
-          <img class="reveal__photo" src="assets/photo/reveal.jpg" alt="신랑신부">
+          <div class="reveal__date">2026 &nbsp;|&nbsp; 11 &nbsp;|&nbsp; 14</div>
+          <div class="reveal__our">Our<br>Wedding</div>
+          <img class="reveal__photo" src="assets/photo/cover.jpg" alt="신랑신부">
           <div class="reveal__cap">2026년 11월 14일 토요일 오후 6시 30분<br>토브헤세드</div>
           <div class="reveal__sub">Tov Hesed</div>
         </div>
@@ -556,25 +605,17 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   </div>
 </div>
 
-<!-- 이후 섹션 — 구성은 pwinvitation 참고안, 글씨·여백 서식은 기존 것 -->
-<section class="block rv">
-  <div class="kicker kicker--asis">The WEDDING OF</div>
-  <h2 class="couple"><b>박유찬</b> 그리고 <b>구혜진</b></h2>
-  <div class="solo"><img src="assets/photo/s1.jpg" alt="" loading="lazy"></div>
-
-  <div class="invite">
-    <div class="kicker">Invitation</div>
-    <h2 class="couple"><b>초대합니다</b></h2>
-    <p class="body">
-      서로를 만나기 위해 각자의 길을 걸어왔습니다.<br>
-      각자의 길 끝에 서로가 서로에게 물들어<br>
-      같은 곳을 바라보게 되었습니다.<br><br>
-      이제 두 사람의 길이 하나가 됩니다.<br>
-      그 시작을 함께 축복해주세요.
-    </p>
-  </div>
-
-  <div class="solo"><img src="assets/photo/s2.jpg" alt="" loading="lazy"></div>
+<!-- 이후 섹션 — 구성·사진은 pwinvitation 참고안 그대로, 글씨 서식만 이 사이트 것 -->
+<section class="block block--tint rv">
+  <div class="kicker">Invitation</div>
+  <h2 class="couple"><b>초대합니다.</b></h2>
+  <p class="body">
+    서로를 만나기 위해 각자의 길을 걸어 왔습니다.<br>
+    각자의 길 끝에 서로가 있었습니다.<br><br>
+    이제 두 사람의 길이 하나가 됩니다.<br>
+    그 시작을 함께 축복해주세요.
+  </p>
+  <div class="photo-in"><img src="assets/photo/invite.jpg" alt="" loading="lazy"></div>
 
   <div class="parents">
     <p>박종화 &middot; 모복심 <span class="rel">의 장남</span> <b>유찬</b></p>
@@ -585,26 +626,32 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 
 <section class="block rv">
   <div class="kicker">Wedding Date</div>
-  <h2 class="couple"><b>2026년 11월 14일</b></h2>
-  <p class="date">토요일 오후 6시 30분</p>
+  <p class="date-title">2026년 11월 14일 토요일 오후 6시 30분</p>
   <div class="cal" id="cal" aria-label="2026년 11월 달력"></div>
-  <div class="dday" id="dday">
-    <div><b data-u="d">0</b><small>Days</small></div>
-    <div><b data-u="h">00</b><small>Hours</small></div>
-    <div><b data-u="m">00</b><small>Minutes</small></div>
-    <div><b data-u="s">00</b><small>Seconds</small></div>
+  <div class="banner">
+    <ul class="dday" id="dday">
+      <li><b data-u="d">0</b><span>Days</span></li><li class="dday__colon">:</li>
+      <li><b data-u="h">00</b><span>Hours</span></li><li class="dday__colon">:</li>
+      <li><b data-u="m">00</b><span>Minutes</span></li><li class="dday__colon">:</li>
+      <li><b data-u="s">00</b><span>Seconds</span></li>
+    </ul>
   </div>
   <p class="body dday__msg" id="ddayMsg">유찬 <span class="heart">&hearts;</span> 혜진 님의 결혼식이 <b id="ddayLeft"></b>일 남았습니다.</p>
 </section>
 
 <section class="block rv">
   <div class="kicker">Introduction</div>
-  <h2>신랑 &amp; 신부를 소개합니다</h2>
+  <h2 class="couple"><b>신랑 &amp; 신부를 소개합니다.</b></h2>
+  <div class="intro__pics">
+    <img src="assets/photo/groom.jpg" alt="신랑 어린 시절" loading="lazy">
+    <span class="heart">&hearts;</span>
+    <img src="assets/photo/bride.jpg" alt="신부 어린 시절" loading="lazy">
+  </div>
   <div class="intro">
     <div class="who">
-      <div class="who__role">Groom</div>
+      <span class="who__role">Groom</span>
       <div class="who__name">박유찬</div>
-      <div class="who__tag">#ENTP</div>
+      <span class="who__tag who__tag--g">#ENTP</span>
       <ul>
         <li>박종화 &middot; 모복심의 아들</li>
         <li>1989년생, 부산</li>
@@ -612,9 +659,9 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
       </ul>
     </div>
     <div class="who">
-      <div class="who__role">Bride</div>
+      <span class="who__role">Bride</span>
       <div class="who__name">구혜진</div>
-      <div class="who__tag">#ISFP</div>
+      <span class="who__tag who__tag--b">#ISFP</span>
       <ul>
         <li>구학모 &middot; 이해옥의 딸</li>
         <li>1991년생, 서울</li>
@@ -626,46 +673,54 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 
 <section class="block rv">
   <div class="kicker">Gallery</div>
-  <h2>우리의 순간</h2>
-  <div class="thumbs" id="thumbs"></div>
+  <h2 class="couple"><b>우리의 순간</b></h2>
+  <div class="thumbs is-folded" id="thumbs"></div>
+  <button type="button" class="btn-line btn-line--narrow" id="galleryMore" aria-expanded="false">사진 더 보기</button>
 </section>
 
-<section class="block rv">
+<section class="block block--tint rv">
   <div class="kicker">Location</div>
-  <h2>오시는 길</h2>
-  <p class="addr">서울 강남구 도산대로38길 32<br><span>토브헤세드</span></p>
-  <div class="map">
-    <img src="assets/photo/map.jpg" alt="토브헤세드 약도" loading="lazy">
-  </div>
+  <h2 class="couple"><b>오시는 길</b></h2>
+  <p class="addr">서울 강남구 도산대로38길 32<br>토브헤세드</p>
+  <div class="map"><img src="assets/photo/map-naver.jpg" alt="토브헤세드 위치 — 언북중학교 옆, 학동역 10번 출구 도보 5분" loading="lazy"></div>
   <div class="maplinks">
-    <button type="button" class="maplink maplink--naver" data-app="naver"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>네이버 지도</button>
-    <button type="button" class="maplink maplink--kakao" data-app="kakao"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>카카오맵</button>
+    <button type="button" class="maplink" data-app="naver"><img src="assets/photo/ico-naver.png" alt="">네이버 지도</button>
+    <button type="button" class="maplink" data-app="kakao"><img src="assets/photo/ico-kakao.png" alt="">카카오 내비</button>
+    <button type="button" class="maplink" data-app="tmap"><img src="assets/photo/ico-tmap.png" alt="">티맵</button>
   </div>
-  <div class="ways">
-    <div class="way">
+  <details class="way" open>
+    <summary>오시는 길</summary>
+    <div class="way__grp">
       <b>버스 이용시</b>
-      <p>언북중학교 입구 정류장 하차<br><span class="tag">간선</span>145, 440 &nbsp; <span class="tag">지선</span>4212</p>
-      <p>서울세관 정류장 하차<br><span class="tag">간선</span>141 &nbsp; <span class="tag">직행</span>3600</p>
+      <p><strong>언북중학교 입구 정류장 하차</strong></p>
+      <p><span class="tag tag--blue">간선버스</span>145, 440</p>
+      <p><span class="tag tag--green">지선버스</span>4212</p>
+      <p><strong>서울세관 정류장 하차</strong></p>
+      <p><span class="tag tag--blue">간선버스</span>141</p>
+      <p><span class="tag tag--red">직행버스</span>3600</p>
     </div>
-    <div class="way">
+    <div class="way__grp">
       <b>지하철 이용시</b>
-      <p><span class="tag tag--7">7호선</span>학동역 10번 출구 (서울세관 방면)<br>셔틀버스 이용 또는 도보 5분</p>
+      <p><span class="tag tag--7">지하철 7호선</span>학동역 10번 출구 (서울세관방면) 셔틀버스 이용 또는 도보 5분</p>
     </div>
-    <div class="way">
+    <div class="way__grp">
       <b>자가용 이용시</b>
-      <p>내비게이션 &ldquo;토브헤세드&rdquo; 또는 &ldquo;언북중학교&rdquo; 검색<br>도로명주소 서울특별시 강남구 논현2동 도산대로 38길 32<br>주차는 주차요원의 안내를 받아주세요</p>
+      <p>네비게이션: <strong>&ldquo;토브헤세드&rdquo;</strong> 또는 <strong>&ldquo;언북중학교&rdquo;</strong> 검색</p>
+      <p>도로명주소: 서울특별시 강남구 논현2동 도산대로 38길 32</p>
+      <p>주차장 안내: 주차요원의 안내를 받으세요.</p>
     </div>
-  </div>
+  </details>
 </section>
 
 <section class="block rv">
   <div class="kicker">Information</div>
-  <h2>안내사항</h2>
+  <h2 class="couple"><b>안내사항</b></h2>
   <div class="tabs" role="tablist">
     <button type="button" role="tab" aria-selected="true" data-tab="cookie">식전 쿠키</button>
     <button type="button" role="tab" aria-selected="false" data-tab="shuttle">셔틀 안내</button>
   </div>
   <div class="tabpanel" role="tabpanel" data-tab="cookie">
+    <div class="photo-in"><img src="assets/photo/info-cookie.jpg" alt="식전 쿠키" loading="lazy"></div>
     <p class="body">
       식 전 간단히 즐기실 수 있도록<br>
       <b>간단한 쿠키를 준비해 두었습니다.</b><br>
@@ -676,19 +731,20 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
     </p>
   </div>
   <div class="tabpanel" role="tabpanel" data-tab="shuttle" hidden>
+    <div class="photo-in"><img src="assets/photo/info-shuttle.jpg" alt="셔틀버스" loading="lazy"></div>
     <p class="body">
-      7호선 학동역 10번 출구에서<br>
-      예식 1시간 전부터 <b>셔틀버스를 운행합니다.</b><br>
-      (서울세관 방면)<br><br>
+      <b>7호선 학동역 10번 출구에서</b><br>
+      <b>예식 1시간 전부터 셔틀버스를 운행합니다.</b><br>
+      (서울세관 방면)<br>
       식장까지 편하게 이동하실 수 있도록<br>
-      가급적 셔틀버스를 이용해 주세요 &#129293;
+      가급적 셔틀버스를 이용해 주세요. &#129293;
     </p>
   </div>
 </section>
 
 <section class="block rv">
   <div class="kicker">Thanks To</div>
-  <h2>마음 전하는 곳</h2>
+  <h2 class="couple"><b>마음 전하는 곳</b></h2>
   <p class="body">
     직접 축하를 전하지 못하는 분들을 위해<br>
     부득이하게 계좌번호를 기재하게 되었습니다.<br>
@@ -726,7 +782,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 
 <section class="block rv" id="rsvpSection" hidden>
   <div class="kicker">Attendance</div>
-  <h2 class="couple"><b>참석 의사 전달</b></h2>
+  <h2 class="couple h2--line"><b>참석 여부</b></h2>
   <p class="body">
     특별한 날 축하하는 마음으로<br>
     참석해 주시는 모든 분들에게 한 분 한 분<br>
@@ -734,7 +790,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
     하단의 버튼을 눌러<br>
     참석 여부 전달을 꼭 부탁드립니다.
   </p>
-  <button type="button" class="btn-primary" id="rsvpOpen">참석 의사 전달하기</button>
+  <button type="button" class="btn-line btn-line--narrow" id="rsvpOpen">전달하기</button>
 </section>
 
 <div class="sheet" id="rsvp" role="dialog" aria-modal="true" aria-labelledby="rsvpTitle">
@@ -795,8 +851,8 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 </div>
 
 <section class="block rv share">
-  <button type="button" class="btn-line" id="shareBtn">공유하기</button>
-  <button type="button" class="btn-line" id="copyLink">링크 복사하기</button>
+  <button type="button" class="share__btn" id="shareBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M12 15V4m0 0L8 8m4-4 4 4"/></svg>공유하기</button>
+  <button type="button" class="share__btn" id="copyLink"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>링크 복사하기</button>
 </section>
 
 <!-- 연락하기 팝업 -->
@@ -821,6 +877,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 </div>
 
 <div class="toast" id="toast" role="status"></div>
+<div class="devbadge" id="devBadge" hidden>DEV · 줌 켬</div>
 
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="사진 확대">
   <img class="lb__img" id="lbImg" alt="">
@@ -838,7 +895,6 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 <script>
 (() => {
   const hero = document.getElementById('hero');
-  const root = document.documentElement;
 
   const clamp01 = v => v < 0 ? 0 : v > 1 ? 1 : v;
   const seg = (p, a, b) => clamp01((p - a) / (b - a));            // a~b 구간 → 0~1
@@ -868,8 +924,10 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 
   let targetP = 0, curP = 0, last = 0, raf = 0;
 
+  const sticky = hero.querySelector('.hero__sticky');
   function readTarget() {
-    const total = hero.offsetHeight - window.innerHeight;
+    // innerHeight 를 쓰면 iOS 에서 주소창이 접히는 동안 분모가 프레임마다 변해 p 가 앞뒤로 튄다
+    const total = hero.offsetHeight - sticky.offsetHeight;
     targetP = clamp01(-hero.getBoundingClientRect().top / total);
   }
 
@@ -878,13 +936,13 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
     const f = seg(p, FLASH[0], FLASH[1]);
     const s = easeOut(seg(p, RISE[0], RISE[1]));
 
-    root.style.setProperty('--p', p.toFixed(4));
-    root.style.setProperty('--theta', (o * MAX_DEG).toFixed(3) + 'deg');
-    root.style.setProperty('--zoom', (1 + o * (maxZoom - 1)).toFixed(5));
-    root.style.setProperty('--shade', (o * 0.38).toFixed(4));
-    root.style.setProperty('--flash', f.toFixed(4));
-    root.style.setProperty('--rise', (1 - s).toFixed(4));
-    root.style.setProperty('--revealOp', clamp01(s * 1.6).toFixed(4));
+    hero.style.setProperty('--p', p.toFixed(4));
+    hero.style.setProperty('--theta', (o * MAX_DEG).toFixed(3) + 'deg');
+    hero.style.setProperty('--zoom', (1 + o * (maxZoom - 1)).toFixed(5));
+    hero.style.setProperty('--shade', (o * 0.38).toFixed(4));
+    hero.style.setProperty('--flash', f.toFixed(4));
+    hero.style.setProperty('--rise', (1 - s).toFixed(4));
+    hero.style.setProperty('--revealOp', clamp01(s * 1.6).toFixed(4));
   }
 
   function tick(now) {
@@ -915,7 +973,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   document.querySelectorAll('.rv').forEach(el => io.observe(el));
 
   // ── 갤러리 썸네일 + 확대 보기 ─────────────────
-  const GALLERY_COUNT = 15;
+  const GALLERY_COUNT = 17;
   const pad = n => String(n).padStart(2, '0');
 
   const thumbs = document.getElementById('thumbs');
@@ -927,7 +985,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
       btn.dataset.i = i;
       btn.setAttribute('aria-label', `${i}번째 사진 크게 보기`);
       const im = document.createElement('img');
-      im.src = `assets/photo/t${pad(i)}.jpg`;
+      im.src = `assets/photo/g${pad(i)}.jpg`;
       im.loading = 'lazy';
       im.decoding = 'async';
       im.alt = '';
@@ -983,7 +1041,13 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 
 
 
-  // ── 줌 A/B 전환 — 안내 문구 7번 연속 탭 ──────
+  // ── 줌 A/B 전환 — 안내 문구 7번 연속 탭. 줌 켠 판 = dev 모드 ──
+  const devBadge = document.getElementById('devBadge');
+  function showDev(on) {
+    if (devBadge) devBadge.hidden = !on;
+    if (on) alert('dev 모드입니다 (줌 효과 켬). 기본판으로 돌아가려면 "스크롤 해주세요" 를 7번 연속 탭');
+  }
+  if (maxZoom !== 1) showDev(true);
   {
     let taps = 0, tapAt = 0;
     document.querySelector('.hint')?.addEventListener('click', () => {
@@ -995,7 +1059,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
       maxZoom = maxZoom === 1 ? ZOOM_ON : 1;
       try { localStorage.setItem(ZOOM_KEY, maxZoom === 1 ? '0' : '1'); } catch {}
       apply(curP);
-      toast(maxZoom === 1 ? '줌 효과 끔 (기본)' : '줌 효과 켬 (시험판)');
+      if (maxZoom === 1) { showDev(false); toast('기본판 (줌 없음)'); } else showDev(true);
     });
   }
 
@@ -1015,6 +1079,15 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   document.getElementById('contactOpen')?.addEventListener('click', () => contact.setAttribute('data-open', ''));
   document.getElementById('contactClose')?.addEventListener('click', () => contact.removeAttribute('data-open'));
   contact?.addEventListener('click', e => { if (e.target === contact) contact.removeAttribute('data-open'); });
+
+  // ── 갤러리 접기 — 처음 6장만, 버튼으로 전부 ─────
+  const moreBtn = document.getElementById('galleryMore');
+  moreBtn?.addEventListener('click', () => {
+    const folded = thumbs.classList.toggle('is-folded');
+    moreBtn.textContent = folded ? '사진 더 보기' : '사진 접기';
+    moreBtn.setAttribute('aria-expanded', String(!folded));
+    if (folded) thumbs.scrollIntoView({ block: 'start', behavior: 'smooth' });
+  });
 
   // ── 달력 · 남은 시간 ───────────────────────
   const WEDDING = new Date(2026, 10, 14, 18, 30, 0);   // 2026-11-14 18:30 (보는 기기의 시간대 기준)
@@ -1240,6 +1313,10 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
     kakao: {
       app: `kakaomap://search?q=${encodeURIComponent(PLACE)}`,
       web: `https://map.kakao.com/?q=${encodeURIComponent(PLACE)}`,
+    },
+    tmap: {   // 티맵은 웹 지도가 없어 앱이 없으면 설치 페이지로
+      app: `tmap://route?goalname=${encodeURIComponent(PLACE)}&goalx=127.0327347&goaly=37.5186142`,
+      web: /iPhone|iPad|iPod/i.test(navigator.userAgent) ? 'https://apps.apple.com/kr/app/id431589174' : 'https://play.google.com/store/apps/details?id=com.skt.tmap.ku',
     },
   };
 

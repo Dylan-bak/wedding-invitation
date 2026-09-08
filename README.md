@@ -20,16 +20,20 @@ http://localhost:4321
 | `assets/hero/frame.jpg` | 문틀·기둥·꽃·간판 — 스크롤 중 고정되는 배경 |
 | `assets/hero/door-l.jpg` · `door-r.jpg` | 좌·우 문짝 (각각 경첩 기준 회전) |
 | `assets/hero/gate-bg.jpg` | 문 뒤로 보이는 공간 (문짝을 지운 인페인팅 결과에서 개구부만 크롭) |
-| `assets/photo/reveal.jpg` | 문 열린 뒤 아래에서 올라오는 사진 |
-| `assets/photo/s1~s2.jpg` | 갤러리 단독 게재 2장 — origin `2`·`8` (원본 비율 유지) |
-| `assets/photo/t01~t15.jpg` | 갤러리 썸네일 15장 (336×366) |
-| `assets/photo/f01~f15.jpg` | 썸네일 클릭 시 띄우는 확대본 (장변 2800, 장당 약 260KB) |
-| `assets/photo/map.jpg` | 약도 |
-| `assets/origin/` | 촬영 원본 `1~17` `map.jpg` `door-2.jpeg`, AI 로 문 위를 채운 `door-4.png`, 둘을 합친 첫 화면 소스 `door-5.jpg` — **git 제외**. 확장자가 `.jpg`/`.jpeg` 섞여 있어 빌드 스크립트가 있는 쪽을 찾아 쓴다 |
+| `assets/photo/cover.jpg` | 문 열린 뒤 올라오는 표지 사진 (아치) |
+| `assets/photo/invite.jpg` | 초대합니다 아래 가로 사진 |
+| `assets/photo/groom.jpg` `bride.jpg` | 소개 절 어린 시절 사진 (400×400, 원형 표시) |
+| `assets/photo/g01~g17.jpg` | 갤러리 썸네일 17장 (480×540, 8:9) |
+| `assets/photo/f01~f17.jpg` | 썸네일 클릭 시 띄우는 확대본 (참고안 원본 1000px 그대로) |
+| `assets/photo/info-cookie.jpg` `info-shuttle.jpg` | 안내사항 탭 사진 |
+| `assets/photo/map-naver.jpg` | 오시는 길 지도 — 참고안의 네이버 지도 화면을 2배 해상도로 캡처해 확대 조절 막대만 잘라낸 것 |
+| `assets/photo/ico-naver.png` `ico-kakao.png` `ico-tmap.png` `heart.png` `banner.jpg` | 지도앱 버튼 로고 · 달력 예식일 하트 · 남은 시간 띠 배경 (참고안에서 받음) |
+| `assets/origin/ref/` | 참고안 https://pwinvitation.com/cpizNPcWewHC 에서 받은 사진 원본 — **git 제외**. 다시 받으려면 그 페이지의 `/upload/folder/43193/…` 이미지 |
+| `assets/origin/` | 촬영 원본 `1~17` `door-2.jpeg`, AI 로 문 위를 채운 `door-4.png`, 둘을 합친 첫 화면 소스 `door-5.jpg` — **git 제외**. 지금 본문에는 쓰지 않고 대문 사진(door-*)만 쓴다 |
 | `tools/build-door.mjs` | `origin/door-2.jpeg` + `door-4.png` → 첫 화면 소스 `origin/door-5.jpg` |
 | `tools/build-assets.mjs` | `origin/door-5.jpg` → 문틀·문짝 자산 |
 | `tools/build-gen.mjs` | 인페인팅 결과 → 문 뒤 공간(`gate-bg`) |
-| `tools/build-photos.mjs` | `origin/1~17`·`map.jpg` → 갤러리·약도·reveal. 어느 원본이 어디로 가는지는 §4 사진 교체 |
+| `tools/build-ref.mjs` | `origin/ref/` → 본문 사진 전부(표지·초대·소개·갤러리·안내·지도·아이콘). 어느 원본이 어디로 가는지는 §4 사진 교체 |
 | `tools/vertex-image.mjs` | Gemini 이미지 생성/편집 호출 (선택) |
 | `assets/gate-src.jpg` | 문짝만 지운 인페인팅 결과(848×1248) — `gate-bg.jpg` 소스 |
 | `assets/qr.svg` · `qr.png` | 배포 주소 QR — **종이 청첩장 인쇄 업체 전달용** |
@@ -119,7 +123,15 @@ const MAX_DEG  = 110;        // 최대 회전각
 const ZOOM_ON  = 1.22;       // 줌(문이 열리며 사진이 커지는 효과) 켠 판의 최대 확대
 ```
 
-줌은 A/B 시험 중. 기본 = 줌 없음(`maxZoom = 1`). 첫 화면 "스크롤 해주세요" 를 1.2초 안에 7번 연속 탭하면 줌 켠 판으로 바뀌고 `localStorage` 의 `zoom-on` 에 기억된다(다시 7번 = 원복). 이유 = iOS 에서 문이 내려올 때 떨리는 현상의 후보가 줌이라 실기기에서 둘을 비교하기 위함. 판정이 나면 `maxZoom` 초기값을 확정값으로 고정하고 탭 전환 코드를 지운다.
+줌은 A/B 시험 중. 기본 = 줌 없음(`maxZoom = 1`). 첫 화면 "스크롤 해주세요" 를 1.2초 안에 7번 연속 탭하면 줌 켠 판(dev 모드)으로 바뀌어 `alert('dev 모드입니다')` 가 뜨고 왼쪽 위에 붉은 `DEV · 줌 켬` 표식이 계속 보인다. `localStorage` 의 `zoom-on` 에 기억(다시 7번 = 기본판). 판정이 나면 `maxZoom` 초기값을 확정값으로 고정하고 탭 전환·표식 코드를 지운다.
+
+iOS 에서 문이 내려올 때 떨리는 현상에 대해 줌 외에 넣은 대책 3건 (실기기 판정 = HANDOFF P1)
+
+| 대책 | 무엇을 바꿨나 | 왜 |
+|---|---|---|
+| 진행률 분모 | `innerHeight` → `.hero__sticky.offsetHeight` | iOS 는 스크롤 중 주소창이 접히며 `innerHeight` 가 프레임마다 변해 진행률 `p` 가 앞뒤로 튄다 |
+| CSS 변수 위치 | `:root` → `#hero` | 매 프레임 스타일 재계산 범위를 문서 전체에서 첫 화면으로 한정 |
+| `body` 가로 넘침 | `overflow-x:hidden` → `overflow-x:clip` | `hidden` 은 iOS Safari 가 body 를 스크롤 컨테이너로 취급해 `position:sticky` 가 불안정 |
 
 스크롤 길이는 CSS `.hero { height: 300svh }` 로 정한다. 아이폰(390×844) 기준 실측.
 
@@ -140,15 +152,18 @@ const ZOOM_ON  = 1.22;       // 줌(문이 열리며 사진이 커지는 효과)
 
 ### 사진 교체
 
-`assets/origin/` 에 새 사진을 넣고 번호를 맞춘 뒤 `node tools/build-photos.mjs` 를 다시 돌린다.
+본문 사진은 전부 참고안(pwinvitation)에서 받은 것. `assets/origin/ref/` 에 원본을 두고 `node tools/build-ref.mjs` 를 돌린다. 갤러리 순서는 스크립트의 `GALLERY` 배열(참고안 화면 순서 그대로).
 
-| origin | 쓰이는 곳 | 처리 |
+| 원본 (`origin/ref/`) | 결과 | 처리 |
 |---|---|---|
-| `1` | 문 열린 뒤 올라오는 사진(`reveal.jpg`) + 갤러리 격자 4번째 | reveal 은 3:4 중앙 크롭 |
-| `2` | 갤러리 단독 1번(`s1.jpg`) | 원본 비율 유지 (자르지 않음) |
-| `8` | 갤러리 단독 2번(`s2.jpg`) | 원본 비율 유지 (자르지 않음) |
-| `3~7` `9~17` + `1` | 갤러리 썸네일 격자 15장 (`1` 은 4번째 자리) | 썸네일은 112:122 중앙 크롭(336×366), 확대본은 원본 비율 장변 2800 |
-| `map.jpg` | 약도 | 폭 932 그대로, 품질 90 |
+| `edit-image…main1…jpg` (940×1411) | `cover.jpg` | 폭 940 그대로. CSS 가 2:3 아치로 잘라 보인다 |
+| `IMG_5630…main3…jpg` | `invite.jpg` | 폭 1000 그대로 |
+| `edit-image…main28_0/1…jpg` | `groom.jpg` `bride.jpg` | 400×400 중앙 크롭 |
+| `IMG_5527 … IMG_5543` 17장 | `g01~g17.jpg` + `f01~f17.jpg` | 썸네일 480×540 중앙 크롭 / 확대본은 원본 복사 |
+| `IMG_5634` `IMG_5632` (main11) | `info-cookie.jpg` `info-shuttle.jpg` | 폭 1000 그대로 |
+| `naver-map.png` (캡처 780×600) | `map-naver.jpg` | 오른쪽 확대 조절 막대 90px 잘라냄 |
+
+갤러리는 처음 6장만 보이고 「사진 더 보기」 로 전부 펼친다 (`.thumbs.is-folded`). 장수를 바꾸면 스크립트 `GALLERY_COUNT` 도 맞춘다.
 
 ### 배경음악
 
@@ -174,18 +189,19 @@ const ZOOM_ON  = 1.22;       // 줌(문이 열리며 사진이 커지는 효과)
 |---|---|
 | 대문 중앙 로고 `.hero__logo` | Yuchan & Hyejin |
 | 대문 하단 `.hero__title` | 유찬💕혜진 / 11/14(토) 오후 6:30 — `visibility:hidden` 으로 감춰둠. 되살리려면 그 한 줄 삭제 |
-| 문 열린 뒤 첫 화면 `.reveal__cap` | 2026년 11월 14일 토요일 오후 6시 30분 / 토브헤세드 / Tov Hesed |
+| 문 열린 뒤 첫 화면 `.reveal` | 2026 \| 11 \| 14 / OUR WEDDING / 아치 사진 / 2026년 11월 14일 토요일 오후 6시 30분 / 토브헤세드 / Tov Hesed — 참고안 표지와 같은 구성 |
+| 초대합니다 | 참고안 문구 4줄 + 가로 사진 |
 | 연락하기 | 혼주 아래 버튼 → 팝업. 신랑·신부 각각 전화(`tel:`)·문자(`sms:`) |
-| 예식 날짜 | 2026년 11월 14일 / 토요일 오후 6시 30분 + 11월 달력(14일 표시) + 남은 일·시·분·초(1초마다 갱신). 날짜는 스크립트 `WEDDING` 상수 |
-| 신랑 & 신부 소개 | 이름 · MBTI · 부모 · 출생연도/지역 · 직업 |
-| 오시는 길 | 주소 + 약도 이미지 + 네이버·카카오 지도 앱 버튼 + 버스·지하철·자가용 안내 |
-| 안내사항 | 탭 2개 = 식전 쿠키(신부대기실 마감 포함) · 셔틀 안내 |
+| 예식 날짜 | 일시 한 줄 + 11월 달력(14일 = 하트 표식) + 꽃 사진 띠 위 남은 일·시·분·초(1초마다 갱신). 날짜는 스크립트 `WEDDING` 상수 |
+| 신랑 & 신부 소개 | 어린 시절 사진 2장(원형) + 하트 · 이름 · MBTI 칩 · 부모 · 출생연도/지역 · 직업 |
+| 오시는 길 | 주소 + 네이버 지도 캡처 + 네이버 지도·카카오 내비·티맵 버튼(앱 없으면 웹·스토어) + 접이식 버스·지하철·자가용 안내 |
+| 안내사항 | 탭 2개 = 식전 쿠키(사진 + 신부대기실 마감) · 셔틀 안내(사진 + 문구) |
 | 마음 전하는 곳 | 신랑 측 · 신부 측 접이식. 각각 본인 + 아버지 계좌, 복사 버튼 |
 | 공유 | 공유하기(`navigator.share`, 없으면 링크 복사) · 링크 복사하기 |
 
 ### 본문 절 사이 여백
 
-`section.block` 의 위아래 `padding` 하나가 모든 절(초대합니다 · 예식 날짜 · 소개 · 갤러리 · 오시는 길 · 안내사항 · 마음 전하는 곳 · 참석 의사 전달 · 공유)의 여백을 정한다.
+`section.block` 의 위아래 `padding` 하나가 모든 절(초대합니다 · 예식 날짜 · 소개 · 갤러리 · 오시는 길 · 안내사항 · 마음 전하는 곳 · 참석 여부 · 공유)의 여백을 정한다. 초대합니다·오시는 길은 `.block--tint` 로 배경을 살짝 어둡게 (참고안의 번갈이 배경).
 현재 `7svh` — 위 7% + 아래 7% 이므로 **절과 절 사이는 화면 높이의 14%**(844px 화면에서 118px).
 `svh` = 주소창이 보이는 상태의 화면 높이. 첫 화면(`.hero`)과 달리 본문은 주소창 유무로 깨지는 것이 없어 `svh` 를 쓴다.
 맨 아래 `footer` 는 따로 `12svh 24px 16svh`.
