@@ -899,12 +899,12 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   <div class="credit">DEVELOPED BY YUCHAN</div>
 </footer>
 
-<!-- 카카오 지도 SDK. JavaScript 키는 브라우저 노출 전제(공개용)이고, 등록된 도메인에서만 동작한다 -->
-<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d1ca2731552988eb0e824558624edc41&autoload=false"></script>
+<!-- 카카오 지도 SDK. JavaScript 키는 브라우저 노출 전제(공개용)이고, 등록된 도메인에서만 동작한다.
+     async 로 불러 페이지 렌더를 막지 않고, 다 실리면 onload 로 지도를 그린다.
+     SDK 가 안 실리면(오프라인·도메인 미등록) 지도 칸이 비어 뒤의 캡처 이미지가 그대로 보인다 -->
 <script>
-(() => {
+function initKakaoMap() {
   const box = document.getElementById('kakaoMap');
-  // SDK 가 안 실려 있으면(오프라인·도메인 미등록 차단) 아무것도 안 하고 캡처 이미지를 남긴다
   if (!box || !window.kakao || !kakao.maps) return;
   kakao.maps.load(() => {
     const pos = new kakao.maps.LatLng(37.5186142, 127.0327347);   // 토브헤세드
@@ -912,8 +912,9 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
     new kakao.maps.Marker({ position: pos, map });
     map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
   });
-})();
+}
 </script>
+<script async src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d1ca2731552988eb0e824558624edc41&autoload=false" onload="initKakaoMap()"></script>
 <script>
 (() => {
   const hero = document.getElementById('hero');
