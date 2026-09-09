@@ -367,9 +367,6 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 .card .name{margin:8px 0 12px; font-size:16px; letter-spacing:.1em}
 .card a{display:inline-block; font-size:12px; letter-spacing:.1em; color:inherit; text-decoration:none;
   border:1px solid rgba(58,53,47,.2); border-radius:99px; padding:6px 14px; margin:3px 2px}
-.map{margin-top:22px; border-radius:4px; overflow:hidden; border:1px solid rgba(58,53,47,.14)}
-/* 지도는 노선색이 정보이므로 색을 깎지 않는다 */
-.map img{width:100%; display:block}
 /* 지도앱 바로가기 */
 .maplinks{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px}
 .maplink{
@@ -440,8 +437,11 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 
 /* 오시는 길 — 주소 · 지도 · 앱 버튼 · 교통 안내 */
 .addr{margin:-6px 0 22px; font-size:15px; line-height:1.9; letter-spacing:.02em}
-.map{margin:0 -24px; border-radius:0; border:0}
-.map img{width:100%; display:block}
+/* 지도 = 카카오 실제 지도(map__kakao)를 위에, 캡처 이미지(map__fallback)를 아래에 겹친다.
+   SDK 가 안 뜨거나 키 도메인이 등록되기 전이면 위 칸이 비어 아래 캡처가 그대로 보인다 */
+.map{position:relative; margin:0 -24px; height:300px; overflow:hidden}
+.map__fallback{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0}
+.map__kakao{position:absolute; inset:0; z-index:1}
 .maplinks{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:16px}
 .maplink{
   display:flex; align-items:center; justify-content:center; gap:6px;
@@ -686,7 +686,10 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   <div class="kicker">Location</div>
   <h2 class="couple"><b>오시는 길</b></h2>
   <p class="addr">서울 강남구 도산대로38길 32<br>토브헤세드</p>
-  <div class="map"><img src="assets/photo/map-naver.jpg" alt="토브헤세드 위치 — 언북중학교 옆, 학동역 10번 출구 도보 5분" loading="lazy"></div>
+  <div class="map">
+    <div class="map__kakao" id="kakaoMap"></div>
+    <img class="map__fallback" src="assets/photo/map-naver.jpg" alt="토브헤세드 위치 — 언북중학교 옆, 학동역 10번 출구 도보 5분" loading="lazy">
+  </div>
   <div class="maplinks">
     <button type="button" class="maplink" data-app="naver"><img src="assets/photo/ico-naver.png" alt="">네이버 지도</button>
     <button type="button" class="maplink" data-app="kakao"><img src="assets/photo/ico-kakao.png" alt="">카카오 내비</button>
@@ -896,6 +899,21 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   <div class="credit">DEVELOPED BY YUCHAN</div>
 </footer>
 
+<!-- 카카오 지도 SDK. JavaScript 키는 브라우저 노출 전제(공개용)이고, 등록된 도메인에서만 동작한다 -->
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=d1ca2731552988eb0e824558624edc41&autoload=false"></script>
+<script>
+(() => {
+  const box = document.getElementById('kakaoMap');
+  // SDK 가 안 실려 있으면(오프라인·도메인 미등록 차단) 아무것도 안 하고 캡처 이미지를 남긴다
+  if (!box || !window.kakao || !kakao.maps) return;
+  kakao.maps.load(() => {
+    const pos = new kakao.maps.LatLng(37.5186142, 127.0327347);   // 토브헤세드
+    const map = new kakao.maps.Map(box, { center: pos, level: 3 });
+    new kakao.maps.Marker({ position: pos, map });
+    map.addControl(new kakao.maps.ZoomControl(), kakao.maps.ControlPosition.RIGHT);
+  });
+})();
+</script>
 <script>
 (() => {
   const hero = document.getElementById('hero');
