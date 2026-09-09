@@ -151,7 +151,7 @@ body{
   /* Drop Shadow — 거리 0 / 번짐 21 / 불투명도 48%.
      CSS 에는 spread 가 없어 짧은 그림자를 겹쳐 퍼짐을 흉내낸다 */
   text-shadow:0 0 21px rgba(0,0,0,.48), 0 0 7px rgba(0,0,0,.34);
-  opacity:clamp(0, calc(1 - var(--p) * 7), 1);
+  opacity:clamp(0, calc(1 - var(--p) * 7), 1); will-change:opacity;
 }
 /* letter-spacing 은 마지막 글자 뒤에도 붙어 가운데정렬이 왼쪽으로 밀린다 → 상쇄 */
 .hero__logo span{display:block; margin-right:-.05em}
@@ -173,9 +173,11 @@ body{
 .hint{
   /* 박스는 lvh 높이지만 안내는 주소창이 있는 화면(svh)에서도 보여야 한다 → 그 차이만큼 올린다 */
   position:absolute; left:50%; bottom:calc(100lvh - 96svh); translate:-50% 0;
+  /* 연속 탭으로 dev 모드에 들어갈 수 있게 — 없으면 두 번째 탭에서 브라우저가 화면을 확대한다 */
+  touch-action:manipulation; -webkit-tap-highlight-color:transparent; cursor:pointer;
   display:flex; flex-direction:column; align-items:center; gap:10px;
   color:#fff; text-shadow:0 2px 16px rgba(0,0,0,.45);
-  opacity:clamp(0, calc(1 - var(--p) * 12), 1);
+  opacity:clamp(0, calc(1 - var(--p) * 12), 1); will-change:opacity;
 }
 .hint__box{
   position:relative; width:25px; height:40px;
@@ -202,6 +204,8 @@ body{
   opacity:var(--revealOp);
   transform:translateY(calc(var(--rise) * 34svh));
   will-change:transform,opacity;
+  /* .hint 뒤에 놓여 화면 전체를 덮으므로, 이게 없으면 안내 문구를 탭할 수 없다 */
+  pointer-events:none;
 }
 .reveal__inner{text-align:center; padding:0 28px; width:100%}
 .reveal__date{font-family:"Cormorant Garamond",serif; font-size:13px; letter-spacing:.18em; opacity:.6}
@@ -925,10 +929,16 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   let targetP = 0, curP = 0, last = 0, raf = 0;
 
   const sticky = hero.querySelector('.hero__sticky');
-  function readTarget() {
+  // 스크롤할 때마다 재면 그때마다 배치 계산이 강제로 일어나 프레임이 밀린다.
+  // 두 값 모두 svh·lvh 기준이라 주소창이 접혀도 변하지 않으므로 화면 크기가 바뀔 때만 다시 잰다
+  let heroTop = 0, heroRange = 1;
+  function measure() {
+    heroTop = hero.getBoundingClientRect().top + window.scrollY;
     // innerHeight 를 쓰면 iOS 에서 주소창이 접히는 동안 분모가 프레임마다 변해 p 가 앞뒤로 튄다
-    const total = hero.offsetHeight - sticky.offsetHeight;
-    targetP = clamp01(-hero.getBoundingClientRect().top / total);
+    heroRange = Math.max(1, hero.offsetHeight - sticky.offsetHeight);
+  }
+  function readTarget() {
+    targetP = clamp01((window.scrollY - heroTop) / heroRange);
   }
 
   function apply(p) {
@@ -963,8 +973,8 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   }
 
   addEventListener('scroll', onScroll, { passive:true });
-  addEventListener('resize', onScroll);
-  readTarget(); curP = targetP; apply(curP);
+  addEventListener('resize', () => { measure(); onScroll(); });
+  measure(); readTarget(); curP = targetP; apply(curP);
 
   // 이후 섹션 등장
   const io = new IntersectionObserver(es => {
