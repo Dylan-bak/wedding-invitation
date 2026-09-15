@@ -37,6 +37,9 @@
   --shift-x:0.35%;  /* 첫 화면 좌우 이동. 사진 폭 기준 %, +면 오른쪽. 390px 화면에서 0.35% = 2px */
 }
 *{box-sizing:border-box;margin:0;padding:0}
+/* img 의 height 속성이 CSS 를 덮어 사진이 늘어나는 것을 막는다. 실제 높이가 필요한 곳은
+   클래스 선택자(.photo__frame·.map__fallback·.maplink img·.lb__img)라 아래 규칙을 이긴다 */
+img{height:auto}
 body{
   background:var(--paper); color:var(--ink);
   font-family:"Noto Serif KR",serif; font-weight:300;
@@ -205,7 +208,7 @@ body{
 .reveal__our{margin-top:8px; font-family:"Cormorant Garamond",serif; font-weight:500; text-transform:uppercase;
   font-size:clamp(34px,10.5vw,46px); line-height:1.02; letter-spacing:.06em}
 /* 아치 사진 — 폭은 화면 폭 -80px(참고안), 작은 화면에서는 높이가 넘치지 않게 56lvh 로 제한 */
-.reveal__photo{display:block; margin:24px auto 0; width:min(calc(100vw - 80px), calc(56lvh * 2 / 3), 440px);
+.reveal__photo{display:block; margin:24px auto 0; height:auto; width:min(calc(100vw - 80px), calc(56lvh * 2 / 3), 440px);
   aspect-ratio:2/3; object-fit:cover; border-radius:999px 999px 0 0}
 .reveal__cap{margin-top:22px; font-size:clamp(14px,3.9vw,17px); letter-spacing:.06em; line-height:1.9}
 .reveal__sub{margin-top:10px; font-family:"Cormorant Garamond",serif; font-style:italic; opacity:.6; letter-spacing:.12em}
@@ -227,8 +230,6 @@ h2{font-weight:400; font-size:clamp(19px,5vw,24px); letter-spacing:.14em; margin
 .parents b{font-weight:600; margin-left:.15em}
 .couple b{font-weight:600}
 p.body{font-size:15px; line-height:2.3; letter-spacing:.02em; opacity:.85}
-figure img{width:100%; border-radius:4px; display:block; box-shadow:0 14px 40px rgba(90,70,50,.14)}
-figcaption{margin-top:14px; font-size:12px; letter-spacing:.2em; opacity:.5}
 footer{padding:12svh 24px 16svh; text-align:center; font-family:"Cormorant Garamond",serif; letter-spacing:.3em; opacity:.4; font-size:12px}
 /* 제작 표기 — 글자만 작고 진하기는 THANK YOU 와 같게 */
 footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
@@ -318,7 +319,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   padding:0; border:0; background:none; cursor:pointer; display:block;
   border-radius:10px; overflow:hidden; -webkit-tap-highlight-color:transparent;
 }
-.thumbs img{width:100%; aspect-ratio:8/9; object-fit:cover; display:block;
+.thumbs img{width:100%; height:auto; aspect-ratio:8/9; object-fit:cover; display:block;
   transition:transform .35s cubic-bezier(.2,.7,.2,1)}
 .thumbs button:hover img, .thumbs button:focus-visible img{transform:scale(1.04)}
 .thumbs button:focus-visible{outline:2px solid rgba(58,53,47,.5); outline-offset:2px}
@@ -419,7 +420,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 
 /* 신랑 · 신부 소개 — 어린 시절 사진 두 장 + 하트, 아래 두 열 */
 .intro__pics{display:flex; justify-content:center; align-items:center; gap:14px; margin-top:6px}
-.intro__pics img{width:min(36vw,150px); aspect-ratio:1; object-fit:cover; border-radius:50%}
+.intro__pics img{width:min(36vw,150px); height:auto; aspect-ratio:1; object-fit:cover; border-radius:50%}
 .intro__pics .heart{font-size:18px}
 .intro{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:22px}
 .who__role{font-family:"Cormorant Garamond",serif; letter-spacing:.3em; font-size:14px; opacity:.6}
