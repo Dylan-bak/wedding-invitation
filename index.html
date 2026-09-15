@@ -308,9 +308,9 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 .fld__msg{margin-top:14px; font-size:13px; line-height:1.8; text-align:center}
 .fld__msg[data-err]{color:#a4433a}
 
-/* 본문 사진 한 장 — 좌우 여백 안에 원본 비율 그대로 */
-.photo-in{margin:28px 0 0}
-.photo-in img{width:100%; height:auto; display:block; border-radius:4px}
+/* 본문 사진 한 장 — 참고 사이트처럼 좌우 여백 없이 화면을 꽉 채운다 */
+.photo-in{margin:28px -24px 0}
+.photo-in img{width:100%; height:auto; display:block; object-fit:contain}
 /* 지연 로딩 사진은 width/height 속성으로 자리를 미리 잡는다 (없으면 로드 순간 내용이 밀린다) */
 
 /* 갤러리 — 참고안과 같은 2열 · 8:9 · 둥근 모서리. 접힌 상태에서는 6장 + 아래 흐림 */
