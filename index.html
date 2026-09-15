@@ -623,7 +623,18 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 <section class="block rv">
   <div class="kicker">Wedding Date</div>
   <p class="date-title">2026년 11월 14일 토요일 오후 6시 30분</p>
-  <div class="cal" id="cal" aria-label="2026년 11월 달력"></div>
+  <div class="cal" aria-label="2026년 11월 달력">
+    <table>
+      <thead><tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead>
+      <tbody>
+        <tr><td><span>1</span></td><td><span>2</span></td><td><span>3</span></td><td><span>4</span></td><td><span>5</span></td><td><span>6</span></td><td><span>7</span></td></tr>
+        <tr><td><span>8</span></td><td><span>9</span></td><td><span>10</span></td><td><span>11</span></td><td><span>12</span></td><td><span>13</span></td><td class="is-day"><span>14</span></td></tr>
+        <tr><td><span>15</span></td><td><span>16</span></td><td><span>17</span></td><td><span>18</span></td><td><span>19</span></td><td><span>20</span></td><td><span>21</span></td></tr>
+        <tr><td><span>22</span></td><td><span>23</span></td><td><span>24</span></td><td><span>25</span></td><td><span>26</span></td><td><span>27</span></td><td><span>28</span></td></tr>
+        <tr><td><span>29</span></td><td><span>30</span></td><td></td><td></td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
   <div class="banner">
     <ul class="dday" id="dday">
       <li><b data-u="d">0</b><span>Days</span></li><li class="dday__colon">:</li>
@@ -670,7 +681,25 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 <section class="block rv">
   <div class="kicker">Gallery</div>
   <h2 class="couple"><b>우리의 순간</b></h2>
-  <div class="thumbs is-folded" id="thumbs"></div>
+  <div class="thumbs is-folded" id="thumbs">
+    <button type="button" data-i="1" aria-label="1번째 사진 크게 보기"><img src="assets/photo/g01.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="2" aria-label="2번째 사진 크게 보기"><img src="assets/photo/g02.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="3" aria-label="3번째 사진 크게 보기"><img src="assets/photo/g03.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="4" aria-label="4번째 사진 크게 보기"><img src="assets/photo/g04.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="5" aria-label="5번째 사진 크게 보기"><img src="assets/photo/g05.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="6" aria-label="6번째 사진 크게 보기"><img src="assets/photo/g06.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="7" aria-label="7번째 사진 크게 보기"><img src="assets/photo/g07.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="8" aria-label="8번째 사진 크게 보기"><img src="assets/photo/g08.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="9" aria-label="9번째 사진 크게 보기"><img src="assets/photo/g09.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="10" aria-label="10번째 사진 크게 보기"><img src="assets/photo/g10.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="11" aria-label="11번째 사진 크게 보기"><img src="assets/photo/g11.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="12" aria-label="12번째 사진 크게 보기"><img src="assets/photo/g12.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="13" aria-label="13번째 사진 크게 보기"><img src="assets/photo/g13.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="14" aria-label="14번째 사진 크게 보기"><img src="assets/photo/g14.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="15" aria-label="15번째 사진 크게 보기"><img src="assets/photo/g15.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="16" aria-label="16번째 사진 크게 보기"><img src="assets/photo/g16.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+    <button type="button" data-i="17" aria-label="17번째 사진 크게 보기"><img src="assets/photo/g17.jpg" width="480" height="540" alt="" loading="lazy" decoding="async"></button>
+  </div>
   <button type="button" class="btn-line btn-line--narrow" id="galleryMore" aria-expanded="false">사진 더 보기</button>
 </section>
 
@@ -779,7 +808,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   </div>
 </section>
 
-<section class="block rv" id="rsvpSection" hidden>
+<section class="block rv" id="rsvpSection">
   <div class="kicker">Attendance</div>
   <h2 class="couple h2--line"><b>참석 여부</b></h2>
   <p class="body">
@@ -1019,24 +1048,7 @@ function initKakaoMap() {
   const GALLERY_COUNT = 17;
   const pad = n => String(n).padStart(2, '0');
 
-  const thumbs = document.getElementById('thumbs');
-  if (thumbs) {
-    const frag = document.createDocumentFragment();
-    for (let i = 1; i <= GALLERY_COUNT; i++) {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.dataset.i = i;
-      btn.setAttribute('aria-label', `${i}번째 사진 크게 보기`);
-      const im = document.createElement('img');
-      im.src = `assets/photo/g${pad(i)}.jpg`;
-      im.loading = 'lazy';
-      im.decoding = 'async';
-      im.alt = '';
-      btn.appendChild(im);
-      frag.appendChild(btn);
-    }
-    thumbs.appendChild(frag);
-  }
+  const thumbs = document.getElementById('thumbs');   // 썸네일은 HTML 에 고정 (자리를 미리 잡으려고)
 
   const lb = document.getElementById('lb');
   const lbImg = document.getElementById('lbImg');
@@ -1112,19 +1124,6 @@ function initKakaoMap() {
 
   // ── 달력 · 남은 시간 ───────────────────────
   const WEDDING = new Date(2026, 10, 14, 18, 30, 0);   // 2026-11-14 18:30 (보는 기기의 시간대 기준)
-  const cal = document.getElementById('cal');
-  if (cal) {
-    const first = new Date(2026, 10, 1).getDay();       // 11월 1일 요일 (0 = 일)
-    const days = new Date(2026, 11, 0).getDate();       // 11월 일수
-    let html = '<table><thead><tr>' + ['일','월','화','수','목','금','토'].map(d => `<th>${d}</th>`).join('') + '</tr></thead><tbody><tr>';
-    for (let i = 0; i < first; i++) html += '<td></td>';
-    for (let d = 1; d <= days; d++) {
-      html += `<td${d === 14 ? ' class="is-day"' : ''}><span>${d}</span></td>`;
-      if ((first + d) % 7 === 0 && d < days) html += '</tr><tr>';
-    }
-    html += '</tr></tbody></table>';
-    cal.innerHTML = html;
-  }
   const dday = document.getElementById('dday');
   if (dday) {
     const u = {};
@@ -1216,7 +1215,7 @@ function initKakaoMap() {
   if (!RSVP_ENDPOINT) rsvp.hidden = true;   // 주소가 없으면 팝업도 DOM 에서 감춘다
 
   if (RSVP_ENDPOINT) {
-    rsvpSection.hidden = false;
+    rsvpSection.hidden = false;   // HTML 에서 이미 보이는 상태. 주소가 없을 때만 아래에서 감춘다
 
     const form = document.getElementById('rsvpForm');
     const msg = document.getElementById('rsvpMsg');
