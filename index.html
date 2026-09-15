@@ -135,9 +135,9 @@ body{
 /* 대문 중앙 로고 — 이름을 정보가 아니라 로고처럼 얹는다.
    문이 주역이므로 크기는 문 폭 안에 머물게 하고, 글자만 떠 보이도록 그림자로 분리 */
 .hero__logo{
-  /* 문 세로 중앙에서 문 높이의 7% 위. 문 좌표가 바뀌면 따라간다 */
+  /* 문 세로 중앙에서 문 높이의 3% 위. 문 좌표가 바뀌면 따라간다 */
   position:absolute; left:0; right:0;
-  top:calc((var(--door-t) + var(--door-b)) / 2 - (var(--door-b) - var(--door-t)) * 0.07); translate:0 -50%;
+  top:calc((var(--door-t) + var(--door-b)) / 2 - (var(--door-b) - var(--door-t)) * 0.03); translate:0 -50%;
   text-align:center; pointer-events:none;
   color:#FFFFFF;
   font-family:"Cormorant Garamond",serif; font-weight:600;
