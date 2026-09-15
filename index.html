@@ -135,9 +135,9 @@ body{
 /* 대문 중앙 로고 — 이름을 정보가 아니라 로고처럼 얹는다.
    문이 주역이므로 크기는 문 폭 안에 머물게 하고, 글자만 떠 보이도록 그림자로 분리 */
 .hero__logo{
-  /* 문 세로 중앙에서 문 높이의 15% 위. 문 좌표가 바뀌면 따라간다 */
+  /* 문 세로 중앙에서 문 높이의 7% 위. 문 좌표가 바뀌면 따라간다 */
   position:absolute; left:0; right:0;
-  top:calc((var(--door-t) + var(--door-b)) / 2 - (var(--door-b) - var(--door-t)) * 0.15); translate:0 -50%;
+  top:calc((var(--door-t) + var(--door-b)) / 2 - (var(--door-b) - var(--door-t)) * 0.07); translate:0 -50%;
   text-align:center; pointer-events:none;
   color:#FFFFFF;
   font-family:"Cormorant Garamond",serif; font-weight:600;
@@ -207,14 +207,16 @@ body{
 .reveal__date{font-family:"Cormorant Garamond",serif; font-size:13px; letter-spacing:.18em; opacity:.6}
 .reveal__our{margin-top:8px; font-family:"Cormorant Garamond",serif; font-weight:500; text-transform:uppercase;
   font-size:clamp(34px,10.5vw,46px); line-height:1.02; letter-spacing:.06em}
-/* 아치 사진 — 폭은 화면 폭 -80px(참고안), 작은 화면에서는 높이가 넘치지 않게 56lvh 로 제한 */
-.reveal__photo{display:block; margin:24px auto 0; height:auto; width:min(calc(100vw - 80px), calc(56lvh * 2 / 3), 440px);
-  aspect-ratio:2/3; object-fit:cover; border-radius:999px 999px 0 0}
+/* 아치 사진 — 폭·모서리는 참고 사이트와 같은 값(화면폭-39px · 300px).
+   높이 상한 = 화면높이-265px. 위아래 글자 몫을 남겨 한 화면에 들어가는 것을 보장 */
+.reveal__photo{display:block; margin:24px auto 0; height:auto;
+  width:min(calc(100vw - 39px), calc((100lvh - 265px) * 2 / 3), 440px);
+  aspect-ratio:2/3; object-fit:cover; border-radius:300px 300px 0 0}
 .reveal__cap{margin-top:22px; font-size:clamp(14px,3.9vw,17px); letter-spacing:.06em; line-height:1.9}
 .reveal__sub{margin-top:10px; font-family:"Cormorant Garamond",serif; font-style:italic; opacity:.6; letter-spacing:.12em}
 
 /* 2) 이후 섹션 */
-section.block{padding:7svh 24px; max-width:520px; margin:0 auto; text-align:center}
+section.block{padding:7svh 20px; max-width:520px; margin:0 auto; text-align:center}
 .rv{opacity:0; transform:translateY(38px); transition:opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1)}
 .rv.on{opacity:1; transform:none}
 .kicker{font-family:"Cormorant Garamond",serif; letter-spacing:.42em; font-size:12px; opacity:.55; text-transform:uppercase}
@@ -309,7 +311,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 .fld__msg[data-err]{color:#a4433a}
 
 /* 본문 사진 한 장 — 참고 사이트처럼 좌우 여백 없이 화면을 꽉 채운다 */
-.photo-in{margin:28px -24px 0}
+.photo-in{margin:28px -20px 0}
 .photo-in img{width:100%; height:auto; display:block; object-fit:contain}
 /* 지연 로딩 사진은 width/height 속성으로 자리를 미리 잡는다 (없으면 로드 순간 내용이 밀린다) */
 
@@ -386,7 +388,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 
 /* 테두리만 있는 버튼 — 연락하기·사진 더 보기·전달하기 */
 .btn-line{
-  display:block; width:100%; margin-top:26px; padding:12px 16px;
+  display:block; width:100%; margin-top:26px; padding:7px 16px;   /* 두께 36px = 참고 사이트와 같게 */
   border:1px solid rgba(58,53,47,.55); border-radius:2px; background:transparent; color:inherit;
   font-family:inherit; font-size:14px; letter-spacing:.14em; cursor:pointer;
   -webkit-tap-highlight-color:transparent; transition:background .2s ease;
@@ -404,7 +406,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 /* 예식일 = 참고안과 같은 하트 표식 위에 흰 글자 */
 .cal td.is-day span{background:url(assets/photo/heart.png) center/34px 30px no-repeat; color:#fff; font-weight:600; padding-bottom:3px}
 .banner{
-  position:relative; margin:22px -24px 0; padding:32px 12px;
+  position:relative; margin:22px -20px 0; padding:32px 12px;
   background:url(assets/photo/banner.jpg) center/cover no-repeat;
 }
 .banner::before{content:""; position:absolute; inset:0; background:rgba(0,0,0,.42)}
@@ -434,7 +436,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 .addr{margin:-6px 0 22px; font-size:15px; line-height:1.9; letter-spacing:.02em}
 /* 지도 = 카카오 실제 지도(map__kakao)를 위에, 캡처 이미지(map__fallback)를 아래에 겹친다.
    SDK 가 안 뜨거나 키 도메인이 등록되기 전이면 위 칸이 비어 아래 캡처가 그대로 보인다 */
-.map{position:relative; margin:0 -24px; height:300px; overflow:hidden}
+.map{position:relative; margin:0 -20px; height:300px; overflow:hidden}
 .map__fallback{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0}
 .map__kakao{position:absolute; inset:0; z-index:1}
 .maplinks{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:16px}
