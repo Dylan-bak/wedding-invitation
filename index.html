@@ -31,7 +31,7 @@
   --door-l: 17.429%;  --door-r: 82.214%;
   --door-t: 19.062%;  --door-b: 76.889%;
   --door-c: 50.000%;
-  --ink:#3a352f; --paper:#fbf9f6;
+  --ink:#3a352f; --paper:#ffffff;   /* 참고안 사진 배경이 흰색이라 바탕도 흰색이어야 사진이 사각형으로 뜨지 않는다 */
   --shade:0;        /* 문짝 그늘 — ::after 가 읽으므로 변수로 남긴다. 나머지 연출값은 JS 가 요소에 직접 쓴다 */
   --swing:-1;       /* 1 = 안쪽으로 열림, -1 = 바깥쪽(보는 사람 쪽)으로 열림 */
   --shift-x:0.35%;  /* 첫 화면 좌우 이동. 사진 폭 기준 %, +면 오른쪽. 390px 화면에서 0.35% = 2px */
@@ -60,7 +60,7 @@ body{
   position:absolute; top:50%; left:50%;
   width:max(100vw, calc(100lvh * var(--img-w) / var(--img-h)));
   aspect-ratio: var(--img-w) / var(--img-h);
-  transform:translate(calc(-50% + var(--shift-x)),-50%);
+  transform:translate(calc(-50% + var(--shift-x)),-50%) scale(1.03);   /* 3% 여유 — 아이폰에서 화면 아래에 바탕색 띠가 드러나는 것을 덮는다 */
   will-change:transform;
 }
 
@@ -193,7 +193,7 @@ body{
 /* 문 열린 뒤 아래에서 올라오는 화면 */
 .reveal{
   position:absolute; inset:0; display:grid; place-items:center;
-  background:linear-gradient(180deg,#fff 0%, #fdfbf8 100%);
+  background:var(--paper);   /* 그라데이션을 쓰면 아래 절과 경계가 계단처럼 보인다 */
   opacity:0;
   transform:translateY(34svh);
   will-change:transform,opacity;
@@ -237,7 +237,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 .btn-primary{
   display:block; width:100%; margin-top:22px; padding:14px 16px;
   border:1px solid rgba(58,53,47,.75); border-radius:4px;
-  background:var(--ink); color:#fbf9f6;
+  background:var(--ink); color:var(--paper);
   font-family:inherit; font-size:14px; letter-spacing:.14em; cursor:pointer;
   -webkit-tap-highlight-color:transparent; transition:opacity .2s ease;
 }
@@ -292,7 +292,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   background:#fff; color:inherit; font-family:inherit; font-size:14px; cursor:pointer;
   -webkit-tap-highlight-color:transparent; transition:background .18s ease, border-color .18s ease;
 }
-.seg button[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:#fbf9f6}
+.seg button[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--paper)}
 
 /* 인원 증감 */
 .stepper{display:flex; align-items:center; justify-content:center; gap:16px; margin-top:2px}
@@ -323,7 +323,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 .thumbs button:focus-visible{outline:2px solid rgba(58,53,47,.5); outline-offset:2px}
 .thumbs.is-folded button:nth-child(n+7){display:none}
 .thumbs.is-folded::after{content:""; position:absolute; left:0; right:0; bottom:0; height:130px; pointer-events:none;
-  background:linear-gradient(180deg, rgba(251,249,246,0), var(--paper) 90%)}
+  background:linear-gradient(180deg, rgba(255,255,255,0), var(--paper) 90%)}
 
 /* 확대 보기 */
 .lb{
@@ -380,7 +380,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 
 
 /* 참고안처럼 절이 번갈아 살짝 어두운 배경 */
-.block--tint{background:rgba(58,53,47,.035)}
+.block--tint{background:rgba(102,100,100,.03)}   /* = #fafafa. 참고 사이트와 같은 중립 음영 */
 
 /* 테두리만 있는 버튼 — 연락하기·사진 더 보기·전달하기 */
 .btn-line{
@@ -507,7 +507,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 /* 짧은 알림 — 복사됨 · 줌 전환 */
 .toast{
   position:fixed; left:50%; bottom:calc(env(safe-area-inset-bottom, 0px) + 28px); translate:-50% 0; z-index:70;
-  padding:10px 18px; border-radius:99px; background:rgba(58,53,47,.9); color:#fbf9f6;
+  padding:10px 18px; border-radius:99px; background:rgba(58,53,47,.9); color:var(--paper);
   font-size:13px; letter-spacing:.06em; opacity:0; pointer-events:none; transition:opacity .25s ease;
 }
 .toast.is-on{opacity:1}
