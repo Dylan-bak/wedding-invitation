@@ -37,7 +37,6 @@
   --flash:0;        /* 화이트아웃 */
   --rise:1;         /* 다음 화면 상승 (1=아래, 0=제자리) */
   --revealOp:0;
-  --zoom:1;
   --shade:0;        /* 문짝 그늘 */
   --swing:-1;       /* 1 = 안쪽으로 열림, -1 = 바깥쪽(보는 사람 쪽)으로 열림 */
   --shift-x:0.35%;  /* 첫 화면 좌우 이동. 사진 폭 기준 %, +면 오른쪽. 390px 화면에서 0.35% = 2px */
@@ -64,7 +63,7 @@ body{
   position:absolute; top:50%; left:50%;
   width:max(100vw, calc(100lvh * var(--img-w) / var(--img-h)));
   aspect-ratio: var(--img-w) / var(--img-h);
-  transform:translate(calc(-50% + var(--shift-x)),-50%) scale(var(--zoom));
+  transform:translate(calc(-50% + var(--shift-x)),-50%);
   will-change:transform;
 }
 
@@ -173,8 +172,6 @@ body{
 .hint{
   /* 박스는 lvh 높이지만 안내는 주소창이 있는 화면(svh)에서도 보여야 한다 → 그 차이만큼 올린다 */
   position:absolute; left:50%; bottom:calc(100lvh - 96svh); translate:-50% 0;
-  /* 연속 탭으로 dev 모드에 들어갈 수 있게 — 없으면 두 번째 탭에서 브라우저가 화면을 확대한다 */
-  touch-action:manipulation; -webkit-tap-highlight-color:transparent; cursor:pointer;
   display:flex; flex-direction:column; align-items:center; gap:10px;
   color:#fff; text-shadow:0 2px 16px rgba(0,0,0,.45);
   opacity:clamp(0, calc(1 - var(--p) * 12), 1); will-change:opacity;
@@ -518,9 +515,6 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   font-size:13px; letter-spacing:.06em; opacity:0; pointer-events:none; transition:opacity .25s ease;
 }
 .toast.is-on{opacity:1}
-/* 줌 켠 판(dev) 표식 — 어느 판을 보고 있는지 항상 보이게 */
-.devbadge{position:fixed; left:12px; top:calc(env(safe-area-inset-top, 0px) + 14px); z-index:70;
-  padding:5px 10px; border-radius:99px; background:#c2412f; color:#fff; font-size:11px; letter-spacing:.08em; pointer-events:none}
 
 @media (prefers-reduced-motion: reduce){ .rv{opacity:1; transform:none; transition:none} }
 
@@ -884,7 +878,6 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 </div>
 
 <div class="toast" id="toast" role="status"></div>
-<div class="devbadge" id="devBadge" hidden>DEV · 줌 켬</div>
 
 <div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="사진 확대">
   <img class="lb__img" id="lbImg" alt="">
@@ -934,11 +927,6 @@ function initKakaoMap() {
   // 90도를 넘으면 문짝 뒷면이 보인다. 앞면 무늬가 좌우 반전돼 그려지지만
   // 나뭇결 판문이라 티가 나지 않고, 활짝 젖혀진 문으로 읽힌다.
   const MAX_DEG = 110;
-  // 줌(문이 열리며 사진이 커지는 효과) = A/B 시험 중. 기본은 줌 없음 — iOS 에서 문이 내려올 때
-  // 떨리는 현상의 후보. "스크롤 해주세요" 를 7번 연속 탭하면 줌 있는 판으로 바뀌고 브라우저에 기억된다
-  const ZOOM_KEY = 'zoom-on';
-  const ZOOM_ON = 1.22;
-  let maxZoom = (() => { try { return localStorage.getItem(ZOOM_KEY) === '1' ? ZOOM_ON : 1; } catch { return 1; } })();
 
   // 휠 한 칸이 100px 가까이 점프하므로 스크롤값을 그대로 쓰면 각도가 계단처럼 튄다.
   // 목표값과 현재값을 시간 기반 지수보간으로 따라가게 해 프레임 사이를 메운다.
@@ -967,7 +955,6 @@ function initKakaoMap() {
 
     hero.style.setProperty('--p', p.toFixed(4));
     hero.style.setProperty('--theta', (o * MAX_DEG).toFixed(3) + 'deg');
-    hero.style.setProperty('--zoom', (1 + o * (maxZoom - 1)).toFixed(5));
     hero.style.setProperty('--shade', (o * 0.38).toFixed(4));
     hero.style.setProperty('--flash', f.toFixed(4));
     hero.style.setProperty('--rise', (1 - s).toFixed(4));
@@ -1069,28 +1056,6 @@ function initKakaoMap() {
 
 
 
-
-  // ── 줌 A/B 전환 — 안내 문구 7번 연속 탭. 줌 켠 판 = dev 모드 ──
-  const devBadge = document.getElementById('devBadge');
-  function showDev(on) {
-    if (devBadge) devBadge.hidden = !on;
-    if (on) alert('dev 모드입니다 (줌 효과 켬). 기본판으로 돌아가려면 "스크롤 해주세요" 를 7번 연속 탭');
-  }
-  if (maxZoom !== 1) showDev(true);
-  {
-    let taps = 0, tapAt = 0;
-    document.querySelector('.hint')?.addEventListener('click', () => {
-      const now = Date.now();
-      taps = now - tapAt < 1200 ? taps + 1 : 1;
-      tapAt = now;
-      if (taps < 7) return;
-      taps = 0;
-      maxZoom = maxZoom === 1 ? ZOOM_ON : 1;
-      try { localStorage.setItem(ZOOM_KEY, maxZoom === 1 ? '0' : '1'); } catch {}
-      apply(curP);
-      if (maxZoom === 1) { showDev(false); toast('기본판 (줌 없음)'); } else showDev(true);
-    });
-  }
 
   // ── 짧은 알림 ─────────────────────────────
   const toastEl = document.getElementById('toast');
