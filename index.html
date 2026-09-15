@@ -32,12 +32,7 @@
   --door-t: 19.062%;  --door-b: 76.889%;
   --door-c: 50.000%;
   --ink:#3a352f; --paper:#fbf9f6;
-  --p:0;            /* 스크롤 진행률 0~1 */
-  --theta:0deg;     /* 문 회전각 */
-  --flash:0;        /* 화이트아웃 */
-  --rise:1;         /* 다음 화면 상승 (1=아래, 0=제자리) */
-  --revealOp:0;
-  --shade:0;        /* 문짝 그늘 */
+  --shade:0;        /* 문짝 그늘 — ::after 가 읽으므로 변수로 남긴다. 나머지 연출값은 JS 가 요소에 직접 쓴다 */
   --swing:-1;       /* 1 = 안쪽으로 열림, -1 = 바깥쪽(보는 사람 쪽)으로 열림 */
   --shift-x:0.35%;  /* 첫 화면 좌우 이동. 사진 폭 기준 %, +면 오른쪽. 390px 화면에서 0.35% = 2px */
 }
@@ -54,6 +49,8 @@ body{
 /* 높이는 lvh(주소창이 사라진 가장 큰 화면) 기준. svh 로 잡으면 모바일에서 주소창이
    내려간 순간 계단 아래에 배경색 띠가 드러난다 */
 .hero__sticky{position:sticky; top:0; height:100vh; height:100lvh; overflow:hidden}
+/* 상승 거리(34svh)를 픽셀로 재는 자. svh 는 주소창이 접혀도 안 변해 화면 크기 바뀔 때만 다시 잰다 */
+.svh-probe{position:absolute; top:0; left:0; width:0; height:34svh; visibility:hidden; pointer-events:none}
 
 /* 이미지 로드 실패 시 드러나는 색. 검정이면 화면이 통째로 검게 보이므로 본문과 같은 크림톤으로 */
 .stage{position:absolute; inset:0; background:var(--paper)}
@@ -114,25 +111,22 @@ body{
   left:var(--door-l); width:calc(var(--door-c) - var(--door-l));
   background-image:url(assets/hero/door-l.jpg);
   transform-origin:left center;
-  transform:rotateY(calc(var(--swing) * var(--theta)));
 }
 .door--r{
   left:var(--door-c); width:calc(var(--door-r) - var(--door-c));
   background-image:url(assets/hero/door-r.jpg);
   transform-origin:right center;
-  transform:rotateY(calc(-1 * var(--swing) * var(--theta)));
 }
 .door--r::after{opacity:calc(var(--shade) * 0.8)}
 
 /* 화이트아웃 */
-.flash{position:absolute; inset:0; background:#fff; opacity:var(--flash); pointer-events:none}
+.flash{position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none}
 
 /* 타이틀·스크롤 안내가 밝은 대리석 바닥 위에 놓여 흰 글자가 묻힌다.
    글자 뒤에만 어두운 그라데이션을 깔아 대비를 만든다. */
 .hero__veil{
   position:absolute; inset:auto 0 0 0; height:46svh; pointer-events:none;
   background:linear-gradient(180deg, rgba(20,16,12,0) 0%, rgba(20,16,12,.42) 55%, rgba(20,16,12,.62) 100%);
-  opacity:clamp(0, calc(1 - var(--p) * 9), 1);
 }
 
 /* 대문 중앙 로고 — 이름을 정보가 아니라 로고처럼 얹는다.
@@ -150,7 +144,7 @@ body{
   /* Drop Shadow — 거리 0 / 번짐 21 / 불투명도 48%.
      CSS 에는 spread 가 없어 짧은 그림자를 겹쳐 퍼짐을 흉내낸다 */
   text-shadow:0 0 21px rgba(0,0,0,.48), 0 0 7px rgba(0,0,0,.34);
-  opacity:clamp(0, calc(1 - var(--p) * 7), 1); will-change:opacity;
+  will-change:opacity;
 }
 /* letter-spacing 은 마지막 글자 뒤에도 붙어 가운데정렬이 왼쪽으로 밀린다 → 상쇄 */
 .hero__logo span{display:block; margin-right:-.05em}
@@ -161,7 +155,6 @@ body{
   position:absolute; inset:auto 0 16svh 0; text-align:center; color:#fff;
   visibility:hidden;                         /* 잠시 감춤 — 되살릴 때 이 줄만 지운다 */
   text-shadow:0 1px 3px rgba(0,0,0,.5), 0 2px 24px rgba(0,0,0,.55);
-  opacity:clamp(0, calc(1 - var(--p) * 9), 1);
 }
 .hero__title .names{font-size:clamp(20px,5.4vw,30px); letter-spacing:.1em; line-height:1.5}
 /* names 의 letter-spacing 이 하트 앞뒤에도 붙는다. 음수 마진으로 상쇄해 이름과 붙임 */
@@ -174,32 +167,35 @@ body{
   position:absolute; left:50%; bottom:calc(100lvh - 96svh); translate:-50% 0;
   display:flex; flex-direction:column; align-items:center; gap:10px;
   color:#fff; text-shadow:0 2px 16px rgba(0,0,0,.45);
-  opacity:clamp(0, calc(1 - var(--p) * 12), 1); will-change:opacity;
+  will-change:opacity;
 }
 .hint__box{
   position:relative; width:25px; height:40px;
   border:1px solid rgba(255,255,255,.9); border-radius:4px; overflow:hidden;
 }
 .hint__dot{
-  position:absolute; left:50%; width:8px; height:8px; margin-left:-4px;
+  position:absolute; left:50%; top:0; width:8px; height:8px; margin-left:-4px;
   border-radius:50%; background:#fff;
   animation:scrollDot 1.5s linear infinite;
 }
-/* 끝점의 opacity 0 = 위에 닿은 점이 아래로 순간이동하는 것이 안 보이게 */
+/* 끝점의 opacity 0 = 위에 닿은 점이 아래로 순간이동하는 것이 안 보이게.
+   40px = .hint__box 높이. top 대신 transform 을 움직여 배치 계산을 일으키지 않는다 */
 @keyframes scrollDot{
-  0%{top:100%; opacity:0}
+  0%{transform:translateY(40px); opacity:0}
   18%{opacity:1}
   82%{opacity:1}
-  100%{top:0; opacity:0}
+  100%{transform:translateY(0); opacity:0}
 }
+/* 문이 열리기 시작하면 안내가 사라지므로 애니메이션도 멈춘다 */
+.hero[data-open="1"] .hint__dot{animation:none}
 .hint__label{font-size:13px; letter-spacing:.02em}
 
 /* 문 열린 뒤 아래에서 올라오는 화면 */
 .reveal{
   position:absolute; inset:0; display:grid; place-items:center;
   background:linear-gradient(180deg,#fff 0%, #fdfbf8 100%);
-  opacity:var(--revealOp);
-  transform:translateY(calc(var(--rise) * 34svh));
+  opacity:0;
+  transform:translateY(34svh);
   will-change:transform,opacity;
   /* .hint 뒤에 놓여 화면 전체를 덮으므로, 이게 없으면 안내 문구를 탭할 수 없다 */
   pointer-events:none;
@@ -516,7 +512,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 }
 .toast.is-on{opacity:1}
 
-@media (prefers-reduced-motion: reduce){ .rv{opacity:1; transform:none; transition:none} }
+@media (prefers-reduced-motion: reduce){ .rv{opacity:1; transform:none; transition:none} .hint__dot{animation:none} }
 
 /* 배경음악 토글 — 모바일 브라우저는 사용자가 화면을 건드리기 전에는 소리를 못 낸다.
    그래서 첫 탭·스크롤 때 재생을 시도하고, 이 버튼으로 언제든 끌 수 있게 한다 */
@@ -563,6 +559,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 <!-- HERO : 스크롤 → 문 열림 → 화이트아웃 → 아래에서 상승 -->
 <div class="hero" id="hero">
   <div class="hero__sticky">
+    <i class="svh-probe" aria-hidden="true"></i>
     <div class="stage">
       <div class="photo">
         <img class="photo__frame" src="assets/hero/frame.jpg" alt="" fetchpriority="high">
@@ -928,21 +925,34 @@ function initKakaoMap() {
   // 나뭇결 판문이라 티가 나지 않고, 활짝 젖혀진 문으로 읽힌다.
   const MAX_DEG = 110;
 
-  // 휠 한 칸이 100px 가까이 점프하므로 스크롤값을 그대로 쓰면 각도가 계단처럼 튄다.
-  // 목표값과 현재값을 시간 기반 지수보간으로 따라가게 해 프레임 사이를 메운다.
+  // 지수보간 = 데스크톱 휠 전용. 휠 한 칸이 100px 가까이 점프해 각도가 계단처럼 튀는 것을 메운다.
+  // 손가락 스크롤은 값이 연속이라 메울 것이 없고 지연만 생긴다. 그 지연이 아이폰에서
+  // 각도가 멈칫했다 따라붙기를 반복하는 떨림으로 보이므로 터치 기기에서는 끈다.
   const TAU = 90;   // ms — 작을수록 즉각적, 클수록 부드럽지만 지연
+  const coarse = matchMedia('(hover:none) and (pointer:coarse)').matches;
   const smooth = !matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  let targetP = 0, curP = 0, last = 0, raf = 0;
+  let targetP = 0, curP = 0, last = 0, raf = 0, idle = 0;
 
   const sticky = hero.querySelector('.hero__sticky');
+  const probe = hero.querySelector('.svh-probe');
+  // 연출값을 받는 요소들. #hero 에 상속 변수를 쓰면 첫 화면 전체가 매 프레임 다시 계산된다
+  const doorL = hero.querySelector('.door--l');
+  const doorR = hero.querySelector('.door--r');
+  const flashEl = hero.querySelector('.flash');
+  const revealEl = hero.querySelector('.reveal');
+  const veil = hero.querySelector('.hero__veil');
+  const logo = hero.querySelector('.hero__logo');
+  const hintEl = hero.querySelector('.hint');
+  const swing = parseFloat(getComputedStyle(hero).getPropertyValue('--swing')) || -1;
   // 스크롤할 때마다 재면 그때마다 배치 계산이 강제로 일어나 프레임이 밀린다.
   // 두 값 모두 svh·lvh 기준이라 주소창이 접혀도 변하지 않으므로 화면 크기가 바뀔 때만 다시 잰다
-  let heroTop = 0, heroRange = 1;
+  let heroTop = 0, heroRange = 1, riseDist = 0;
   function measure() {
     heroTop = hero.getBoundingClientRect().top + window.scrollY;
     // innerHeight 를 쓰면 iOS 에서 주소창이 접히는 동안 분모가 프레임마다 변해 p 가 앞뒤로 튄다
     heroRange = Math.max(1, hero.offsetHeight - sticky.offsetHeight);
+    riseDist = probe.offsetHeight;
   }
   function readTarget() {
     targetP = clamp01((window.scrollY - heroTop) / heroRange);
@@ -953,28 +963,44 @@ function initKakaoMap() {
     const f = seg(p, FLASH[0], FLASH[1]);
     const s = easeOut(seg(p, RISE[0], RISE[1]));
 
-    hero.style.setProperty('--p', p.toFixed(4));
-    hero.style.setProperty('--theta', (o * MAX_DEG).toFixed(3) + 'deg');
-    hero.style.setProperty('--shade', (o * 0.38).toFixed(4));
-    hero.style.setProperty('--flash', f.toFixed(4));
-    hero.style.setProperty('--rise', (1 - s).toFixed(4));
-    hero.style.setProperty('--revealOp', clamp01(s * 1.6).toFixed(4));
+    const deg = o * MAX_DEG;
+    doorL.style.transform = 'rotateY(' + (swing * deg).toFixed(3) + 'deg)';
+    doorR.style.transform = 'rotateY(' + (-swing * deg).toFixed(3) + 'deg)';
+    const shade = (o * 0.38).toFixed(4);
+    doorL.style.setProperty('--shade', shade);
+    doorR.style.setProperty('--shade', shade);
+    flashEl.style.opacity = f.toFixed(4);
+    revealEl.style.opacity = clamp01(s * 1.6).toFixed(4);
+    revealEl.style.transform = 'translateY(' + ((1 - s) * riseDist).toFixed(1) + 'px)';
+    veil.style.opacity = clamp01(1 - p * 9).toFixed(4);
+    logo.style.opacity = clamp01(1 - p * 7).toFixed(4);
+    hintEl.style.opacity = clamp01(1 - p * 12).toFixed(4);
+
+    // 안내 점의 무한 애니메이션 정지용. 값이 바뀔 때만 써야 매 프레임 DOM 쓰기가 되지 않는다
+    const open = p > 0.09 ? '1' : '0';
+    if (hero.dataset.open !== open) hero.dataset.open = open;
   }
 
   function tick(now) {
+    // 스크롤 위치를 이벤트가 아니라 매 프레임 직접 읽는다. iOS 는 스크롤 이벤트를
+    // 매 프레임 주지 않으므로 이벤트에만 기대면 걸러진 프레임에서 각도가 멈춘다.
+    readTarget();
     const dt = last ? Math.min(now - last, 64) : 16;
     last = now;
-    const k = 1 - Math.exp(-dt / TAU);
-    curP += (targetP - curP) * k;
-
-    if (Math.abs(targetP - curP) < 0.00015) { curP = targetP; raf = 0; last = 0; apply(curP); return; }
+    curP += (targetP - curP) * (coarse ? 1 : 1 - Math.exp(-dt / TAU));
     apply(curP);
+
+    // 변화가 없어도 12프레임은 더 돌린 뒤 멈춘다 — 이벤트가 안 온 프레임과 진짜 정지를 구분
+    if (Math.abs(targetP - curP) < 0.00015) {
+      curP = targetP;
+      if (++idle > 12) { raf = 0; last = 0; idle = 0; return; }
+    } else idle = 0;
     raf = requestAnimationFrame(tick);
   }
 
   function onScroll() {
-    readTarget();
-    if (!smooth) { curP = targetP; apply(curP); return; }
+    if (!smooth) { readTarget(); curP = targetP; apply(curP); return; }
+    idle = 0;
     if (!raf) { last = 0; raf = requestAnimationFrame(tick); }
   }
 
