@@ -310,6 +310,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 /* 본문 사진 한 장 — 좌우 여백 안에 원본 비율 그대로 */
 .photo-in{margin:28px 0 0}
 .photo-in img{width:100%; height:auto; display:block; border-radius:4px}
+/* 지연 로딩 사진은 width/height 속성으로 자리를 미리 잡는다 (없으면 로드 순간 내용이 밀린다) */
 
 /* 갤러리 — 참고안과 같은 2열 · 8:9 · 둥근 모서리. 접힌 상태에서는 6장 + 아래 흐림 */
 .thumbs{position:relative; display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:10px}
@@ -591,7 +592,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
         <div class="reveal__inner">
           <div class="reveal__date">2026 &nbsp;|&nbsp; 11 &nbsp;|&nbsp; 14</div>
           <div class="reveal__our">Our<br>Wedding</div>
-          <img class="reveal__photo" src="assets/photo/cover.jpg" alt="신랑신부">
+          <img class="reveal__photo" src="assets/photo/cover.jpg" alt="신랑신부" width="940" height="1411">
           <div class="reveal__cap">2026년 11월 14일 토요일 오후 6시 30분<br>토브헤세드</div>
           <div class="reveal__sub">Tov Hesed</div>
         </div>
@@ -610,7 +611,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
     이제 두 사람의 길이 하나가 됩니다.<br>
     그 시작을 함께 축복해주세요.
   </p>
-  <div class="photo-in"><img src="assets/photo/invite.jpg" alt="" loading="lazy"></div>
+  <div class="photo-in"><img src="assets/photo/invite.jpg" alt="" width="1000" height="604" loading="lazy"></div>
 
   <div class="parents">
     <p>박종화 &middot; 모복심 <span class="rel">의 장남</span> <b>유찬</b></p>
@@ -638,9 +639,9 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   <div class="kicker">Introduction</div>
   <h2 class="couple"><b>신랑 &amp; 신부를 소개합니다.</b></h2>
   <div class="intro__pics">
-    <img src="assets/photo/groom.jpg" alt="신랑 어린 시절" loading="lazy">
+    <img src="assets/photo/groom.jpg" alt="신랑 어린 시절" width="400" height="400" loading="lazy">
     <span class="heart">&hearts;</span>
-    <img src="assets/photo/bride.jpg" alt="신부 어린 시절" loading="lazy">
+    <img src="assets/photo/bride.jpg" alt="신부 어린 시절" width="400" height="400" loading="lazy">
   </div>
   <div class="intro">
     <div class="who">
@@ -679,7 +680,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   <p class="addr">서울 강남구 도산대로38길 32<br>토브헤세드</p>
   <div class="map">
     <div class="map__kakao" id="kakaoMap"></div>
-    <img class="map__fallback" src="assets/photo/map-naver.jpg" alt="토브헤세드 위치 — 언북중학교 옆, 학동역 10번 출구 도보 5분" loading="lazy">
+    <img class="map__fallback" src="assets/photo/map-naver.jpg" alt="토브헤세드 위치 — 언북중학교 옆, 학동역 10번 출구 도보 5분" width="690" height="600" loading="lazy">
   </div>
   <div class="maplinks">
     <button type="button" class="maplink" data-app="naver"><img src="assets/photo/ico-naver.png" alt="">네이버 지도</button>
@@ -718,7 +719,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
     <button type="button" role="tab" aria-selected="false" data-tab="shuttle">셔틀 안내</button>
   </div>
   <div class="tabpanel" role="tabpanel" data-tab="cookie">
-    <div class="photo-in"><img src="assets/photo/info-cookie.jpg" alt="식전 쿠키" loading="lazy"></div>
+    <div class="photo-in"><img src="assets/photo/info-cookie.jpg" alt="식전 쿠키" width="1000" height="600" loading="lazy"></div>
     <p class="body">
       식 전 간단히 즐기실 수 있도록<br>
       <b>간단한 쿠키를 준비해 두었습니다.</b><br>
@@ -729,7 +730,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
     </p>
   </div>
   <div class="tabpanel" role="tabpanel" data-tab="shuttle" hidden>
-    <div class="photo-in"><img src="assets/photo/info-shuttle.jpg" alt="셔틀버스" loading="lazy"></div>
+    <div class="photo-in"><img src="assets/photo/info-shuttle.jpg" alt="셔틀버스" width="1000" height="600" loading="lazy"></div>
     <p class="body">
       <b>7호선 학동역 10번 출구에서</b><br>
       <b>예식 1시간 전부터 셔틀버스를 운행합니다.</b><br>
