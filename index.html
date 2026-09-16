@@ -242,6 +242,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
   border:1px solid rgba(58,53,47,.75); border-radius:4px;
   background:var(--ink); color:var(--paper);
   font-family:inherit; font-size:14px; letter-spacing:.14em; cursor:pointer;
+  text-align:center; text-decoration:none;   /* a 태그로도 쓴다 */
   -webkit-tap-highlight-color:transparent; transition:opacity .2s ease;
 }
 .btn-primary:active{opacity:.78}
@@ -465,6 +466,15 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 .tag--green{background:#4a972e}
 .tag--red{background:#e02b2b}
 .tag--7{background:#7f9e1a}
+/* 교통 안내 안의 예식장 블로그 링크 */
+.waylinks{margin-top:6px}
+.waylink{display:inline-flex; align-items:center; gap:7px; margin:8px 8px 0 0; padding:6px 11px;
+  border:1px solid rgba(58,53,47,.35); border-radius:2px;
+  font-size:12.5px; line-height:1.5; letter-spacing:.02em; color:inherit; text-decoration:none;
+  -webkit-tap-highlight-color:transparent}
+.waylink::after{content:""; width:5px; height:5px; opacity:.6;
+  border-right:1px solid currentColor; border-bottom:1px solid currentColor; transform:rotate(-45deg)}
+.waylink:active{background:rgba(58,53,47,.06)}
 
 /* 안내사항 탭 */
 .tabs{display:flex; justify-content:center; gap:0; margin-top:-8px;
@@ -733,12 +743,19 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
     <div class="way__grp">
       <b>지하철 이용시</b>
       <p><span class="tag tag--7">지하철 7호선</span>학동역 10번 출구 (서울세관방면) 셔틀버스 이용 또는 도보 5분</p>
+      <p class="waylinks">
+        <a class="waylink" href="https://m.site.naver.com/20Xcn" target="_blank" rel="noopener">평지 도보 안내</a>
+        <a class="waylink" href="https://m.site.naver.com/20XcK" target="_blank" rel="noopener">셔틀 안내</a>
+      </p>
     </div>
     <div class="way__grp">
       <b>자가용 이용시</b>
       <p>네비게이션: <strong>&ldquo;토브헤세드&rdquo;</strong> 또는 <strong>&ldquo;언북중학교&rdquo;</strong> 검색</p>
       <p>도로명주소: 서울특별시 강남구 논현2동 도산대로 38길 32</p>
       <p>주차장 안내: 주차요원의 안내를 받으세요.</p>
+      <p class="waylinks">
+        <a class="waylink" href="https://m.site.naver.com/20XcB" target="_blank" rel="noopener">식장 주차 안내</a>
+      </p>
     </div>
   </details>
 </section>
@@ -754,9 +771,8 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
     <div class="photo-in"><img src="assets/photo/info-cookie.jpg" alt="식전 쿠키" width="1000" height="600" loading="lazy"></div>
     <p class="body">
       식 전 간단히 즐기실 수 있도록<br>
-      <b>간단한 쿠키를 준비해 두었습니다.</b><br>
-      편하게 오셔서 맛있게 즐겨주세요 &#129293;<br><br>
-      신부대기실은 <b>오후 6시 15분에 마감됩니다.</b><br>
+      <b>간단한 쿠키가 준비되어 있습니다.</b><br><br>
+      신부대기실은 <b>오후 6시 20분에 마감됩니다.</b><br>
       신랑&middot;신부와 함께 사진을 남기고 싶으신 분들은<br>
       <b>오후 6시까지</b> 와주시면 감사하겠습니다 :)
     </p>
@@ -770,6 +786,7 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
       식장까지 편하게 이동하실 수 있도록<br>
       가급적 셔틀버스를 이용해 주세요. &#129293;
     </p>
+    <a class="btn-line btn-line--narrow" href="https://m.site.naver.com/20XcK" target="_blank" rel="noopener">셔틀 안내 블로그 보기</a>
   </div>
 </section>
 
