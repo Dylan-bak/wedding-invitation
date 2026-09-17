@@ -1,9 +1,8 @@
 // 배포본 식별값을 index.html 과 assets/version.txt 에 같이 심는다.
-// 두 값이 어긋나면 페이지가 스스로 새 주소로 한 번 다시 받는다 (README §4 「하객 화면이 옛 내용일 때」).
+// 두 값이 어긋나면 페이지가 스스로 새 주소로 한 번 다시 받는다 (README §9).
 //
 // 사용: node tools/build-version.mjs [--assets]
 //   --assets = 사진·아이콘·음악 주소에도 ?v= 를 붙인다. 자산 파일을 교체했을 때만 쓴다
-//              (붙이면 이미 받아둔 하객도 사진 4.3MB 를 다시 받는다)
 import fs from 'fs';
 
 const ROOT = 'D:/Projects/Dylan/wed';

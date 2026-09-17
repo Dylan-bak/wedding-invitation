@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
 <!-- 하객이 받은 주소는 바꿀 수 없다. 배포본 번호가 서버와 다르면 ?v= 를 붙인 새 주소로 한 번만 다시 받는다.
-     두 값은 node tools/build-version.mjs 가 같이 심는다. 배경 = README §4 배포본 번호 갱신 -->
+     두 값은 node tools/build-version.mjs 가 같이 심는다. 배경 = README §9 -->
 <script>
-window.BUILD = '20260917-115639';
+window.BUILD = '20260917-120613';
 (function () {
   fetch('assets/version.txt?t=' + Date.now(), { cache: 'no-store' })
     .then(function (r) { return r.ok ? r.text() : ''; })
