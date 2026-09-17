@@ -3,6 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<!-- 하객이 받은 주소는 바꿀 수 없다. 배포본 번호가 서버와 다르면 ?v= 를 붙인 새 주소로 한 번만 다시 받는다.
+     두 값은 node tools/build-version.mjs 가 같이 심는다. 배경 = README §4 배포본 번호 갱신 -->
+<script>
+window.BUILD = '20260917-113901';
+(function () {
+  fetch('assets/version.txt?t=' + Date.now(), { cache: 'no-store' })
+    .then(function (r) { return r.ok ? r.text() : ''; })
+    .then(function (v) {
+      v = (v || '').trim();
+      if (!v || v === window.BUILD) return;
+      if (new URLSearchParams(location.search).get('v') === v) return;   // 이 줄이 무한 새로고침을 막는다
+      location.replace(location.pathname + '?v=' + encodeURIComponent(v) + location.hash);
+    })
+    .catch(function () {});
+})();
+</script>
 <title>유찬💕혜진 결혼합니다</title>
 <meta name="description" content="2026년 11월 14일 토요일 오후 6시 30분, 토브헤세드에서 저희 두 사람이 결혼합니다.">
 
@@ -1070,6 +1087,7 @@ function initKakaoMap() {
 
   const thumbs = document.getElementById('thumbs');   // 썸네일은 HTML 에 고정 (자리를 미리 잡으려고)
 
+  const ASSET_V = '';   // tools/build-version.mjs --assets 가 채운다 (자산 교체 시에만)
   const lb = document.getElementById('lb');
   const lbImg = document.getElementById('lbImg');
   const lbCount = document.getElementById('lbCount');
@@ -1077,7 +1095,7 @@ function initKakaoMap() {
 
   const show = i => {
     cur = (i + GALLERY_COUNT) % GALLERY_COUNT;      // 끝에서 처음으로 이어짐
-    lbImg.src = `assets/photo/f${pad(cur + 1)}.jpg`;
+    lbImg.src = `assets/photo/f${pad(cur + 1)}.jpg${ASSET_V}`;
     lbCount.textContent = `${cur + 1} / ${GALLERY_COUNT}`;
   };
 

@@ -22,6 +22,13 @@ await page.goto(URL, { waitUntil: 'networkidle0' });
 // 문 열림 구간(진행률 0.10~0.62)을 실제 휠 스크롤로 통과시키며 프레임 간격 기록
 const result = await page.evaluate(async () => {
   const hero = document.getElementById('hero');
+  // 각도는 스크립트가 문짝 인라인 style 에 직접 쓴다 (CSS 변수 경로는 떨림 때문에 폐기)
+  const doorL = hero.querySelector('.door--l');
+  const readTheta = () => {
+    const t = doorL.style.transform || '';
+    const i = t.indexOf('rotateY(');
+    return i < 0 ? 0 : Math.abs(parseFloat(t.slice(i + 8)));
+  };
   const total = hero.offsetHeight - innerHeight;
   const from = Math.round(total * 0.08);
   const to = Math.round(total * 0.66);
@@ -32,8 +39,7 @@ const result = await page.evaluate(async () => {
   const frames = [];   // {t, theta}
   let stop = false;
   const rec = t => {
-    const th = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--theta'));
-    frames.push({ t, th });
+    frames.push({ t, th: readTheta() });
     if (!stop) requestAnimationFrame(rec);
   };
   requestAnimationFrame(rec);
@@ -83,8 +89,11 @@ if (SHOTS) {
     await new Promise(r => setTimeout(r, 500));
     const name = `tools/shots/p${String(Math.round(p * 100)).padStart(2, '0')}.png`;
     await page.screenshot({ path: name });
-    const th = await page.evaluate(() =>
-      getComputedStyle(document.documentElement).getPropertyValue('--theta').trim());
+    const th = await page.evaluate(() => {
+      const t = document.querySelector('.door--l').style.transform || '';
+      const i = t.indexOf('rotateY(');
+      return i < 0 ? '0' : Math.abs(parseFloat(t.slice(i + 8))).toFixed(2);
+    });
     console.log(name, 'theta=' + th);
   }
 }
