@@ -503,7 +503,7 @@ GEMINI_API_KEY=... node tools/vertex-image.mjs assets/gen-gate.png "<프롬프�
 **지금 쓰는 방식 = GitHub Pages.** 완전 무료 + 가장 쉬움. AWS 는 학습 목적이거나 접속 로그·세밀한 캐시 제어가 필요할 때만.
 
 빌드·서버 로직이 없는 순수 정적 사이트 → 정적 호스팅 아무 곳이나 가능.
-**올릴 것은 `index.html` + `assets/hero` + `assets/photo` + `assets/qr.*` 뿐.**
+**올릴 것은 `index.html` + `assets/version.txt` + `assets/hero` + `assets/photo` + `assets/qr.*` 뿐. `version.txt` 가 없으면 페이지의 자기 갱신 검사가 실패해 하객 화면이 옛 내용으로 남는다.**
 `assets/origin/`(촬영 원본, git 제외)과 `tools/` 는 자산 재생성용이라 배포 대상이 아니다.
 
 | # | 방식 | 비용 | 세팅 | HTTPS | 자동배포 | 판정 |
@@ -514,14 +514,42 @@ GEMINI_API_KEY=... node tools/vertex-image.mjs assets/gen-gate.png "<프롬프�
 | 9-4 | S3 단독 | 월 0.1 USD | 10분 | X (http 만) | 수동 sync | 비권장 |
 | 9-4 | Lightsail · EC2 + nginx | 월 3.5~5 USD | 30분+ | O | 수동 | 비권장 |
 
+### 고친 뒤 다시 올릴 때 (매번 이 순서)
+
+1. 배포본 번호 갱신 — 빼먹으면 이미 링크를 받은 하객 화면이 옛 내용으로 남는다
+
+   ```bash
+   node tools/build-version.mjs
+   ```
+
+   사진·아이콘·음악 파일을 교체했을 때만 (이유 = §4 배포본 번호 갱신)
+
+   ```bash
+   node tools/build-version.mjs --assets
+   ```
+
+2. commit·push
+
+   ```bash
+   git add -A && git commit -m "<무엇을 고쳤는지>" && git push origin main
+   ```
+
+3. 1~2분 뒤 반영. 실제로 올라갔는지 숫자로 확인
+
+   ```bash
+   curl -s https://dylan-bak.github.io/wedding-invitation/assets/version.txt
+   ```
+
+   여기서 나온 번호가 방금 심은 번호(`assets/version.txt` 내용)와 같으면 반영 완료. 다르면 아직 배포 중이니 30초 뒤 다시.
+
 ### 9-1. GitHub Pages — 무료 · 가장 쉬움
 
 저장소가 **public** 이어야 무료다. private 이면 GitHub Pro 필요.
 
-1. 저장소에 push
+1. 배포본 번호를 심고 저장소에 push
 
    ```bash
-   git push -u origin main
+   node tools/build-version.mjs && git add -A && git push -u origin main
    ```
 
 2. GitHub 저장소 → **Settings** → 좌측 **Pages**

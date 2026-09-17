@@ -7,7 +7,7 @@
 <!-- 하객이 받은 주소는 바꿀 수 없다. 배포본 번호가 서버와 다르면 ?v= 를 붙인 새 주소로 한 번만 다시 받는다.
      두 값은 node tools/build-version.mjs 가 같이 심는다. 배경 = README §4 배포본 번호 갱신 -->
 <script>
-window.BUILD = '20260917-113901';
+window.BUILD = '20260917-115639';
 (function () {
   fetch('assets/version.txt?t=' + Date.now(), { cache: 'no-store' })
     .then(function (r) { return r.ok ? r.text() : ''; })
@@ -443,12 +443,12 @@ footer .credit{margin-top:1.6em; font-size:11px; letter-spacing:.24em}
 .intro__pics img{width:min(36vw,150px); height:auto; aspect-ratio:1; object-fit:cover; border-radius:50%}
 .intro__pics .heart{font-size:18px}
 .intro{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:22px}
-.who__role{font-family:"Cormorant Garamond",serif; letter-spacing:.3em; font-size:14px; opacity:.6}
-.who__name{margin-top:4px; font-size:17px; font-weight:600; letter-spacing:.3em}
-.who__tag{display:inline-block; margin-top:10px; padding:4px 12px; border-radius:99px; font-size:11px; letter-spacing:.04em; font-weight:600}
+.who__role{font-family:"Cormorant Garamond",serif; letter-spacing:.3em; font-size:13px; opacity:.6}
+.who__name{margin-top:4px; font-size:16px; font-weight:600; letter-spacing:.3em}
+.who__tag{display:inline-block; margin-top:10px; padding:4px 12px; border-radius:99px; font-size:10px; letter-spacing:.04em; font-weight:600}
 .who__tag--g{background:#d4efff; color:#1fa9f5}
 .who__tag--b{background:#ffe1e6; color:#f0648a}
-.who ul{list-style:none; margin-top:14px; font-size:13.5px; line-height:1.95; opacity:.85}
+.who ul{list-style:none; margin-top:14px; font-size:12.5px; line-height:1.85; opacity:.85}
 
 /* 오시는 길 — 주소 · 지도 · 앱 버튼 · 교통 안내 */
 .addr{margin:-6px 0 22px; font-size:15px; line-height:1.9; letter-spacing:.02em}
