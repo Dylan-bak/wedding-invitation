@@ -7,7 +7,7 @@
 <!-- 하객이 받은 주소는 바꿀 수 없다. 배포본 번호가 서버와 다르면 ?v= 를 붙인 새 주소로 한 번만 다시 받는다.
      두 값은 node tools/build-version.mjs 가 같이 심는다. 배경 = README §9 -->
 <script>
-window.BUILD = '20260917-120613';
+window.BUILD = '20261002-161943';
 (function () {
   fetch('assets/version.txt?t=' + Date.now(), { cache: 'no-store' })
     .then(function (r) { return r.ok ? r.text() : ''; })
@@ -48,7 +48,7 @@ window.BUILD = '20260917-120613';
   --door-l: 17.429%;  --door-r: 82.214%;
   --door-t: 19.062%;  --door-b: 76.889%;
   --door-c: 50.000%;
-  --ink:#3a352f; --paper:#ffffff;   /* 참고안 사진 배경이 흰색이라 바탕도 흰색이어야 사진이 사각형으로 뜨지 않는다 */
+  --ink:#3a352f; --paper:#ffffff;   /* 바꾸면 사진 가장자리가 바탕과 달라 사각형으로 드러난다 (README §10 T4) */
   --shade:0;        /* 문짝 그늘 — ::after 가 읽으므로 변수로 남긴다. 나머지 연출값은 JS 가 요소에 직접 쓴다 */
   --swing:-1;       /* 1 = 안쪽으로 열림, -1 = 바깥쪽(보는 사람 쪽)으로 열림 */
   --shift-x:0.35%;  /* 첫 화면 좌우 이동. 사진 폭 기준 %, +면 오른쪽. 390px 화면에서 0.35% = 2px */
@@ -1248,12 +1248,11 @@ function initKakaoMap() {
   })();
 
   const rsvp = document.getElementById('rsvp');
-  const rsvpSection = document.getElementById('rsvpSection');
 
-  if (!RSVP_ENDPOINT) rsvp.hidden = true;   // 주소가 없으면 팝업도 DOM 에서 감춘다
+  // 주소가 없으면 팝업만 감춘다. 절까지 감추면 높이가 바뀌어 위로 스크롤할 때 화면이 튄다
+  if (!RSVP_ENDPOINT) rsvp.hidden = true;
 
   if (RSVP_ENDPOINT) {
-    rsvpSection.hidden = false;   // HTML 에서 이미 보이는 상태. 주소가 없을 때만 아래에서 감춘다
 
     const form = document.getElementById('rsvpForm');
     const msg = document.getElementById('rsvpMsg');
